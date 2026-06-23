@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWP · Прогнозное планирование персонала</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14171c; --ink2:#1c2128; --ink3:#262c35;
+  --paper:#f4f1ea; --surface:#ffffff; --surface2:#fbfaf6;
+  --line:#e4ded1; --line2:#efeae0; --linedk:rgba(255,255,255,.09);
+  --t1:#1b1f24; --t2:#5c6470; --t3:#8d96a2;
+  --primary:#0f766e; --primary-d:#0c5d57; --primary-l:#e2f1ef;
+  --gold:#c08a2d; --gold-l:#f7eede;
+  --red:#c4361b; --red-l:#fbe9e4; --red-bd:#f0c9bf;
+  --green:#117a5b; --green-l:#e2f3ec; --green-bd:#bfe3d3;
+  --amber:#b07d12; --amber-l:#f9efd4; --amber-bd:#ecd79a;
+  --blue:#1f5fa6; --blue-l:#e6eef8;
+  --purple:#6b4fa0; --purple-l:#ece6f6;
+  --radius:14px; --shadow:0 1px 2px rgba(20,23,28,.04),0 6px 24px -12px rgba(20,23,28,.18);
+  --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+  --sans:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--sans); color:var(--t1); background:var(--paper);
+  -webkit-font-smoothing:antialiased; font-size:14px; line-height:1.45;
+  background-image:radial-gradient(rgba(20,23,28,.018) 1px,transparent 1px);
+  background-size:22px 22px;
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tnum{font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{letter-spacing:-.01em;line-height:1.15}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select{font-family:inherit;font-size:14px;color:var(--t1)}
+input:focus,select:focus{outline:none}
+.app{min-height:100%;display:flex;flex-direction:column}
+
+/* ---------- HEADER ---------- */
+header{position:sticky;top:0;z-index:30;background:var(--ink);color:#fff;
+  border-bottom:1px solid var(--linedk);box-shadow:0 8px 30px -18px rgba(0,0,0,.6)}
+.hdr-in{max-width:1320px;margin:0 auto;padding:14px 22px;display:flex;gap:20px;
+  align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(150deg,var(--primary),var(--primary-d));
+  border:1px solid rgba(255,255,255,.14);box-shadow:0 4px 14px -4px rgba(15,118,110,.6)}
+.logo svg{width:22px;height:22px;stroke:#fff}
+.brand h1{font-size:17px;font-weight:800;letter-spacing:.2px}
+.brand .sub{font-family:var(--mono);font-size:9.5px;letter-spacing:2.4px;
+  text-transform:uppercase;color:var(--primary-l);opacity:.85;margin-top:2px}
+.tabs{display:flex;gap:4px;background:var(--ink2);padding:5px;border-radius:13px;
+  border:1px solid var(--linedk);overflow-x:auto}
+.tab{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;
+  font-size:12.5px;font-weight:700;color:#9aa3b0;white-space:nowrap;transition:.18s}
+.tab svg{width:15px;height:15px;stroke:currentColor;flex-shrink:0}
+.tab:hover{color:#fff;background:var(--ink3)}
+.tab.active{background:var(--primary);color:#fff;box-shadow:0 3px 10px -3px rgba(15,118,110,.7)}
+.hbtn{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:10px;
+  font-size:12.5px;font-weight:700;color:#c3cad4;background:var(--ink2);
+  border:1px solid var(--linedk);transition:.18s}
+.hbtn svg{width:15px;height:15px;stroke:currentColor}
+.hbtn:hover{color:#fff;background:var(--ink3)}
+
+/* ---------- LAYOUT ---------- */
+main{flex:1;padding:26px 22px 60px}
+.wrap{max-width:1320px;margin:0 auto}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;
+  flex-wrap:wrap;padding-bottom:18px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.pagehead h2{font-size:23px;font-weight:800;color:var(--ink)}
+.pagehead .lead{color:var(--t2);font-size:13.5px;margin-top:5px;max-width:640px}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--primary);font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:7px}
+.eyebrow::before{content:"";width:18px;height:2px;background:var(--primary);display:inline-block}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.tool{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;
+  font-size:12.5px;font-weight:700;background:var(--surface);border:1px solid var(--line);
+  color:var(--t1);box-shadow:var(--shadow);transition:.15s}
+.tool svg{width:15px;height:15px;stroke:currentColor}
+.tool:hover{border-color:var(--primary);color:var(--primary)}
+.tool.red{background:var(--red-l);border-color:var(--red-bd);color:var(--red)}
+.tool.red:hover{background:#f8ddd5}
+
+.grid{display:grid;gap:18px}
+.g12{grid-template-columns:repeat(12,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1080px){.g12,.g3,.g2{grid-template-columns:1fr}.col-span-4,.col-span-8,.col-span-7,.col-span-5{grid-column:auto!important}}
+.col-span-4{grid-column:span 4}.col-span-5{grid-column:span 5}
+.col-span-7{grid-column:span 7}.col-span-8{grid-column:span 8}
+
+/* ---------- CARDS ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow);position:relative}
+.card.flush{padding:0;overflow:hidden}
+.card.dark{background:var(--ink);color:#fff;border-color:var(--ink3)}
+.card.accent{border-top:3px solid var(--primary)}
+.card.accent-p{border-top:3px solid var(--purple)}
+.card.accent-g{border-top:3px solid var(--gold)}
+.ctitle{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:800;
+  color:var(--ink);padding-bottom:13px;margin-bottom:16px;border-bottom:1px solid var(--line2)}
+.card.dark .ctitle{color:#fff;border-color:var(--ink3)}
+.ctitle svg{width:18px;height:18px;stroke:var(--primary)}
+.ctitle .sp{margin-left:auto}
+
+/* ---------- FORM ---------- */
+.field{margin-bottom:16px}
+.flabel{display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;
+  color:var(--t1);margin-bottom:7px}
+.input,.select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface);font-weight:600;transition:.15s;color:var(--t1)}
+.input:focus,.select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-l)}
+.select{cursor:pointer;background:var(--surface)}
+.input.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.input.big{font-size:21px;font-weight:800;font-family:var(--mono);padding:13px}
+.rowflex{display:flex;gap:8px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;
+  border-radius:5px;background:var(--line);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;
+  border-radius:50%;background:var(--primary);border:2.5px solid #fff;
+  box-shadow:0 1px 5px rgba(15,118,110,.5);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;
+  background:var(--primary);border:2.5px solid #fff;cursor:pointer}
+input[type=range].rp::-webkit-slider-thumb{background:var(--purple)}
+input[type=range].rp::-moz-range-thumb{background:var(--purple)}
+
+/* hint tooltip */
+.hint{position:relative;display:inline-grid;place-items:center;width:16px;height:16px;
+  border-radius:50%;background:var(--line2);color:var(--t3);cursor:help;flex-shrink:0}
+.hint svg{width:11px;height:11px;stroke:currentColor}
+.hint:hover{background:var(--primary);color:#fff}
+.hint .tip{position:absolute;bottom:135%;left:50%;transform:translateX(-50%);
+  width:260px;padding:11px 13px;background:var(--ink);color:#eef1f5;font-size:11.5px;
+  font-weight:500;line-height:1.5;border-radius:10px;box-shadow:0 10px 30px -8px rgba(0,0,0,.5);
+  opacity:0;visibility:hidden;transition:.16s;z-index:60;text-align:left;pointer-events:none;
+  letter-spacing:0}
+.hint:hover .tip{opacity:1;visibility:visible;bottom:150%}
+.hint .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--ink)}
+
+/* ---------- BADGES / TAGS ---------- */
+.badge{display:inline-block;padding:3px 8px;border-radius:6px;font-family:var(--mono);
+  font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border:1px solid}
+.b-blue{background:var(--blue-l);color:var(--blue);border-color:#c7dbf2}
+.b-green{background:var(--green-l);color:var(--green);border-color:var(--green-bd)}
+.b-purple{background:var(--purple-l);color:var(--purple);border-color:#d8cdee}
+.b-red{background:var(--red-l);color:var(--red);border-color:var(--red-bd)}
+.b-amber{background:var(--amber-l);color:var(--amber);border-color:var(--amber-bd)}
+.b-gray{background:var(--line2);color:var(--t2);border-color:var(--line)}
+.tag{display:inline-flex;align-items:center;padding:4px 9px;border-radius:7px;font-size:11.5px;
+  font-weight:700;border:1px solid}
+.tag-ok{background:var(--green-l);color:var(--green);border-color:var(--green-bd)}
+.tag-gap{background:var(--red-l);color:var(--red);border-color:var(--red-bd)}
+
+/* ---------- METRICS ---------- */
+.metric{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.metric .mlabel{font-family:var(--mono);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--t2);font-weight:700;margin-bottom:8px}
+.metric .mval{font-size:34px;font-weight:800;font-family:var(--mono);color:var(--ink);line-height:1;
+  font-variant-numeric:tabular-nums}
+.metric .mval small{font-size:14px;font-weight:500;color:var(--t3);font-family:var(--sans)}
+.metric .msub{font-size:11.5px;color:var(--t2);margin-top:7px}
+.metric.gap-pos{background:var(--red-l);border-color:var(--red-bd)}
+.metric.gap-neg{background:var(--green-l);border-color:var(--green-bd)}
+.metric.gap-pos .mval{color:var(--red)} .metric.gap-neg .mval{color:var(--green)}
+
+.kpi{border:1px solid var(--line);border-radius:12px;padding:15px;background:var(--surface)}
+.kpi .kt{font-size:11.5px;font-weight:700;color:var(--t2);display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.kpi .kt svg{width:14px;height:14px}
+.kpi .kv{font-size:27px;font-weight:800;font-family:var(--mono);line-height:1;font-variant-numeric:tabular-nums}
+.kpi .kd{font-size:11px;color:var(--t2);margin-top:8px;line-height:1.45}
+
+/* ---------- TABLE ---------- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ink);color:#dfe4ea;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:1px;text-transform:uppercase;font-weight:700;padding:11px 14px;text-align:left}
+thead th.c{text-align:center} thead th.r{text-align:right}
+tbody td{padding:11px 14px;border-top:1px solid var(--line2)}
+tbody tr:hover{background:var(--surface2)}
+td.c{text-align:center} td.r{text-align:right}
+.grouprow td{background:var(--surface2);font-family:var(--mono);font-size:10px;letter-spacing:.8px;
+  text-transform:uppercase;font-weight:700;color:var(--t2);padding:8px 14px}
+.cell-edit{width:100%;border:none;border-bottom:1.5px solid transparent;background:transparent;
+  padding:4px 2px;font-weight:600}
+.cell-edit:hover{border-bottom-color:var(--line)}
+.cell-edit:focus{border-bottom-color:var(--primary)}
+.dirty td{background:var(--gold-l)!important}
+
+/* ---------- PROGRESS BARS ---------- */
+.bartrack{height:9px;border-radius:9px;background:var(--line2);overflow:hidden}
+.barfill{height:100%;border-radius:9px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+.chip{font-family:var(--mono);font-size:11px;font-weight:600;padding:4px 9px;border-radius:7px;border:1px solid}
+.chip-ok{background:var(--green-l);color:var(--green);border-color:var(--green-bd)}
+.chip-gap{background:var(--red-l);color:var(--red);border-color:var(--red-bd)}
+
+/* note / callout */
+.note{display:flex;gap:10px;padding:13px 15px;border-radius:11px;font-size:12.5px;line-height:1.5;
+  border:1px solid}
+.note svg{width:17px;height:17px;flex-shrink:0;margin-top:1px}
+.note-red{background:var(--red-l);border-color:var(--red-bd);color:#7a2310}
+.note-green{background:var(--green-l);border-color:var(--green-bd);color:#0c4a37}
+.note-blue{background:var(--blue-l);border-color:#c7dbf2;color:#163e6e}
+.note-amber{background:var(--amber-l);border-color:var(--amber-bd);color:#6d4d09}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--t2);font-weight:600;margin-top:6px}
+.legend span{display:flex;align-items:center;gap:6px}
+.swatch{width:13px;height:13px;border-radius:3px;flex-shrink:0}
+.swatch.line{height:3px;width:18px;border-radius:2px}
+
+.muted{color:var(--t2)} .small{font-size:12px}
+.divider{height:1px;background:var(--line2);margin:16px 0}
+.section-label{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--t2);font-weight:700;margin-bottom:10px}
+
+/* toast */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:13px 18px;
+  border-radius:12px;box-shadow:0 16px 40px -12px rgba(0,0,0,.5);display:none;align-items:center;
+  gap:11px;z-index:200;font-size:13px;font-weight:600;border:1px solid var(--ink3);max-width:340px}
+#toast.show{display:flex;animation:slideup .3s cubic-bezier(.2,.8,.2,1)}
+#toast svg{width:18px;height:18px;stroke:var(--green);flex-shrink:0}
+#toast.err svg{stroke:var(--red)}
+#toast.warn svg{stroke:var(--amber)}
+@keyframes slideup{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(20,23,28,.55);backdrop-filter:blur(4px);
+  z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+#modal.show{display:flex}
+.modal-box{background:var(--surface);border-radius:18px;max-width:720px;width:100%;
+  max-height:84vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;
+  border-bottom:1px solid var(--line);background:var(--surface2)}
+.modal-head h3{font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px}
+.modal-head h3 svg{width:21px;height:21px;stroke:var(--primary)}
+.modal-body{padding:20px 24px;overflow-y:auto}
+.gitem{padding:14px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--surface)}
+.gitem .gterm{font-weight:800;color:var(--primary-d);font-size:13.5px;margin-bottom:4px}
+.gitem .gdesc{font-size:13px;color:var(--t2);line-height:1.5}
+.xbtn{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  background:var(--surface);border:1px solid var(--line);color:var(--t2)}
+.xbtn:hover{color:var(--red);border-color:var(--red-bd)}
+.xbtn svg{width:18px;height:18px;stroke:currentColor}
+
+/* animate in */
+.fadein{animation:fadein .4s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+svg.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--mono);fill:var(--t2)}
+.chart .axislbl{font-size:10px}
+.chart .vlbl{font-size:9.5px}
+
+.fnote{font-size:11px;color:var(--t3);margin-top:12px;line-height:1.5;
+  border-left:2px solid var(--line);padding-left:11px}
+
+/* print */
+@media print{
+  body{background:#fff}
+  header,.actions,.hint,.tool,.hbtn,#toast{display:none!important}
+  main{padding:0}
+  .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+  .card.dark{background:#fff!important;color:#000!important}
+  .card.dark *{color:#000!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="hdr-in">
+      <div class="brand">
+        <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></div>
+        <div>
+          <h1>SWP&nbsp;·&nbsp;Кадровый прогноз</h1>
+          <div class="sub">Strategic Workforce Planning</div>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+      <button class="hbtn" id="glossaryBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Глоссарий
+      </button>
+    </div>
+  </header>
+  <main><div class="wrap" id="view"></div></main>
+</div>
+
+<div id="toast"></div>
+<div id="modal"><div class="modal-box">
+  <div class="modal-head">
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Глоссарий терминов и методик</h3>
+    <button class="xbtn" id="modalClose"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="modal-body" id="glossaryBody"></div>
+</div></div>
+
+<input type="file" id="fileImport" accept=".json,.csv" style="display:none">
+
+<script>
+/* ============================================================
+   SWP — Прогнозное планирование персонала (автономная версия)
+   Чистый JS + SVG. Без зависимостей, работает офлайн.
+   ============================================================ */
+</script>
+<script>
+/* ============================================================
+   SWP — Прогнозное планирование персонала
+   Часть 1: данные, состояние, расчётные и прогнозные модели
+   ============================================================ */
+"use strict";
+
+/* ---------------- ИКОНКИ (inline SVG) ---------------- */
+const IC = {
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  layers:'<path d="m12 2 9 5-9 5-9-5 9-5z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/>',
+  brain:'<path d="M12 5a3 3 0 1 0-5.997.142M12 5a3 3 0 1 1 5.997.142M12 5v14M6 8a3 3 0 0 0-1 5.8M18 8a3 3 0 0 1 1 5.8M7.5 14a3 3 0 0 0 4.5 4 3 3 0 0 0 4.5-4"/>',
+  db:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/>',
+  sliders:'<line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/>',
+  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  help:'<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  up:'<path d="m18 15-6-6-6 6"/>', down:'<path d="m6 9 6 6 6-6"/>',
+  arrow:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  trend:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>',
+  dollar:'<line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  plus:'<path d="M5 12h14M12 5v14"/>',
+  trash:'<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  zap:'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  route:'<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+  gauge:'<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>'
+};
+function ic(n,cls){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+(cls?' class="'+cls+'"':'')+'>'+IC[n]+'</svg>';}
+
+/* ---------------- СПРАВОЧНЫЕ ДАННЫЕ ---------------- */
+const GLOSSARY = [
+  {t:'FTE (Full-Time Equivalent)', d:'Эквивалент полной занятости — мера потребности, равная 1 сотруднику на полной ставке. Все расчёты численности ведутся в FTE.'},
+  {t:'GAP / Разрыв', d:'Разница между расчётной потребностью и фактическим штатом. Положительный GAP = дефицит (нужен найм), отрицательный = профицит (переобучение или высвобождение).'},
+  {t:'Прогноз оттока (Attrition)', d:'Экспоненциальная модель убыли персонала. Из годовой текучести выводится месячная вероятность увольнения; численность убывает как (1−ставка)^t.'},
+  {t:'Монте-Карло', d:'Вероятностный прогноз: тысячи сценариев со случайными колебаниями оттока, успешности найма и спроса. Даёт «веер» P10–P50–P90 вместо одной линии.'},
+  {t:'P10 / P50 / P90', d:'Перцентили исходов симуляции. P50 — медиана (срединный сценарий), P10–P90 — коридор, в который попадает 80% исходов. Чем шире коридор, тем выше неопределённость.'},
+  {t:'Survival Analysis (Анализ дожития)', d:'Модель вероятности высвобождения профессии из-за автоматизации. S(t)=exp(−λt), где риск λ выводится из вектора навыков должности, а не задаётся вручную.'},
+  {t:'Hazard / Риск автоматизации', d:'Скорость вытеснения роли технологиями. Считается по навыкам: рутинные операции (обход, замеры) — высокий риск; аналитика, ML, сети — низкий.'},
+  {t:'CBA (Cost-Benefit Analysis)', d:'Сравнение издержек: увольнение + найм с рынка ПРОТИВ внутреннего переобучения. По методологии SHRM найм оценивается в 1.5 оклада, увольнение — в 3.'},
+  {t:'ROI переобучения', d:'Рентабельность вложений в переквалификацию: (Экономия от рескиллинга ÷ Стоимость рескиллинга) × 100%. Положительный ROI = переобучать выгоднее, чем менять людей.'},
+  {t:'Skill Gap Index', d:'Доля недостающих компетенций при переходе между ролями. Чем меньше пересечение навыков, тем дороже и длиннее переобучение.'},
+  {t:'qTrend (кривая этапа)', d:'4 контрольные точки (Q1–Q4), задающие форму потребности внутри фазы жизненного цикла. Например, СМР: всплеск к пику, ПНР: спад к норме эксплуатации.'},
+  {t:'СМР / ПНР', d:'Строительно-монтажные и пуско-наладочные работы — капиталоёмкие начальные фазы жизненного цикла актива с пиковой потребностью в инженерах и рабочих.'}
+];
+
+// headcount — фактическая численность роли (для bus-factor и демографии)
+// avgAge — средний возраст носителей (демографический риск, выход на пенсию)
+// market — дефицитность профессии на рынке труда 0..1 (внешний рыночный риск)
+const INITIAL_PROFESSIONS = {
+  operator:{id:'operator',name:'Оператор технологической установки',type:'core',salary:350000,trainingBase:100000,skillRate:15000,skills:'ТБ;Арматура;Давление;Диагностика',headcount:520,avgAge:44,market:0.45},
+  patrol:{id:'patrol',name:'Оператор-обходчик',type:'core',salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ;Обход;Замеры;Арматура',headcount:380,avgAge:49,market:0.30},
+  driller:{id:'driller',name:'Машинист буровой',type:'core',salary:450000,trainingBase:150000,skillRate:20000,skills:'ТБ;Бурение;Гидравлика;Тяжелая техника',headcount:140,avgAge:47,market:0.65},
+  mechanic:{id:'mechanic',name:'Слесарь ТОиР',type:'aux',salary:300000,trainingBase:90000,skillRate:10000,skills:'ТБ;Чертежи;Инструмент;Механика',headcount:260,avgAge:46,market:0.40},
+  electrician:{id:'electrician',name:'Электромонтёр',type:'aux',salary:320000,trainingBase:90000,skillRate:12000,skills:'ТБ;Электробезопасность;Схемы;КИПиА',headcount:180,avgAge:43,market:0.50},
+  iot_tech:{id:'iot_tech',name:'Специалист IIoT (датчики)',type:'mgmt',salary:600000,trainingBase:250000,skillRate:35000,skills:'ТБ;Чертежи;Датчики;Телеметрия;Сети',headcount:28,avgAge:34,market:0.80},
+  data_scientist:{id:'data_scientist',name:'Аналитик данных (AI)',type:'mgmt',salary:900000,trainingBase:350000,skillRate:50000,skills:'Телеметрия;Python;Машинное обучение;SQL',headcount:12,avgAge:31,market:0.85}
+};
+const PROF_DEFAULTS = {salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ',headcount:20,avgAge:42,market:0.4};
+
+const DEFAULT_TEMPLATES = {
+  oil_gas:{name:'Нефтегазодобыча',volume:500000,unit:'баррелей',period:'месяц',norm:1200,shifts:3,absCoeff:1.15,actualStaff:1800,rCore:60,rAux:30,rMgmt:10,turnover:16,hireCap:35,fillDays:75,sepCap:25,autoPace:1},
+  manufacturing:{name:'Машиностроение (завод)',volume:15000,unit:'изделий',period:'год',norm:15,shifts:2,absCoeff:1.10,actualStaff:2100,rCore:75,rAux:15,rMgmt:10,turnover:13,hireCap:40,fillDays:55,sepCap:30,autoPace:1.1},
+  tech_rnd:{name:'IT / R&D центр',volume:1000,unit:'story points',period:'спринт',norm:10,shifts:1,absCoeff:1.05,actualStaff:110,rCore:40,rAux:10,rMgmt:50,turnover:22,hireCap:8,fillDays:95,sepCap:5,autoPace:0.7}
+};
+
+// Жизненный цикл: множитель = ориентир, qTrend = форма кривой внутри фазы
+const STAGES = {
+  design:{name:'Проектирование',mult:0.15,qTrend:[0.10,0.30,0.55,0.80],color:'#8d96a2'},
+  construction:{name:'Строительство (СМР)',mult:2.2,qTrend:[0.9,1.6,2.1,2.2],color:'#b07d12'},
+  commissioning:{name:'Пуско-наладка (ПНР)',mult:1.4,qTrend:[1.8,1.5,1.25,1.05],color:'#6b4fa0'},
+  operation:{name:'Эксплуатация',mult:1.0,qTrend:[1.0,1.0,1.0,1.0],color:'#0f766e'},
+  decline:{name:'Консервация / вывод',mult:0.3,qTrend:[0.9,0.65,0.4,0.2],color:'#c4361b'}
+};
+const STAGE_ORDER = ['design','construction','commissioning','operation','decline'];
+
+// Лексикон рисков автоматизации навыков (вероятность, что задача автоматизируема)
+const SKILL_HAZARD = {
+  'ТБ':0.30,'Обход':0.90,'Замеры':0.85,'Арматура':0.80,'Давление':0.75,'Диагностика':0.55,
+  'Бурение':0.45,'Гидравлика':0.50,'Тяжелая техника':0.55,'Чертежи':0.40,'Инструмент':0.50,
+  'Механика':0.45,'Электробезопасность':0.35,'Схемы':0.40,'КИПиА':0.45,'Датчики':0.30,
+  'Телеметрия':0.25,'Сети':0.25,'Python':0.10,'Машинное обучение':0.08,'SQL':0.20
+};
+const HAZARD_DEFAULT = 0.40;
+
+/* ---------------- СОСТОЯНИЕ ---------------- */
+let profDB = JSON.parse(JSON.stringify(INITIAL_PROFESSIONS));
+let tempDB = JSON.parse(JSON.stringify(INITIAL_PROFESSIONS));
+let customTemplates = {};
+let isDirty = false;
+let activeTab = 'dashboard';
+
+const S = {
+  template:'oil_gas',
+  volume:500000, unit:'баррелей', period:'месяц', norm:1200, shifts:3, absCoeff:1.15, actualStaff:1800,
+  rCore:60, rAux:30, rMgmt:10,
+  stage:'operation', scenario:'base',
+  // фазы жизненного цикла (длительности в месяцах)
+  durDesign:6, durConstruction:18, durCommissioning:6, durOperation:60, durDecline:12,
+  // прогнозные параметры
+  turnover:16,       // годовая текучесть, %
+  hireCap:35,        // макс. найм, чел/мес
+  fillDays:75,       // средний срок закрытия вакансии, дней
+  sepCap:25,         // макс. управляемое высвобождение, чел/мес
+  autoPace:1,        // темп внедрения технологий (множитель риска автоматизации)
+  mcRuns:400,        // число симуляций Монте-Карло
+  // CBA
+  sourceProf:'patrol', targetProf:'iot_tech',
+  // веса факторов кадрового риска (нормируются к сумме при расчёте)
+  wDemo:20, wBus:18, wSkill:16, wTurn:14, wMarket:14, wRedund:18
+};
+
+// сохранённые сценарии «что если» (каждый — полный снимок S + справочника)
+let scenarios = [];
+const LS_KEY = 'swp_workforce_v1';
+
+/* ---------------- УТИЛИТЫ ---------------- */
+const fmtKZT = n => Math.round(n).toLocaleString('ru-RU')+' ₸';
+const fmtN = n => Math.round(n).toLocaleString('ru-RU');
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const pct = v => Math.round(v*100);
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function stateSeed(){
+  const arr=[S.volume,S.norm,S.shifts,S.absCoeff,S.actualStaff,S.turnover,S.hireCap,S.fillDays,S.sepCap,
+    S.durDesign,S.durConstruction,S.durCommissioning,S.durOperation,S.durDecline,
+    S.scenario.length,S.autoPace*100,S.mcRuns];
+  let h=2166136261;
+  arr.forEach(x=>{h=Math.imul(h^Math.round(x*7+13),16777619);});
+  return h>>>0;
+}
+function percentile(sorted,p){
+  if(!sorted.length) return 0;
+  const idx=clamp(p,0,1)*(sorted.length-1);
+  const lo=Math.floor(idx),hi=Math.ceil(idx);
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(idx-lo);
+}
+
+/* ---------------- БАЗОВАЯ МОДЕЛЬ (срез «сейчас») ---------------- */
+function computeBase(){
+  const totalR = S.rCore+S.rAux+S.rMgmt || 1;
+  const dist0 = {core:S.rCore/totalR, aux:S.rAux/totalR, mgmt:S.rMgmt/totalR};
+  const baseOperational = (S.volume/Math.max(1,S.norm)) * S.shifts * S.absCoeff; // FTE при норм. эксплуатации
+  const stage = STAGES[S.stage];
+  let calc = baseOperational * stage.mult;
+  if(S.scenario==='optimistic') calc *= 1.25;
+  if(S.scenario==='automation' && (S.stage==='operation'||S.stage==='decline')) calc *= 0.65;
+  const required = Math.max(1, Math.round(calc));
+  const diff = required - S.actualStaff;
+
+  // сдвиг структуры при автоматизации (меньше «рук», больше ИТР/поддержки)
+  let dist = {...dist0};
+  if(S.scenario==='automation'){
+    dist.core = Math.max(0.05, dist.core-0.18);
+    dist.aux += 0.08; dist.mgmt += 0.10;
+    const t = dist.core+dist.aux+dist.mgmt;
+    dist = {core:dist.core/t, aux:dist.aux/t, mgmt:dist.mgmt/t};
+  }
+  const staff = {
+    core: Math.round(required*dist.core),
+    aux: Math.round(required*dist.aux)
+  };
+  staff.mgmt = Math.max(0, required - staff.core - staff.aux);
+
+  return {totalR,dist0,baseOperational,stage,required,diff,dist,staff};
+}
+
+/* ---------------- ТРАЕКТОРИЯ ЖИЗНЕННОГО ЦИКЛА ---------------- */
+function interp4(arr,p){ // p in [0,1] -> кусочно-линейно по 4 точкам
+  const seg = clamp(p,0,1)*3;
+  const i = Math.min(2, Math.floor(seg));
+  const f = seg - i;
+  return arr[i]*(1-f)+arr[i+1]*f;
+}
+function buildPhases(){
+  const dur = {design:S.durDesign,construction:S.durConstruction,commissioning:S.durCommissioning,
+               operation:S.durOperation,decline:S.durDecline};
+  const phases=[]; let cur=0;
+  STAGE_ORDER.forEach(id=>{
+    const len = Math.max(0, Math.round(dur[id]));
+    if(len>0){ phases.push({id,name:STAGES[id].name,color:STAGES[id].color,start:cur,len,end:cur+len}); cur+=len; }
+  });
+  return {phases, horizon:cur};
+}
+function requiredAtMonth(t, phases, base){
+  for(const ph of phases){
+    if(t>=ph.start && t<ph.end){
+      const p = ph.len>1 ? (t-ph.start)/(ph.len-1) : 0;
+      let mult = interp4(STAGES[ph.id].qTrend, p);
+      if(S.scenario==='optimistic') mult*=1.25;
+      if(S.scenario==='automation' && (ph.id==='operation'||ph.id==='decline')) mult*=0.65;
+      return Math.max(0, base*mult);
+    }
+  }
+  return 0;
+}
+function forecastTrajectory(){
+  const b = computeBase();
+  const {phases,horizon} = buildPhases();
+  const H = Math.max(1, horizon);
+  const required = [];
+  for(let t=0;t<H;t++) required.push(Math.round(requiredAtMonth(t,phases,b.baseOperational)));
+  return {phases,horizon:H,required,base:b.baseOperational};
+}
+
+/* ---------------- ПРОГНОЗ ДОСТУПНОЙ ЧИСЛЕННОСТИ (детерм. + Монте-Карло) --- */
+function projectGap(){
+  const traj = forecastTrajectory();
+  const H = traj.horizon, required = traj.required;
+  const monthlyAttr = 1 - Math.pow(1 - clamp(S.turnover,0,90)/100, 1/12);
+  const hireEff = clamp(1 - (S.fillDays-30)/200, 0.30, 1.0); // длинная вакансия -> ниже реализуемый найм
+
+  // --- детерминированная медианная траектория доступной численности ---
+  const availDet=[]; let a=S.actualStaff;
+  for(let t=0;t<H;t++){
+    availDet.push(a);
+    const leavers = a*monthlyAttr;
+    const afterLeave = a-leavers;
+    const req = required[t];
+    let next = afterLeave;
+    const short = req-afterLeave;
+    if(short>0){ next += Math.min(short, S.hireCap*hireEff); }
+    else { const sur=afterLeave-req; if(sur>0) next -= Math.min(sur, S.sepCap); }
+    a = Math.max(0,next);
+  }
+
+  // --- Монте-Карло ---
+  const runs = clamp(Math.round(S.mcRuns),50,1500);
+  const seed = stateSeed();
+  const availSamples = Array.from({length:H},()=>[]);
+  const gapSamples = Array.from({length:H},()=>[]);
+  const peakDef=[]; let deficitAtEnd=0;
+  for(let r=0;r<runs;r++){
+    const rng = mulberry32(seed + r*2654435761);
+    let av=S.actualStaff; let pk=-1e9;
+    for(let t=0;t<H;t++){
+      availSamples[t].push(av);
+      const g = required[t]-av;
+      gapSamples[t].push(g);
+      if(g>pk) pk=g;
+      // переход
+      const attrNoise = monthlyAttr*(1 + (rng()*0.8-0.4));         // ±40% к оттоку
+      const leavers = av*Math.max(0,attrNoise);
+      const afterLeave = av-leavers;
+      const reqNoise = required[t]*(1 + (rng()*0.10-0.05));        // ±5% к спросу
+      let next = afterLeave;
+      const short = reqNoise-afterLeave;
+      if(short>0){
+        const realized = hireEff*(0.65+0.7*rng());                 // переменная успешность найма
+        next += Math.min(short, S.hireCap*clamp(realized,0,1.4));
+      } else {
+        const sur=afterLeave-reqNoise; if(sur>0) next -= Math.min(sur, S.sepCap*(0.7+0.6*rng()));
+      }
+      av = Math.max(0,next);
+    }
+    peakDef.push(pk);
+    if(required[H-1]-av > 0) deficitAtEnd++;
+  }
+  const availP10=[],availP50=[],availP90=[],gapP50=[];
+  for(let t=0;t<H;t++){
+    const sa=availSamples[t].slice().sort((x,y)=>x-y);
+    availP10.push(percentile(sa,0.10)); availP50.push(percentile(sa,0.50)); availP90.push(percentile(sa,0.90));
+    const sg=gapSamples[t].slice().sort((x,y)=>x-y);
+    gapP50.push(percentile(sg,0.50));
+  }
+  const peakSorted = peakDef.slice().sort((x,y)=>x-y);
+  // момент пикового дефицита по медиане gap
+  let peakMonth=0,peakVal=-1e9;
+  gapP50.forEach((g,t)=>{ if(g>peakVal){peakVal=g;peakMonth=t;} });
+  // первый месяц устойчивого дефицита (>2% штата)
+  let firstDeficit=-1;
+  const thr = Math.max(3, S.actualStaff*0.02);
+  for(let t=0;t<H;t++){ if(gapP50[t]>thr){firstDeficit=t;break;} }
+
+  return {traj,H,required,availDet,availP10,availP50,availP90,gapP50,
+    monthlyAttr,hireEff,runs,
+    probDeficitEnd:deficitAtEnd/runs,
+    peakDeficitMed:percentile(peakSorted,0.50),
+    peakDeficitP90:percentile(peakSorted,0.90),
+    peakMonth, peakVal:Math.max(0,Math.round(peakVal)), firstDeficit,
+    endGap: gapP50[H-1]};
+}
+
+/* ---------------- АНАЛИЗ ДОЖИТИЯ / АВТОМАТИЗАЦИЯ ---------------- */
+function professionHazard(p){
+  const sk = String(p.skills||'').split(';').map(s=>s.trim()).filter(Boolean);
+  if(!sk.length) return HAZARD_DEFAULT;
+  let sum=0; sk.forEach(s=>{ sum += (SKILL_HAZARD[s]!==undefined?SKILL_HAZARD[s]:HAZARD_DEFAULT); });
+  return sum/sk.length;
+}
+function automationAnalysis(horizonMonths){
+  const b = computeBase();
+  const years = Math.max(0.5, horizonMonths/12);
+  const list = Object.values(profDB);
+  const byType = {core:list.filter(p=>p.type==='core'),aux:list.filter(p=>p.type==='aux'),mgmt:list.filter(p=>p.type==='mgmt')};
+  const rows=[]; let totalAtRisk=0;
+  list.forEach(p=>{
+    const hz = professionHazard(p);
+    const lambda = hz * S.autoPace * 0.35;          // годовой hazard
+    const surv = Math.exp(-lambda*years);            // вероятность «дожития» роли
+    const dispProb = 1-surv;                          // вероятность вытеснения за горизонт
+    const peers = byType[p.type] ? byType[p.type].length : 1;
+    const fteRole = peers>0 ? Math.round(b.staff[p.type]/peers) : 0;
+    const dispFTE = fteRole*dispProb;
+    totalAtRisk += dispFTE;
+    let status,bcls;
+    if(dispProb>=0.6){status='Рескиллинг';bcls='b-red';}
+    else if(dispProb>=0.3){status='Кросс-тренинг';bcls='b-amber';}
+    else {status='Удержание';bcls='b-green';}
+    rows.push({p,hz,dispProb,fteRole,dispFTE,status,bcls});
+  });
+  rows.sort((x,y)=>y.dispProb-x.dispProb);
+  return {rows, totalAtRisk:Math.round(totalAtRisk), years};
+}
+
+/* ---------------- CBA по паре ролей ---------------- */
+function cbaPair(source,target){
+  const srcSkills = String(source.skills||'').split(';').map(s=>s.trim()).filter(Boolean);
+  const tgtSkills = String(target.skills||'').split(';').map(s=>s.trim()).filter(Boolean);
+  const overlap = srcSkills.filter(s=>tgtSkills.includes(s));
+  const missing = tgtSkills.filter(s=>!srcSkills.includes(s));
+  const overlapPct = Math.round((overlap.length/Math.max(1,tgtSkills.length))*100);
+  const gapPct = 100-overlapPct;
+  const severance = source.salary*3;
+  const recruiting = target.salary*1.5;
+  const replaceCost = severance+recruiting;
+  const trainingCost = Number(target.trainingBase) + missing.length*Number(target.skillRate);
+  const lostProd = source.salary*1.5;
+  const reskillCost = trainingCost+lostProd;
+  const netSavings = replaceCost-reskillCost;
+  const roi = Math.round((netSavings/Math.max(1,reskillCost))*100);
+  return {srcSkills,tgtSkills,overlap,missing,overlapPct,gapPct,severance,recruiting,replaceCost,
+    trainingCost,lostProd,reskillCost,netSavings,roi,positive:roi>=0};
+}
+
+/* ---------------- РЕКОМЕНДУЕМЫЕ МОСТЫ ПЕРЕОБУЧЕНИЯ ---------------- */
+function reskillBridges(){
+  const auto = automationAnalysis(buildPhases().horizon);
+  const list = Object.values(profDB);
+  // источники — роли с высоким риском автоматизации; цели — с низким
+  const sources = auto.rows.filter(r=>r.dispProb>=0.3).map(r=>r.p);
+  const targets = auto.rows.filter(r=>r.dispProb<0.3).map(r=>r.p);
+  const bridges=[];
+  (sources.length?sources:list).forEach(src=>{
+    (targets.length?targets:list).forEach(tgt=>{
+      if(src.id===tgt.id) return;
+      const c = cbaPair(src,tgt);
+      bridges.push({src,tgt,overlap:c.overlapPct,roi:c.roi,net:c.netSavings,feasible:c.overlapPct>=40});
+    });
+  });
+  bridges.sort((a,b)=> (b.feasible-a.feasible) || (b.overlap-a.overlap) || (b.roi-a.roi));
+  return bridges.slice(0,6);
+}
+
+/* ---------------- МНОГОФАКТОРНАЯ ОЦЕНКА КАДРОВОГО РИСКА (§6) ---------------- */
+// Каждый фактор нормируется в [0..1], затем взвешенно агрегируется в индекс 0..100.
+const PENSION_AGE = 63;          // возраст выхода на пенсию (параметр юрисдикции)
+const TYPE_CRIT = {core:0.9, aux:0.6, mgmt:1.0}; // критичность роли для bus-factor
+function riskWeights(){
+  const w={demo:S.wDemo,bus:S.wBus,skill:S.wSkill,turn:S.wTurn,market:S.wMarket,redund:S.wRedund};
+  const sum=Object.values(w).reduce((s,x)=>s+Math.max(0,x),0)||1;
+  Object.keys(w).forEach(k=>w[k]=Math.max(0,w[k])/sum);
+  return w;
+}
+// демографический риск: близость среднего возраста к пенсионному (старт ~45 лет)
+function demoRisk(age){ return clamp((Number(age||42)-45)/(PENSION_AGE-45),0,1); }
+// риск ключевого специалиста: мало носителей × критичность роли
+function busRisk(p){
+  const hc=Math.max(1,Number(p.headcount||1));
+  return clamp(1-(hc-1)/40,0,1) * (TYPE_CRIT[p.type]||0.8);
+}
+function riskAnalysis(){
+  const w=riskWeights();
+  const years=Math.max(0.5, buildPhases().horizon/12);
+  const list=Object.values(profDB);
+  const rows=list.map(p=>{
+    const hz=professionHazard(p);                                  // обсолесценция навыков
+    const lambda=hz*S.autoPace*0.35;
+    const redund=clamp(1-Math.exp(-lambda*years),0,1);             // риск избыточности (дожитие роли)
+    const f={
+      demo:  demoRisk(p.avgAge),
+      bus:   busRisk(p),
+      skill: hz,                                                    // доля навыков с высокой автоматизируемостью
+      turn:  clamp((S.turnover/45)*(0.7+0.6*Number(p.market||0.4)),0,1),
+      market:clamp(Number(p.market||0.4)*(0.5+S.fillDays/180),0,1),
+      redund:redund
+    };
+    const index=Math.round(100*(w.demo*f.demo+w.bus*f.bus+w.skill*f.skill+w.turn*f.turn+w.market*f.market+w.redund*f.redund));
+    // доминирующий фактор → рекомендованное действие (митигейшн)
+    const FACT=[['demo',f.demo,'Кадровый резерв / наставничество (демография)'],
+                ['bus',f.bus,'Дублирование компетенции, снятие зависимости от ключевого носителя'],
+                ['skill',f.skill,'Программа переобучения под смену технологии'],
+                ['turn',f.turn,'Удержание: пересмотр мотивации и условий'],
+                ['market',f.market,'Опережающий рекрутинг / пайплайн кандидатов'],
+                ['redund',f.redund,'План перераспределения / переквалификации']];
+    FACT.sort((a,b)=>b[1]-a[1]);
+    const lvl=index>=66?{t:'Критический',b:'b-red'}:index>=40?{t:'Повышенный',b:'b-amber'}:{t:'Умеренный',b:'b-green'};
+    return {p,f,index,lvl,dominant:FACT[0][0],action:FACT[0][2]};
+  });
+  rows.sort((a,b)=>b.index-a.index);
+  const headcount=list.reduce((s,p)=>s+Math.max(0,Number(p.headcount||0)),0)||1;
+  const weighted=Math.round(rows.reduce((s,r)=>s+r.index*Math.max(0,Number(r.p.headcount||0)),0)/headcount);
+  return {rows,w,years,portfolioIndex:weighted,
+    critical:rows.filter(r=>r.index>=66).length,
+    elevated:rows.filter(r=>r.index>=40&&r.index<66).length};
+}
+
+/* ---------------- ПЛАН ДЕЙСТВИЙ (§10) — нанять/обучить/высвободить ---------------- */
+function actionPlan(){
+  const M=projectGap();
+  const auto=automationAnalysis(M.H);
+  const bridges=reskillBridges();
+  const list=Object.values(profDB);
+  const avgSalary=list.reduce((s,p)=>s+Number(p.salary||0),0)/Math.max(1,list.length);
+  const acts=[];
+  // 1) НАЙМ — закрытие прогнозного дефицита
+  if(M.peakVal>0){
+    const qty=Math.round(M.peakVal);
+    const months=Math.max(1, Math.ceil(qty/Math.max(1,S.hireCap*M.hireEff)));
+    acts.push({type:'Найм',cls:'b-red',target:'Закрытие дефицита эксплуатации',qty,
+      cost:qty*avgSalary*1.5, months, priority:M.firstDeficit>=0?1:3,
+      note:'Старт с '+(Math.max(0,M.firstDeficit))+'-го мес.; реализуемость найма '+pct(M.hireEff)+'%'});
+  }
+  // 2) ПЕРЕОБУЧЕНИЕ — выполнимые мосты с положительным ROI
+  bridges.filter(b=>b.feasible&&b.roi>=0).slice(0,3).forEach(b=>{
+    const src=profDB[b.src.id]||b.src, tgt=profDB[b.tgt.id]||b.tgt;
+    const qty=Math.max(1, Math.round((Number(src.headcount||10))*0.15));
+    const c=cbaPair(src,tgt);
+    acts.push({type:'Переобучение',cls:'b-amber',target:src.name+' → '+tgt.name,qty,
+      cost:qty*c.reskillCost, months:Math.max(2,Math.round(c.gapPct/15)), priority:2,
+      note:'ROI '+b.roi+'%, совпадение навыков '+b.overlap+'%'});
+  });
+  // 3) ВЫСВОБОЖДЕНИЕ / ПЕРЕРАСПРЕДЕЛЕНИЕ — роли под риском автоматизации
+  auto.rows.filter(r=>r.dispProb>=0.5).slice(0,3).forEach(r=>{
+    const qty=Math.max(1,Math.round(r.dispFTE));
+    const months=Math.max(2, Math.ceil(qty/Math.max(1,S.sepCap)));
+    acts.push({type:'Высвобождение',cls:'b-purple',target:r.p.name,qty,
+      cost:qty*Number(r.p.salary||avgSalary)*3, months, priority:3,
+      note:'Вероятность вытеснения '+pct(r.dispProb)+'% за '+auto.years.toFixed(1)+' г.'});
+  });
+  acts.sort((a,b)=>a.priority-b.priority || b.cost-a.cost);
+  const total=acts.reduce((s,a)=>s+a.cost,0);
+  const byType=t=>acts.filter(a=>a.type===t).reduce((s,a)=>s+a.qty,0);
+  return {acts,total,hire:byType('Найм'),reskill:byType('Переобучение'),release:byType('Высвобождение'),M};
+}
+
+/* ---------------- СЦЕНАРИИ: расчёт сводных метрик под произвольным состоянием --- */
+// временно подменяет глобальные S/profDB, считает, восстанавливает — без побочных эффектов
+function withState(st,pf,fn){
+  const sBak=JSON.parse(JSON.stringify(S)), pBak=profDB;
+  Object.assign(S,st); profDB=pf||profDB;
+  try{ return fn(); }
+  finally{ Object.keys(S).forEach(k=>{ if(!(k in sBak)) delete S[k]; }); Object.assign(S,sBak); profDB=pBak; }
+}
+function scenarioMetrics(state,profs){
+  return withState(state,profs,()=>{
+    const b=computeBase();
+    const M=projectGap();
+    const risk=riskAnalysis();
+    const plan=actionPlan();
+    return {required:b.required, gapNow:b.diff, horizon:M.H,
+      probDeficit:M.probDeficitEnd, peakDeficit:Math.round(M.peakDeficitMed),
+      fteAtRisk:automationAnalysis(M.H).totalAtRisk,
+      riskIndex:risk.portfolioIndex, planCost:plan.total};
+  });
+}
+function currentScenarioSnapshot(name){
+  return {id:'sc_'+Date.now().toString(36), name:name||('Сценарий '+(scenarios.length+1)),
+    savedAt:new Date().toISOString(), baseline:false,
+    state:JSON.parse(JSON.stringify(S)), professions:JSON.parse(JSON.stringify(profDB))};
+}
+
+/* ---------------- ПЕРСИСТЕНТНОСТЬ (localStorage) ---------------- */
+function persist(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      v:1, state:S, professions:profDB, customTemplates, scenarios
+    }));
+  }catch(e){/* приватный режим / переполнение — тихо игнорируем */}
+}
+function restore(){
+  try{
+    const raw=localStorage.getItem(LS_KEY); if(!raw) return false;
+    const d=JSON.parse(raw);
+    if(d.state) Object.keys(S).forEach(k=>{ if(d.state[k]!==undefined) S[k]=d.state[k]; });
+    if(d.professions && typeof d.professions==='object'){
+      profDB=JSON.parse(JSON.stringify(d.professions));
+      tempDB=JSON.parse(JSON.stringify(d.professions));
+    }
+    if(d.customTemplates) customTemplates=d.customTemplates;
+    if(Array.isArray(d.scenarios)) scenarios=d.scenarios;
+    const ids=Object.keys(profDB);
+    if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
+    if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ============================================================
+   Часть 2: SVG-графики, рендер вкладок, события
+   ============================================================ */
+
+/* ---------------- ПОСТРОИТЕЛИ ГРАФИКОВ (SVG) ---------------- */
+function svgForecast(M){
+  const W=780,H=340,pl=52,pr=18,pt=26,pb=46;
+  const n=M.H, iw=W-pl-pr, ih=H-pt-pb;
+  let maxV=0;
+  for(let i=0;i<n;i++){ maxV=Math.max(maxV,M.required[i],M.availP90[i],M.availDet[i]); }
+  maxV=Math.max(maxV,S.actualStaff)*1.12||10;
+  const X=i=> pl + iw*(n>1? i/(n-1):0);
+  const Y=v=> pt+ih - ih*(v/maxV);
+  const path=(arr)=>arr.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+  // band P10-P90
+  let band='M'+X(0)+' '+Y(M.availP90[0]);
+  for(let i=1;i<n;i++) band+=' L'+X(i).toFixed(1)+' '+Y(M.availP90[i]).toFixed(1);
+  for(let i=n-1;i>=0;i--) band+=' L'+X(i).toFixed(1)+' '+Y(M.availP10[i]).toFixed(1);
+  band+=' Z';
+  // фазовые полосы
+  let bands='';
+  M.traj.phases.forEach((ph,k)=>{
+    const x0=X(ph.start), x1=X(Math.min(n-1,ph.end));
+    bands+='<rect x="'+x0.toFixed(1)+'" y="'+pt+'" width="'+Math.max(0,(x1-x0)).toFixed(1)+'" height="'+ih+'" fill="'+ph.color+'" opacity="'+(k%2?0.05:0.085)+'"/>';
+    if(x1-x0>34) bands+='<text x="'+((x0+x1)/2).toFixed(1)+'" y="'+(pt-9)+'" text-anchor="middle" class="vlbl" style="fill:'+ph.color+';font-weight:700">'+ph.name.split(' ')[0]+'</text>';
+  });
+  // сетка Y
+  let grid=''; const steps=4;
+  for(let s=0;s<=steps;s++){ const v=maxV*s/steps,y=Y(v);
+    grid+='<line x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'" stroke="#e8e3d8" stroke-width="1"/>';
+    grid+='<text x="'+(pl-8)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" class="axislbl">'+fmtN(v)+'</text>';
+  }
+  // ось X (метки месяцев)
+  let xlbl=''; const stepX=Math.max(1,Math.ceil(n/8));
+  for(let i=0;i<n;i+=stepX){ xlbl+='<text x="'+X(i).toFixed(1)+'" y="'+(H-pb+18)+'" text-anchor="middle" class="vlbl">'+i+'</text>'; }
+  xlbl+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-6)+'" text-anchor="middle" class="vlbl" style="font-weight:700">месяц проекта</text>';
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'
+    +bands+grid
+    +'<path d="'+band+'" fill="#0f766e" opacity="0.12"/>'
+    +'<path d="'+path(M.required)+'" fill="none" stroke="#c4361b" stroke-width="2.4"/>'
+    +'<path d="'+path(M.availP50)+'" fill="none" stroke="#0f766e" stroke-width="2.4"/>'
+    +'<path d="'+path(M.availDet)+'" fill="none" stroke="#0f766e" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>'
+    +xlbl+'</svg>';
+}
+
+function svgGap(gap){
+  const W=780,H=170,pl=52,pr=18,pt=14,pb=34;
+  const n=gap.length, iw=W-pl-pr, ih=H-pt-pb;
+  let mx=1; gap.forEach(g=>mx=Math.max(mx,Math.abs(g)));
+  const zeroY=pt+ih/2;
+  const bw=Math.max(1.2, iw/n*0.7);
+  let bars='';
+  gap.forEach((g,i)=>{
+    const x=pl+iw*(n>1?i/(n-1):0)-bw/2;
+    const h=(Math.abs(g)/mx)*(ih/2);
+    const y=g>=0? zeroY-h : zeroY;
+    const c=g>0.5? '#c4361b' : g<-0.5? '#117a5b' : '#c9c2b3';
+    bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(0.6,h).toFixed(1)+'" fill="'+c+'" rx="1"/>';
+  });
+  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'
+    +'<line x1="'+pl+'" y1="'+zeroY+'" x2="'+(W-pr)+'" y2="'+zeroY+'" stroke="#c9c2b3" stroke-width="1.2"/>'
+    +'<text x="'+(pl-8)+'" y="'+(pt+10)+'" text-anchor="end" class="axislbl" style="fill:#c4361b">дефицит</text>'
+    +'<text x="'+(pl-8)+'" y="'+(H-pb+2)+'" text-anchor="end" class="axislbl" style="fill:#117a5b">профицит</text>'
+    +bars+'</svg>';
+}
+
+function svgDonut(parts){ // [{v,color,label}]
+  const total=parts.reduce((s,p)=>s+p.v,0)||1;
+  const cx=70,cy=70,r=54,sw=22; const C=2*Math.PI*r;
+  let off=0,segs='';
+  parts.forEach(p=>{
+    const frac=p.v/total, len=C*frac;
+    segs+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+p.color+'" stroke-width="'+sw+'" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    off+=len;
+  });
+  return '<svg viewBox="0 0 140 140" style="width:140px;height:140px">'+segs
+    +'<text x="70" y="66" text-anchor="middle" class="mono" style="font-size:22px;font-weight:800;fill:var(--ink)">'+fmtN(total)+'</text>'
+    +'<text x="70" y="84" text-anchor="middle" style="font-size:9px;letter-spacing:1px;fill:var(--t3);font-family:var(--mono)">FTE</text></svg>';
+}
+
+function hbar(val,color){ // val 0..100
+  return '<div class="bartrack"><div class="barfill" style="width:'+clamp(val,0,100)+'%;background:'+color+'"></div></div>';
+}
+
+/* ---------------- ОБЩИЕ ЭЛЕМЕНТЫ ---------------- */
+function hint(t){return '<span class="hint">'+ic('help')+'<span class="tip">'+t+'</span></span>';}
+function toolbar(opts){ // opts: {pdf, exportFn, importType}
+  let h='<div class="actions">';
+  h+='<button class="tool red" data-act="print">'+ic('file')+'PDF / Печать</button>';
+  if(opts.exportLabel) h+='<button class="tool" data-act="'+opts.exportAct+'">'+ic('download')+opts.exportLabel+'</button>';
+  if(opts.importAct) h+='<button class="tool" data-act="'+opts.importAct+'">'+ic('upload')+'Загрузить</button>';
+  h+='</div>';
+  return h;
+}
+function periodLabel(){return S.volume.toLocaleString('ru-RU')+' '+S.unit+' / '+S.period;}
+
+/* ============================================================
+   ВКЛАДКА 1 — НОРМАТИВНЫЙ РАСЧЁТ
+   ============================================================ */
+function renderNormative(){
+  const b=computeBase();
+  const allT={...DEFAULT_TEMPLATES,...customTemplates};
+  const list=Object.values(profDB);
+  const groups={core:list.filter(p=>p.type==='core'),aux:list.filter(p=>p.type==='aux'),mgmt:list.filter(p=>p.type==='mgmt')};
+  const q=b.stage.qTrend, baseQ=b.baseOperational;
+
+  const groupRows=(arr,type,label,bcls,clr)=>{
+    const n=arr.length;
+    let h='<tr class="grouprow"><td colspan="7">'+label+' · '+pct(b.dist[type])+'% · '+fmtN(b.staff[type])+' чел.</td></tr>';
+    if(!n){h+='<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic">Нет должностей в справочнике</td></tr>';return h;}
+    arr.forEach(p=>{
+      const req=Math.round(b.staff[type]/n);
+      const perQ=k=>Math.round((baseQ*b.dist[type]/n)*q[k]);
+      h+='<tr><td style="font-weight:700">'+p.name+'</td>'
+        +'<td class="c"><span class="badge '+bcls+'">'+type+'</span></td>'
+        +'<td class="c mono" style="font-weight:800;color:'+clr+'">'+req+'</td>'
+        +'<td class="c mono muted">'+perQ(0)+'</td><td class="c mono muted">'+perQ(1)+'</td>'
+        +'<td class="c mono muted">'+perQ(2)+'</td><td class="c mono" style="font-weight:700;color:'+clr+'">'+perQ(3)+'</td></tr>';
+    });
+    return h;
+  };
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Этап 1 · Детерминированный расчёт</div>'
+    +'<h2>Нормативный расчёт потребности</h2>'
+    +'<p class="lead">Базовая численность (FTE) от объёмов, режима работы и норм выработки. Управляющие параметры пересчитывают все вкладки.</p></div>'
+    +toolbar({exportLabel:'Выгрузить (JSON)',exportAct:'exp-norm',importAct:'imp-norm'})+'</div>'
+
+  +'<div class="grid g12">'
+  // ----- ЛЕВО: параметры -----
+  +'<div class="col-span-4"><div class="card accent">'
+    +'<div class="ctitle">'+ic('sliders')+'Вводные параметры'+hint('Управляющий блок. Любое изменение мгновенно пересчитывает потребность и прогнозы на всех вкладках.')+'</div>'
+
+    +'<div class="field" style="background:var(--surface2);padding:14px;border-radius:11px;border:1px solid var(--line)">'
+      +'<label class="flabel">Отраслевой шаблон'+hint('Готовый профиль производства. Можно сохранить свой набор параметров как новый шаблон.')+'</label>'
+      +'<select class="select" id="tpl">'+Object.entries(allT).map(([k,v])=>'<option value="'+k+'"'+(S.template===k?' selected':'')+'>'+v.name+'</option>').join('')+'</select>'
+      +'<button class="tool" id="saveTpl" style="width:100%;justify-content:center;margin-top:9px;border-style:dashed;color:var(--primary)">'+ic('save')+'Сохранить как свой шаблон</button>'
+    +'</div>'
+
+    +'<div class="field"><label class="flabel">Объём работ'+hint('Количество, единица измерения и период. Норма выработки должна быть привязана к этому же периоду.')+'</label>'
+      +'<div class="rowflex"><input class="input num" type="number" id="volume" value="'+S.volume+'" style="flex:2">'
+      +'<input class="input" type="text" id="unit" value="'+S.unit+'" style="flex:1.2;font-size:12px">'
+      +'<select class="select" id="period" style="flex:1.2;font-size:12px">'+['смена','месяц','квартал','год','спринт'].map(p=>'<option'+(S.period===p?' selected':'')+'>'+p+'</option>').join('')+'</select></div></div>'
+
+    +'<div class="grid g2" style="gap:12px">'
+      +'<div class="field" style="margin-bottom:0"><label class="flabel">Норма (ед/чел)'+hint('Выработка 1 сотрудника за выбранный период.')+'</label><input class="input num" type="number" id="norm" value="'+S.norm+'"></div>'
+      +'<div class="field" style="margin-bottom:0"><label class="flabel">Резерв (коэфф.)'+hint('Запас на отпуска и больничные. 1.15 = +15% к штату.')+'</label><input class="input num" type="number" step="0.05" id="absCoeff" value="'+S.absCoeff+'"></div>'
+    +'</div>'
+
+    +'<div class="field" style="margin-top:16px"><label class="flabel">Режим работы (сменность)'+hint('Множитель рабочих мест. Круглосуточно 24/7 = 3 смены.')+'</label>'
+      +'<select class="select" id="shifts">'+[[1,'1 смена (8 ч)'],[2,'2 смены (16 ч)'],[3,'3 смены (24/7)'],[4,'Вахта / ротация']].map(([v,t])=>'<option value="'+v+'"'+(S.shifts===v?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'
+
+    +'<div class="divider"></div>'
+    +'<div class="section-label">Конструктор оргструктуры'+hint('Пропорции распределения штата. Система нормализует до 100%.')+'</div>'
+    +slider('rCore','Основной (Core)',pct(b.dist.core),'var(--primary)')
+    +slider('rAux','Поддержка / ТОиР (Aux)',pct(b.dist.aux),'var(--green)')
+    +slider('rMgmt','ИТР / Руководство (Mgmt)',pct(b.dist.mgmt),'var(--purple)')
+
+    +'<div class="field" style="margin-top:18px;background:var(--surface2);padding:14px;border-radius:11px;border:1px solid var(--line)">'
+      +'<label class="flabel">Текущий (фактический) штат'+hint('Сколько людей оформлено сейчас. Разница с расчётом даёт дефицит или профицит.')+'</label>'
+      +'<input class="input big" type="number" id="actualStaff" value="'+S.actualStaff+'"></div>'
+  +'</div></div>'
+
+  // ----- ПРАВО: результаты -----
+  +'<div class="col-span-8"><div class="grid" style="gap:18px">'
+    +'<div class="card"><div class="ctitle">'+ic('users')+'Сводный результат (FTE)'+hint('Модель: (Объём ÷ Норму) × Сменность × Резерв × Множитель этапа жизненного цикла («'+b.stage.name+'»).')+'</div>'
+      +'<div class="grid g3">'
+        +'<div class="metric"><div class="mlabel">Расчётная потребность</div><div class="mval">'+fmtN(b.required)+' <small>чел.</small></div><div class="msub">этап: '+b.stage.name+'</div></div>'
+        +'<div class="metric"><div class="mlabel">Текущий факт</div><div class="mval">'+fmtN(S.actualStaff)+' <small>чел.</small></div><div class="msub">'+periodLabel()+'</div></div>'
+        +'<div class="metric '+(b.diff>0?'gap-pos':b.diff<0?'gap-neg':'')+'"><div class="mlabel">Разрыв (GAP)</div>'
+          +'<div class="mval" style="display:flex;align-items:center;gap:6px;font-size:27px">'
+          +(b.diff>0?ic('up')+'Дефицит '+fmtN(b.diff):b.diff<0?ic('down')+'Избыток '+fmtN(-b.diff):'Баланс')+'</div>'
+          +'<div class="msub">'+(b.diff>0?'требуется найм':b.diff<0?'переобучение / высвобождение':'штат сбалансирован')+'</div></div>'
+      +'</div></div>'
+
+    +'<div class="card"><div class="ctitle">'+ic('layers')+'Детализация по должностям'
+      +hint('Распределение потребности по должностям из справочника с учётом оргструктуры и кривой этапа (Q1–Q4 — динамика внутри фазы).')+'</div>'
+      +'<div class="tbl-wrap"><table><thead><tr>'
+        +'<th>Должность</th><th class="c">Роль</th><th class="c">FTE цель</th>'
+        +'<th class="c">Q1</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
+        +groupRows(groups.core,'core','Основной персонал','b-blue','var(--blue)')
+        +groupRows(groups.aux,'aux','Службы ТОиР','b-green','var(--green)')
+        +groupRows(groups.mgmt,'mgmt','ИТР и менеджмент','b-purple','var(--purple)')
+      +'</tbody></table></div></div>'
+  +'</div></div>'
+  +'</div></div>';
+}
+function slider(id,label,valPct,clr){
+  return '<div class="field"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px">'
+    +'<span class="muted">'+label+'</span><span class="mono" style="color:'+clr+';font-weight:800">'+valPct+'%</span></div>'
+    +'<input type="range" min="5" max="90" id="'+id+'" value="'+S[id]+'" style="accent-color:'+clr+'"></div>';
+}
+
+/* ============================================================
+   ВКЛАДКА 2 — ЖИЗНЕННЫЙ ЦИКЛ (траектория)
+   ============================================================ */
+function renderLifecycle(){
+  const M=projectGap();
+  const b=computeBase();
+  const phaseInput=(id,label)=>'<div><label class="flabel" style="font-size:11px;justify-content:center;text-align:center">'+label+'</label>'
+    +'<input class="input num" type="number" min="0" id="'+id+'" value="'+S[id]+'" style="text-align:center;padding:8px"></div>';
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Этап 2 · Моделирование во времени</div>'
+    +'<h2>Траектория жизненного цикла</h2>'
+    +'<p class="lead">Потребность в персонале меняется по фазам актива: проектирование → СМР → ПНР → эксплуатация → вывод. Задайте длительности и сценарий.</p></div>'
+    +toolbar({exportLabel:'Сценарий (JSON)',exportAct:'exp-life',importAct:'imp-life'})+'</div>'
+
+  +'<div class="grid g12">'
+  +'<div class="col-span-4"><div class="card accent-p">'
+    +'<div class="ctitle">'+ic('activity')+'Матрица управления'+hint('Параметры меняют форму кривой потребности и реакцию прогнозных моделей.')+'</div>'
+
+    +'<div class="section-label">Длительности фаз (мес.)'+hint('Горизонт = сумма всех фаз. Фазы с длительностью 0 исключаются.')+'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:18px">'
+      +phaseInput('durDesign','Проект')+phaseInput('durConstruction','СМР')+phaseInput('durCommissioning','ПНР')
+      +phaseInput('durOperation','Эксплуат.')+phaseInput('durDecline','Вывод')
+    +'</div>'
+
+    +'<div class="field"><label class="flabel">Текущий этап (для среза «сейчас»)'+hint('Используется во вкладке «Нормативный расчёт» для снимка потребности.')+'</label>'
+      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>'<option value="'+id+'"'+(S.stage===id?' selected':'')+'>'+STAGES[id].name+' (K='+STAGES[id].mult+')</option>').join('')+'</select></div>'
+
+    +'<div class="field"><label class="flabel">Макро-сценарий'+hint('«Индустрия 4.0» срезает ~35% потребности в рабочих на эксплуатации и сдвигает структуру к ИТР.')+'</label>'
+      +'<select class="select" id="scenario">'
+        +'<option value="base"'+(S.scenario==='base'?' selected':'')+'>Базовый [×1.0]</option>'
+        +'<option value="optimistic"'+(S.scenario==='optimistic'?' selected':'')+'>Агрессивный рост [×1.25]</option>'
+        +'<option value="automation"'+(S.scenario==='automation'?' selected':'')+'>Индустрия 4.0 / роботизация [×0.65]</option>'
+      +'</select></div>'
+
+    +'<div class="divider"></div>'
+    +'<div class="section-label">Структура на горизонте</div>'
+    +'<div style="display:flex;gap:18px;align-items:center">'
+      +svgDonut([{v:b.staff.core,color:'var(--primary)'},{v:b.staff.aux,color:'var(--green)'},{v:b.staff.mgmt,color:'var(--purple)'}])
+      +'<div style="flex:1;font-size:12px">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="swatch" style="background:var(--primary)"></span>Основной — <b class="mono">'+fmtN(b.staff.core)+'</b></div>'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="swatch" style="background:var(--green)"></span>ТОиР — <b class="mono">'+fmtN(b.staff.aux)+'</b></div>'
+        +'<div style="display:flex;align-items:center;gap:8px"><span class="swatch" style="background:var(--purple)"></span>ИТР — <b class="mono">'+fmtN(b.staff.mgmt)+'</b></div>'
+      +'</div>'
+    +'</div>'
+  +'</div></div>'
+
+  +'<div class="col-span-8"><div class="grid" style="gap:18px">'
+    +'<div class="card"><div class="ctitle">'+ic('trend')+'Кривая потребности и комплектования'
+      +hint('Красная линия — расчётная потребность (FTE) по фазам. Зелёная — прогноз доступной численности с учётом найма и оттока (медиана Монте-Карло), коридор — P10–P90.')+'</div>'
+      +svgForecast(M)
+      +'<div class="legend">'
+        +'<span><span class="swatch line" style="background:#c4361b"></span>Потребность (план)</span>'
+        +'<span><span class="swatch line" style="background:#0f766e"></span>Доступно — прогноз (медиана)</span>'
+        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>Коридор P10–P90</span>'
+      +'</div>'
+      +'<div class="fnote">Горизонт планирования: <b>'+M.H+' мес.</b> ('+(M.H/12).toFixed(1)+' г.). Пиковая потребность приходится на фазу с максимумом кривой. Модель найма: до '+S.hireCap+' чел/мес при реализуемости '+pct(M.hireEff)+'% (срок закрытия вакансии '+S.fillDays+' дн.).</div>'
+    +'</div>'
+
+    +'<div class="card"><div class="ctitle">'+ic('gauge')+'Баланс по месяцам (профицит ↔ дефицит)'
+      +hint('Разрыв = Потребность − Доступно по каждому месяцу (медианный сценарий). Красное — дефицит (нужен найм), зелёное — профицит (переобучение / высвобождение).')+'</div>'
+      +svgGap(M.gapP50)
+    +'</div>'
+  +'</div></div>'
+  +'</div></div>';
+}
+
+/* ============================================================
+   ВКЛАДКА 3 — ПРЕДИКТИВНАЯ АНАЛИТИКА (центральная)
+   ============================================================ */
+function renderPredictive(){
+  const M=projectGap();
+  const auto=automationAnalysis(M.H);
+  const bridges=reskillBridges();
+  // покрытие дефицита переобучением: доля выполнимых мостов
+  const feasibleShare = bridges.length? Math.round(bridges.filter(x=>x.feasible).length/bridges.length*100):0;
+  const turnBenchmark = S.turnover>20?'выше нормы':S.turnover>14?'на уровне рынка':'ниже рынка';
+  const probColor = M.probDeficitEnd>0.6?'var(--red)':M.probDeficitEnd>0.3?'var(--amber)':'var(--green)';
+
+  const ctrl=(id,label,val,min,max,step,suf,h)=>'<div class="field"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px">'
+    +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+label+hint(h)+'</span>'
+    +'<span class="mono" style="font-weight:800;color:var(--primary)">'+val+suf+'</span></div>'
+    +'<input type="range" min="'+min+'" max="'+max+'" step="'+step+'" id="'+id+'" value="'+val+'"></div>';
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Этап 3 · Прогноз рисков</div>'
+    +'<h2>Предиктивная аналитика и кадровые риски</h2>'
+    +'<p class="lead">Реальные модели: экспоненциальный отток, вероятностный прогноз Монте-Карло ('+M.runs.toLocaleString('ru-RU')+' сценариев) и анализ дожития профессий. Все числа реагируют на параметры — это не статика.</p></div>'
+    +toolbar({exportLabel:'Прогноз (JSON)',exportAct:'exp-pred'})+'</div>'
+
+  // KPI лента
+  +'<div class="grid g3" style="margin-bottom:18px">'
+    +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+'Вероятность дефицита к концу горизонта</div>'
+      +'<div class="kv" style="color:'+probColor+'">'+pct(M.probDeficitEnd)+'%</div>'
+      +'<div class="kd">Доля из '+M.runs.toLocaleString('ru-RU')+' симуляций, где на '+(M.H-1)+'-й месяц потребность превысила доступный штат.</div></div>'
+    +'<div class="kpi" style="border-top:3px solid var(--red)"><div class="kt">'+ic('alert')+'Пиковый дефицит (медиана)</div>'
+      +'<div class="kv" style="color:var(--red)">'+fmtN(M.peakDeficitMed)+'</div>'
+      +'<div class="kd">До '+fmtN(M.peakDeficitP90)+' чел. в худших 10% сценариев (P90). Пик ожидается на '+M.peakMonth+'-м месяце.</div></div>'
+    +'<div class="kpi" style="border-top:3px solid var(--amber)"><div class="kt">'+ic('zap')+'FTE под риском автоматизации</div>'
+      +'<div class="kv" style="color:var(--amber)">'+fmtN(auto.totalAtRisk)+'</div>'
+      +'<div class="kd">Ожидаемое число позиций к высвобождению за '+auto.years.toFixed(1)+' г. (анализ дожития по навыкам).</div></div>'
+  +'</div>'
+
+  +'<div class="grid g12">'
+  // ЛЕВО — параметры прогноза
+  +'<div class="col-span-4"><div class="card accent-g">'
+    +'<div class="ctitle">'+ic('sliders')+'Драйверы прогноза'+hint('Эти параметры управляют моделями оттока, найма и автоматизации.')+'</div>'
+    +ctrl('turnover','Годовая текучесть',S.turnover,2,45,1,'%','Доля персонала, увольняющегося за год. Переводится в месячную вероятность: 1−(1−p)^(1/12).')
+    +'<div class="fnote" style="margin-top:-6px;margin-bottom:12px">Оценка: <b>'+turnBenchmark+'</b> (бенчмарк ~12–18%).</div>'
+    +ctrl('hireCap','Ёмкость найма',S.hireCap,1,120,1,' чел/мес','Сколько человек реально можно нанять за месяц при текущих рекрутинговых ресурсах.')
+    +ctrl('fillDays','Срок закрытия вакансии',S.fillDays,15,180,5,' дн','Чем дольше закрывается вакансия, тем ниже реализуемость найма в модели.')
+    +ctrl('sepCap','Ёмкость высвобождения',S.sepCap,0,80,1,' чел/мес','Сколько профицитных позиций можно управляемо сократить/перевести за месяц.')
+    +ctrl('autoPace','Темп автоматизации',S.autoPace,0.3,1.6,0.1,'×','Скорость внедрения технологий. Множитель к риску вытеснения профессий.')
+    +ctrl('mcRuns','Симуляций Монте-Карло',S.mcRuns,100,1200,50,'','Больше прогонов — стабильнее перцентили, но дольше расчёт.')
+    +'<div class="note note-blue" style="margin-top:6px">'+ic('info')+'<div>Модель учитывает случайные колебания оттока (±40%), спроса (±5%) и успешности найма. Результат — коридор вероятных исходов, а не одна цифра.</div></div>'
+  +'</div></div>'
+
+  // ПРАВО — графики + риски
+  +'<div class="col-span-8"><div class="grid" style="gap:18px">'
+    +'<div class="card"><div class="ctitle">'+ic('trend')+'Вероятностный прогноз численности (веер Монте-Карло)'
+      +hint('P50 — срединный прогноз доступной численности. Коридор P10–P90 показывает диапазон, в который попадает 80% исходов. Расхождение с красной линией потребности = зона риска.')+'</div>'
+      +svgForecast(M)
+      +'<div class="legend">'
+        +'<span><span class="swatch line" style="background:#c4361b"></span>Потребность</span>'
+        +'<span><span class="swatch line" style="background:#0f766e"></span>Доступно P50</span>'
+        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>P10–P90</span>'
+      +'</div>'
+      +(M.firstDeficit>=0
+        ? '<div class="note note-red" style="margin-top:14px">'+ic('alert')+'<div><b>Кадровый разрыв прогнозируется с '+M.firstDeficit+'-го месяца.</b> Без усиления найма ('+S.hireCap+' чел/мес) пик дефицита достигнет ~'+fmtN(M.peakVal)+' чел. Рекомендуется опережающий рекрутинг и план переобучения.</div></div>'
+        : '<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>Устойчивого дефицита не прогнозируется.</b> Текущая ёмкость найма покрывает потребность по медианному сценарию на всём горизонте.</div></div>')
+    +'</div>'
+
+    +'<div class="card"><div class="ctitle">'+ic('zap')+'Анализ дожития профессий (риск автоматизации)'
+      +hint('Survival Analysis: S(t)=exp(−λt). Риск λ выводится из вектора навыков должности (рутинные операции = высокий риск; аналитика, ML, сети = низкий), масштабируется темпом автоматизации.')+'</div>'
+      +'<div class="tbl-wrap"><table><thead><tr>'
+        +'<th>Профессия</th><th class="c">Риск навыков</th><th class="c">Вероятность вытеснения</th>'
+        +'<th class="c">FTE под риском</th><th class="c">Рекомендация</th></tr></thead><tbody>'
+        +auto.rows.map(r=>'<tr><td style="font-weight:700">'+r.p.name+'</td>'
+          +'<td class="c">'+hbar(r.hz*100, r.hz>0.6?'var(--red)':r.hz>0.4?'var(--amber)':'var(--green)')+'<span class="mono small muted">'+pct(r.hz)+'%</span></td>'
+          +'<td class="c mono" style="font-weight:800;color:'+(r.dispProb>0.6?'var(--red)':r.dispProb>0.3?'var(--amber)':'var(--green)')+'">'+pct(r.dispProb)+'%</td>'
+          +'<td class="c mono" style="font-weight:700">'+r.dispFTE.toFixed(1)+'</td>'
+          +'<td class="c"><span class="badge '+r.bcls+'">'+r.status+'</span></td></tr>').join('')
+      +'</tbody></table></div>'
+      +'<div class="fnote">Расчёт за горизонт '+auto.years.toFixed(1)+' г. при темпе автоматизации ×'+S.autoPace+'. «FTE под риском» = численность роли × вероятность вытеснения.</div>'
+    +'</div>'
+
+    +'<div class="card"><div class="ctitle">'+ic('route')+'Рекомендуемые мосты переобучения'
+      +hint('Система сопоставляет роли с высоким риском вытеснения (источники) с дефицитными ролями (цели) по пересечению навыков и экономике (ROI переобучения).')+'</div>'
+      +(bridges.length? '<div class="tbl-wrap"><table><thead><tr>'
+        +'<th>Источник (профицит/риск)</th><th class="c"></th><th>Цель (дефицит)</th>'
+        +'<th class="c">Совпадение</th><th class="c">ROI</th><th class="c">Статус</th></tr></thead><tbody>'
+        +bridges.map(br=>'<tr><td style="font-weight:600">'+br.src.name+'</td>'
+          +'<td class="c muted">'+ic('arrow')+'</td>'
+          +'<td style="font-weight:600">'+br.tgt.name+'</td>'
+          +'<td class="c mono" style="font-weight:700">'+br.overlap+'%</td>'
+          +'<td class="c mono" style="font-weight:800;color:'+(br.roi>=0?'var(--green)':'var(--red)')+'">'+br.roi+'%</td>'
+          +'<td class="c">'+(br.feasible?'<span class="tag tag-ok">'+ic('check')+'Реально</span>':'<span class="badge b-gray">сложно</span>')+'</td></tr>').join('')
+        +'</tbody></table></div>'
+        +'<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>Покрытие переобучением: '+feasibleShare+'%</b> предложенных переходов выполнимы (пересечение навыков ≥ 40%). Подробная экономика — на вкладке «Переобучение и CBA».</div></div>'
+        : '<div class="muted small" style="font-style:italic">Недостаточно должностей для построения мостов.</div>')
+    +'</div>'
+  +'</div></div>'
+  +'</div></div>';
+}
+
+/* ============================================================
+   ВКЛАДКА 4 — ПЕРЕОБУЧЕНИЕ И CBA
+   ============================================================ */
+function renderCBA(){
+  const list=Object.values(profDB);
+  const source = profDB[S.sourceProf] || list[0];
+  const target = profDB[S.targetProf] || list[1] || list[0];
+  const c = cbaPair(source,target);
+  const dark = c.positive;
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Этап 4 · Экономическое обоснование</div>'
+    +'<h2>Переобучение и анализ затрат (CBA)</h2>'
+    +'<p class="lead">Финансовое сравнение: уволить избыточных и нанять новых ПРОТИВ внутреннего переобучения под дефицитные роли. Методология SHRM.</p></div>'
+    +toolbar({exportLabel:'Отчёт ROI (JSON)',exportAct:'exp-cba'})+'</div>'
+
+  +'<div class="grid g2">'
+  // ЛЕВО — сопоставление навыков
+  +'<div class="card accent"><div class="ctitle">'+ic('target')+'Профиль переобучения (сопоставление навыков)'
+    +hint('Алгоритм сравнивает векторы навыков ролей. Разрыв (недостающие навыки) определяет стоимость курсов ДПО.')+'</div>'
+    +'<div style="display:flex;align-items:center;gap:14px;background:var(--surface2);padding:16px;border-radius:12px;border:1px solid var(--line);margin-bottom:22px">'
+      +'<div style="flex:1"><label class="flabel" style="color:var(--red);font-size:10px;letter-spacing:1px;text-transform:uppercase">Исходная (профицит)</label>'
+        +'<select class="select" id="sourceProf" style="border-color:var(--red-bd)">'+list.map(p=>'<option value="'+p.id+'"'+(source.id===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select></div>'
+      +'<div class="muted">'+ic('arrow')+'</div>'
+      +'<div style="flex:1"><label class="flabel" style="color:var(--green);font-size:10px;letter-spacing:1px;text-transform:uppercase">Целевая (дефицит)</label>'
+        +'<select class="select" id="targetProf" style="border-color:var(--green-bd)">'+list.map(p=>'<option value="'+p.id+'"'+(target.id===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select></div>'
+    +'</div>'
+    +'<div style="margin-bottom:22px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px">'
+      +'<span style="display:flex;align-items:center;gap:7px;color:var(--green)">'+ic('check')+'Совпадающие компетенции</span>'
+      +'<span class="mono" style="color:var(--green);font-size:16px;font-weight:800">'+c.overlapPct+'%</span></div>'
+      +hbar(c.overlapPct,'var(--green)')
+      +'<div class="chips">'+(c.overlap.length?c.overlap.map(s=>'<span class="chip chip-ok">'+s+'</span>').join(''):'<span class="muted small" style="font-style:italic">нет пересечений</span>')+'</div></div>'
+    +'<div style="border-top:1px solid var(--line2);padding-top:18px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px">'
+      +'<span style="display:flex;align-items:center;gap:7px;color:var(--red)">'+ic('alert')+'Разрыв навыков (нужно доучить)'+hint('Каждый недостающий навык умножается на «цену за навык» из справочника и формирует стоимость обучения.')+'</span>'
+      +'<span class="mono" style="color:var(--red);font-size:16px;font-weight:800">'+c.gapPct+'%</span></div>'
+      +hbar(c.gapPct,'var(--red)')
+      +'<div class="chips">'+(c.missing.length?c.missing.map(s=>'<span class="chip chip-gap">'+s+'</span>').join(''):'<span class="small" style="color:var(--green);font-weight:700;font-style:italic">полное соответствие</span>')+'</div></div>'
+  +'</div>'
+
+  // ПРАВО — экономика
+  +'<div class="card '+(dark?'dark':'')+'" '+(dark?'':'style="background:var(--red-l);border-color:var(--red-bd)"')+'>'
+    +'<div class="ctitle" style="'+(dark?'color:#fff;border-color:var(--ink3)':'color:#7a2310;border-color:var(--red-bd)')+'">'+ic('dollar')+'Cost-Benefit Analysis'
+      +hint('Сценарий 1 (увольнение+найм): 3 оклада исходной ЗП + 1.5 оклада новой. Сценарий 2 (рескиллинг): база ДПО + навыки × цена + оплата простоя.')+'</div>'
+    +cbaBlock('Сценарий 1 · Увольнение и найм с рынка',[
+      ['Выходное пособие (3 оклада исх.)',c.severance],
+      ['Рекрутинг и адаптация (1.5 оклада нов.)',c.recruiting]
+    ],'Итого затраты',c.replaceCost,dark,'var(--red)')
+    +cbaBlock('Сценарий 2 · Внутренний рескиллинг',[
+      ['Курсы ДПО (база + '+c.missing.length+' навык. × ставка)',c.trainingCost],
+      ['Оплата простоя на учёбу (~1.5 мес.)',c.lostProd]
+    ],'Итого инвестиции',c.reskillCost,dark,'var(--green)')
+    +'<div style="margin-top:18px;padding:22px;border-radius:14px;text-align:center;'
+      +(c.positive?'background:rgba(17,122,91,.18);border:1px solid rgba(17,122,91,.4)':'background:rgba(196,54,27,.14);border:1px solid var(--red-bd)')+'">'
+      +'<div class="mono" style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:'+(c.positive?'var(--green)':'var(--red)')+'">'
+        +(c.positive?'Чистая экономия — переобучать выгоднее':'Убыток — переобучение нецелесообразно')+'</div>'
+      +'<div class="mono" style="font-size:38px;font-weight:800;margin:10px 0;color:'+(dark?'#fff':c.positive?'var(--green)':'var(--red)')+'">'+fmtKZT(c.netSavings)+'</div>'
+      +'<div class="badge '+(c.positive?'b-green':'b-red')+'" style="font-size:12px;padding:6px 12px">ROI = '+c.roi+'%</div>'
+    +'</div>'
+  +'</div>'
+  +'</div></div>';
+}
+function cbaBlock(title,rows,totalLabel,total,dark,clr){
+  const txt=dark?'color:#aab2bd':'color:#6b6256';
+  const tot=dark?'color:#fff':'color:var(--ink)';
+  const bg=dark?'background:var(--ink2);border:1px solid var(--ink3)':'background:rgba(255,255,255,.6);border:1px solid var(--line)';
+  return '<div style="padding:16px;border-radius:12px;margin-bottom:14px;'+bg+'">'
+    +'<div class="mono" style="font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:11px;color:'+clr+'">'+title+'</div>'
+    +rows.map(([l,v])=>'<div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:12.5px;'+txt+'"><span>'+l+'</span><span class="mono">'+fmtKZT(v)+'</span></div>').join('')
+    +'<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid '+(dark?'var(--ink3)':'var(--line)')+';font-weight:800;'+tot+'"><span>'+totalLabel+'</span><span class="mono">'+fmtKZT(total)+'</span></div>'
+    +'</div>';
+}
+
+/* ============================================================
+   ВКЛАДКА 5 — СПРАВОЧНИК (оргструктура)
+   ============================================================ */
+function renderDictionary(){
+  const rows=Object.values(tempDB);
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">База данных · Оргструктура</div>'
+    +'<h2>Справочник компетенций и затрат</h2>'
+    +'<p class="lead">Должности, оклады, стоимость обучения и векторы навыков. Это основа расчётов CBA и анализа автоматизации.</p></div>'
+    +'<div class="actions">'
+      +'<button class="tool red" data-act="print">'+ic('file')+'PDF</button>'
+      +'<button class="tool" data-act="exp-csv">'+ic('download')+'Экспорт CSV</button>'
+      +'<button class="tool" data-act="imp-csv">'+ic('upload')+'Импорт CSV</button>'
+    +'</div></div>'
+
+  +'<div class="card flush">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;background:var(--surface2);border-bottom:1px solid var(--line);flex-wrap:wrap">'
+      +'<div class="small" style="display:flex;align-items:center;gap:8px;color:var(--t2);font-weight:600">'+ic('info','')+'Режим редактирования. Изменения нужно сохранить, чтобы применить к расчётам.</div>'
+      +'<div class="actions">'
+        +'<button class="tool" data-act="add-prof">'+ic('plus')+'Добавить</button>'
+        +(isDirty?'<button class="tool red" data-act="discard">'+ic('x')+'Отменить</button>'
+          +'<button class="tool" data-act="save-db" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+'Сохранить БД</button>':'')
+      +'</div>'
+    +'</div>'
+    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
+      +'<th>Должность</th><th class="c">Группа</th><th class="r">Оклад ₸</th>'
+      +'<th class="r">База ДПО ₸</th><th class="r">Цена навыка ₸</th>'
+      +'<th class="c">Числ.</th><th class="c">Ср.возр.</th><th class="c">Рынок</th>'
+      +'<th>Навыки (через ;)</th><th class="c">×</th></tr></thead><tbody>'
+      +rows.map(p=>{
+        const changed=isDirty && JSON.stringify(tempDB[p.id])!==JSON.stringify(profDB[p.id]);
+        return '<tr'+(changed?' class="dirty"':'')+' data-row="'+p.id+'">'
+          +'<td><input class="cell-edit" data-f="name" value="'+esc(p.name)+'"></td>'
+          +'<td class="c"><select class="cell-edit" data-f="type" style="text-align:center">'
+            +['core','aux','mgmt'].map(t=>'<option value="'+t+'"'+(p.type===t?' selected':'')+'>'+({core:'Core',aux:'Aux',mgmt:'Mgmt'})[t]+'</option>').join('')+'</select></td>'
+          +'<td class="r"><input class="cell-edit mono" data-f="salary" type="number" value="'+p.salary+'" style="text-align:right;color:var(--blue);font-weight:700"></td>'
+          +'<td class="r"><input class="cell-edit mono" data-f="trainingBase" type="number" value="'+p.trainingBase+'" style="text-align:right;color:var(--green);font-weight:700"></td>'
+          +'<td class="r"><input class="cell-edit mono" data-f="skillRate" type="number" value="'+p.skillRate+'" style="text-align:right;color:var(--amber);font-weight:700"></td>'
+          +'<td class="c"><input class="cell-edit mono" data-f="headcount" type="number" value="'+(p.headcount!=null?p.headcount:0)+'" style="text-align:center;width:54px"></td>'
+          +'<td class="c"><input class="cell-edit mono" data-f="avgAge" type="number" value="'+(p.avgAge!=null?p.avgAge:42)+'" style="text-align:center;width:48px"></td>'
+          +'<td class="c"><input class="cell-edit mono" data-f="market" type="number" step="0.05" min="0" max="1" value="'+(p.market!=null?p.market:0.4)+'" style="text-align:center;width:52px"></td>'
+          +'<td><input class="cell-edit mono" data-f="skills" value="'+esc(p.skills)+'" style="font-size:11px"></td>'
+          +'<td class="c"><button class="xbtn" data-del="'+p.id+'" style="width:30px;height:30px">'+ic('trash')+'</button></td></tr>';
+      }).join('')
+    +'</tbody></table></div>'
+  +'</div></div>';
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+/* ============================================================
+   ВКЛАДКА 0 — СВОДНЫЙ ДАШБОРД (топ-менеджмент, «светофоры»)
+   ============================================================ */
+function light(v,a,b){ return v>=b?'var(--red)':v>=a?'var(--amber)':'var(--green)'; }
+function renderDashboard(){
+  const b=computeBase();
+  const M=projectGap();
+  const risk=riskAnalysis();
+  const plan=actionPlan();
+  const auto=automationAnalysis(M.H);
+  const top=risk.rows.slice(0,5);
+  const gapColor=b.diff>0?'var(--red)':b.diff<0?'var(--amber)':'var(--green)';
+  const probColor=light(M.probDeficitEnd*100,30,60);
+  const riskColor=light(risk.portfolioIndex,40,66);
+
+  const tl=(title,val,sub,color,icon)=>'<div class="kpi" style="border-top:3px solid '+color+'">'
+    +'<div class="kt">'+ic(icon)+title+'</div>'
+    +'<div class="kv" style="color:'+color+'">'+val+'</div><div class="kd">'+sub+'</div></div>';
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Обзор · Стратегический контур</div>'
+    +'<h2>Сводный дашборд кадровой траектории</h2>'
+    +'<p class="lead">Единый «светофор» состояния: разрыв сейчас, вероятность дефицита на горизонте, портфель кадровых рисков и стоимость плана действий. Все показатели агрегируются из расчётных моделей.</p></div>'
+    +toolbar({exportLabel:'Сводка (JSON)',exportAct:'exp-dash'})+'</div>'
+
+  +'<div class="grid g3" style="margin-bottom:18px">'
+    +tl('Разрыв «сейчас»', (b.diff>0?'−':b.diff<0?'+':'')+fmtN(Math.abs(b.diff)),
+        b.diff>0?'дефицит против факта':b.diff<0?'профицит против расчёта':'баланс', gapColor,'users')
+    +tl('Вероятность дефицита', pct(M.probDeficitEnd)+'%',
+        'к '+(M.H-1)+'-му мес. ('+M.runs.toLocaleString('ru-RU')+' симуляций)', probColor,'shield')
+    +tl('Индекс риска (портфель)', risk.portfolioIndex+'<small style="font-size:14px;color:var(--t3)"> /100</small>',
+        risk.critical+' критич. · '+risk.elevated+' повыш. ролей', riskColor,'gauge')
+  +'</div>'
+  +'<div class="grid g3" style="margin-bottom:18px">'
+    +tl('Пиковый дефицит', fmtN(M.peakDeficitMed),
+        'медиана; до '+fmtN(M.peakDeficitP90)+' (P90) на '+M.peakMonth+'-м мес.', 'var(--red)','alert')
+    +tl('FTE под автоматизацией', fmtN(auto.totalAtRisk),
+        'к высвобождению за '+auto.years.toFixed(1)+' г.', 'var(--amber)','zap')
+    +tl('Стоимость плана', fmtKZT(plan.total),
+        plan.hire+' найм · '+plan.reskill+' переоб. · '+plan.release+' высвоб.', 'var(--primary)','dollar')
+  +'</div>'
+
+  +'<div class="grid g12">'
+    +'<div class="col-span-8"><div class="card"><div class="ctitle">'+ic('trend')+'Кадровая траектория объекта'
+      +hint('Потребность по фазам жизненного цикла против прогноза доступной численности (медиана Монте-Карло, коридор P10–P90).')+'</div>'
+      +svgForecast(M)
+      +'<div class="legend">'
+        +'<span><span class="swatch line" style="background:#c4361b"></span>Потребность</span>'
+        +'<span><span class="swatch line" style="background:#0f766e"></span>Доступно (P50)</span>'
+        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>P10–P90</span>'
+      +'</div>'
+      +(M.firstDeficit>=0
+        ? '<div class="note note-red" style="margin-top:14px">'+ic('alert')+'<div><b>Разрыв с '+M.firstDeficit+'-го месяца.</b> Требуется опережающий найм и переобучение — см. вкладку «План действий».</div></div>'
+        : '<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>Устойчивого дефицита не прогнозируется</b> по медианному сценарию.</div></div>')
+    +'</div></div>'
+
+    +'<div class="col-span-4"><div class="card" style="height:100%"><div class="ctitle">'+ic('alert')+'Топ кадровых рисков'
+      +hint('Роли с наибольшим взвешенным индексом риска (демография, bus-factor, навыки, текучесть, рынок, избыточность).')+'</div>'
+      +top.map(r=>'<div style="margin-bottom:13px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px">'
+        +'<span>'+r.p.name+'</span><span class="mono" style="color:'+light(r.index,40,66)+'">'+r.index+'</span></div>'
+        +hbar(r.index, light(r.index,40,66))+'</div>').join('')
+      +'<div class="note note-blue" style="margin-top:10px">'+ic('info')+'<div>Детальная тепловая карта и веса факторов — на вкладке «Кадровые риски».</div></div>'
+    +'</div></div>'
+  +'</div></div>';
+}
+
+/* ============================================================
+   ВКЛАДКА — КАДРОВЫЕ РИСКИ (многофакторная оценка + тепловая карта)
+   ============================================================ */
+function renderRisks(){
+  const r=riskAnalysis();
+  const FAC=[['demo','Демография'],['bus','Ключевой спец.'],['skill','Навыки'],
+             ['turn','Текучесть'],['market','Рынок'],['redund','Избыточность']];
+  const cell=v=>{const c=light(v*100,40,66);
+    return '<td class="c" style="background:'+(v>=0.66?'var(--red-l)':v>=0.4?'var(--amber-l)':'var(--green-l)')+'">'
+      +'<span class="mono" style="font-weight:700;color:'+c+'">'+pct(v)+'</span></td>';};
+  const wslider=(id,label)=>'<div class="field" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px">'
+    +'<span class="muted">'+label+'</span><span class="mono" style="color:var(--primary);font-weight:800">'+S[id]+'</span></div>'
+    +'<input type="range" min="0" max="40" id="'+id+'" value="'+S[id]+'"></div>';
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Управление рисками · §6</div>'
+    +'<h2>Кадровые риски — многофакторная оценка</h2>'
+    +'<p class="lead">Шесть факторов риска по каждой роли сводятся во взвешенный индекс 0–100. Веса настраиваются под приоритеты предприятия. Каждый риск связан с рекомендованным действием (митигейшн).</p></div>'
+    +toolbar({exportLabel:'Реестр рисков (JSON)',exportAct:'exp-risk'})+'</div>'
+
+  +'<div class="grid g3" style="margin-bottom:18px">'
+    +'<div class="metric"><div class="mlabel">Индекс риска (портфель)</div><div class="mval" style="color:'+light(r.portfolioIndex,40,66)+'">'+r.portfolioIndex+'<small> /100</small></div><div class="msub">взвешен по численности ролей</div></div>'
+    +'<div class="metric gap-pos"><div class="mlabel">Критических ролей</div><div class="mval">'+r.critical+'</div><div class="msub">индекс ≥ 66 — нужен план</div></div>'
+    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">Повышенный риск</div><div class="mval" style="color:var(--amber)">'+r.elevated+'</div><div class="msub">индекс 40–65 — мониторинг</div></div>'
+  +'</div>'
+
+  +'<div class="grid g12">'
+  +'<div class="col-span-4"><div class="card accent"><div class="ctitle">'+ic('sliders')+'Веса факторов риска'
+    +hint('Приоритеты предприятия. Система нормирует веса к сумме — можно задавать в любых единицах.')+'</div>'
+    +wslider('wDemo','Демографический')+wslider('wBus','Ключевой специалист (bus factor)')
+    +wslider('wSkill','Компетентностный разрыв')+wslider('wTurn','Текучесть')
+    +wslider('wMarket','Внешний рыночный')+wslider('wRedund','Избыточность (автоматизация)')
+    +'<div class="note note-blue" style="margin-top:8px">'+ic('info')+'<div>Демография считается от среднего возраста роли (пенсия '+PENSION_AGE+' лет), bus-factor — от числа носителей, избыточность — из анализа дожития по навыкам.</div></div>'
+  +'</div></div>'
+
+  +'<div class="col-span-8"><div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('gauge')+'Тепловая карта рисков по ролям'
+    +hint('Цвет ячейки — уровень фактора (зелёный/жёлтый/красный). Итоговый индекс — взвешенная сумма. Сортировка по убыванию риска.')+'</div>'
+    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
+    +'<th>Роль</th>'+FAC.map(f=>'<th class="c">'+f[1]+'</th>').join('')
+    +'<th class="c">Индекс</th><th class="c">Уровень</th><th>Рекомендация</th></tr></thead><tbody>'
+    +r.rows.map(row=>'<tr><td style="font-weight:700">'+row.p.name+'</td>'
+      +FAC.map(f=>cell(row.f[f[0]])).join('')
+      +'<td class="c"><span class="mono" style="font-weight:800;font-size:15px;color:'+light(row.index,40,66)+'">'+row.index+'</span></td>'
+      +'<td class="c"><span class="badge '+row.lvl.b+'">'+row.lvl.t+'</span></td>'
+      +'<td class="small">'+row.action+'</td></tr>').join('')
+    +'</tbody></table></div></div></div>'
+  +'</div></div>';
+}
+
+/* ============================================================
+   ВКЛАДКА — ПЛАН ДЕЙСТВИЙ (нанять/обучить/высвободить, стоимость, сроки)
+   ============================================================ */
+function renderActions(){
+  const plan=actionPlan();
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Действия · §10</div>'
+    +'<h2>План кадровых действий</h2>'
+    +'<p class="lead">Из разрывов, рисков и анализа автоматизации формируется приоритизированный набор действий: найм, переобучение, высвобождение — с оценкой стоимости и сроков.</p></div>'
+    +toolbar({exportLabel:'План (JSON)',exportAct:'exp-act'})+'</div>'
+
+  +'<div class="grid g3" style="margin-bottom:18px">'
+    +'<div class="metric gap-pos"><div class="mlabel">Найм</div><div class="mval">'+fmtN(plan.hire)+' <small>чел.</small></div><div class="msub">закрытие дефицита</div></div>'
+    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">Переобучение</div><div class="mval" style="color:var(--amber)">'+fmtN(plan.reskill)+' <small>чел.</small></div><div class="msub">внутренние переходы</div></div>'
+    +'<div class="metric"><div class="mlabel">Полная стоимость плана</div><div class="mval">'+fmtKZT(plan.total)+'</div><div class="msub">'+plan.acts.length+' действий</div></div>'
+  +'</div>'
+
+  +'<div class="card flush">'
+    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
+    +'<th>Действие</th><th>Объект</th><th class="c">Кол-во</th><th class="r">Стоимость</th>'
+    +'<th class="c">Срок</th><th class="c">Приоритет</th><th>Обоснование</th></tr></thead><tbody>'
+    +(plan.acts.length? plan.acts.map(a=>'<tr>'
+      +'<td><span class="badge '+a.cls+'">'+a.type+'</span></td>'
+      +'<td style="font-weight:600">'+a.target+'</td>'
+      +'<td class="c mono" style="font-weight:700">'+fmtN(a.qty)+'</td>'
+      +'<td class="r mono">'+fmtKZT(a.cost)+'</td>'
+      +'<td class="c mono">'+a.months+' мес.</td>'
+      +'<td class="c"><span class="badge '+(a.priority===1?'b-red':a.priority===2?'b-amber':'b-gray')+'">P'+a.priority+'</span></td>'
+      +'<td class="small muted">'+a.note+'</td></tr>').join('')
+      : '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;font-style:italic">Действий не требуется — траектория сбалансирована.</td></tr>')
+    +'</tbody></table></div></div>'
+  +'<div class="fnote" style="margin-top:14px">Стоимость найма — 1.5 оклада (рекрутинг+адаптация), высвобождения — 3 оклада (выходные обязательства), переобучения — по модели CBA. Сроки — из ёмкости найма/высвобождения и объёма разрыва навыков.</div>'
+  +'</div>';
+}
+
+/* ============================================================
+   ВКЛАДКА — СЦЕНАРИИ «ЧТО ЕСЛИ» (сохранение + сравнение)
+   ============================================================ */
+function renderScenarios(){
+  const cur=scenarioMetrics(S,profDB);
+  const rowsMetrics=[
+    ['Потребность (FTE)', s=>fmtN(s.required), false],
+    ['Разрыв «сейчас»', s=>fmtN(s.gapNow), true],
+    ['Горизонт (мес.)', s=>s.horizon, false],
+    ['Вер. дефицита', s=>pct(s.probDeficit)+'%', true],
+    ['Пиковый дефицит', s=>fmtN(s.peakDeficit), true],
+    ['FTE под автоматизацией', s=>fmtN(s.fteAtRisk), true],
+    ['Индекс риска', s=>s.riskIndex, true],
+    ['Стоимость плана', s=>fmtKZT(s.planCost), true]
+  ];
+  const cols=[{id:'__cur',name:'Текущее состояние',m:cur,cur:true}]
+    .concat(scenarios.map(s=>({id:s.id,name:s.name,m:scenarioMetrics(s.state,s.professions),baseline:s.baseline})));
+
+  return '<div class="fadein">'
+  +'<div class="pagehead"><div><div class="eyebrow">Сценарное моделирование · §7</div>'
+    +'<h2>Сценарии «что если» — сравнение траекторий</h2>'
+    +'<p class="lead">Сохраняйте полный снимок параметров и справочника как сценарий, сравнивайте кадровые траектории бок о бок, назначайте базовую линию. Песочница отделена от текущих данных.</p></div>'
+    +'<div class="actions"><button class="tool red" data-act="print">'+ic('file')+'PDF</button>'
+      +'<button class="tool" data-act="save-scenario" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+'Сохранить текущее как сценарий</button></div></div>'
+
+  +'<div class="card flush">'
+    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
+    +'<th>Показатель</th>'+cols.map(c=>'<th class="c">'+(c.cur?'● ':'')+esc(c.name)+(c.baseline?' ★':'')+'</th>').join('')+'</tr></thead><tbody>'
+    +rowsMetrics.map(([label,fn])=>'<tr><td style="font-weight:700">'+label+'</td>'
+      +cols.map(c=>'<td class="c mono'+(c.cur?'" style="background:var(--primary-l)':'')+'">'+fn(c.m)+'</td>').join('')+'</tr>').join('')
+    +'<tr class="grouprow"><td>Управление</td>'
+      +cols.map(c=>'<td class="c">'+(c.cur
+        ? '<span class="muted small">— активно —</span>'
+        : '<div style="display:flex;gap:5px;justify-content:center">'
+          +'<button class="tool" data-load-sc="'+c.id+'" style="padding:5px 8px;font-size:11px">Загрузить</button>'
+          +'<button class="tool" data-base-sc="'+c.id+'" style="padding:5px 8px;font-size:11px'+(c.baseline?';background:var(--gold-l);border-color:var(--gold)':'')+'">★</button>'
+          +'<button class="xbtn" data-del-sc="'+c.id+'" style="width:28px;height:28px">'+ic('trash')+'</button></div>')+'</td>').join('')
+    +'</tr></tbody></table></div></div>'
+  +(scenarios.length? '' : '<div class="note note-blue" style="margin-top:16px">'+ic('info')+'<div>Пока сохранён только текущий срез. Измените параметры на других вкладках (объём, сценарий, темп автоматизации, фазы) и нажмите «Сохранить текущее как сценарий», чтобы сравнить варианты.</div></div>')
+  +'<div class="fnote" style="margin-top:14px">Каждый сценарий — независимый снимок состояния и справочника. Метрики пересчитываются полными моделями (нормирование, Монте-Карло, риски, план действий) под состоянием сценария. «★» — базовая линия.</div>'
+  +'</div>';
+}
+
+/* ============================================================
+   КОНТРОЛЛЕР — вкладки, рендер, события, ввод/вывод
+   ============================================================ */
+
+const TABS = [
+  {id:'dashboard',  label:'Дашборд',            icon:'gauge',    render:renderDashboard},
+  {id:'normative',  label:'Нормативный расчёт', icon:'sliders',  render:renderNormative},
+  {id:'lifecycle',  label:'Жизненный цикл',     icon:'activity', render:renderLifecycle},
+  {id:'predictive', label:'Предиктивный анализ',icon:'brain',    render:renderPredictive},
+  {id:'risks',      label:'Кадровые риски',     icon:'shield',   render:renderRisks},
+  {id:'cba',        label:'Переобучение / CBA', icon:'dollar',   render:renderCBA},
+  {id:'actions',    label:'План действий',      icon:'route',    render:renderActions},
+  {id:'scenarios',  label:'Сценарии',           icon:'layers',   render:renderScenarios},
+  {id:'dictionary', label:'Справочник',         icon:'db',       render:renderDictionary}
+];
+
+// какие ключи состояния — числовые
+const NUM_KEYS = new Set(['volume','norm','absCoeff','actualStaff','shifts',
+  'rCore','rAux','rMgmt','durDesign','durConstruction','durCommissioning','durOperation','durDecline',
+  'turnover','hireCap','fillDays','sepCap','autoPace','mcRuns',
+  'wDemo','wBus','wSkill','wTurn','wMarket','wRedund']);
+
+/* ---------- ВКЛАДКИ ---------- */
+function buildTabs(){
+  const nav=document.getElementById('tabs');
+  nav.innerHTML = TABS.map(t=>
+    '<button class="tab'+(t.id===activeTab?' active':'')+'" data-tab="'+t.id+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>'
+  ).join('');
+}
+function syncTabs(){
+  document.querySelectorAll('#tabs .tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===activeTab);
+  });
+}
+
+/* ---------- РЕНДЕР c сохранением фокуса ---------- */
+function render(){
+  const view=document.getElementById('view');
+  // запомнить активный элемент внутри #view и позицию курсора
+  const act=document.activeElement;
+  let focusId=null, selS=null, selE=null;
+  if(act && view.contains(act) && act.id){
+    focusId=act.id;
+    try{ selS=act.selectionStart; selE=act.selectionEnd; }catch(e){}
+  }
+  const tab=TABS.find(t=>t.id===activeTab)||TABS[0];
+  view.innerHTML = tab.render();
+  persist(); // автосохранение состояния в localStorage
+  // восстановить фокус
+  if(focusId){
+    const el=document.getElementById(focusId);
+    if(el){
+      try{ el.focus(); }catch(e){}
+      if(selS!=null){ try{ el.setSelectionRange(selS,selE); }catch(e){} }
+    }
+  }
+}
+
+/* ---------- УВЕДОМЛЕНИЯ ---------- */
+let toastTimer=null;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.className='show'+(type?(' '+type):'');
+  t.innerHTML=ic(type==='err'?'alert':type==='warn'?'info':'check')+'<span>'+msg+'</span>';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ t.className=''; },2800);
+}
+
+/* ---------- ШАБЛОНЫ ---------- */
+function applyTemplate(key){
+  const all={...DEFAULT_TEMPLATES,...customTemplates};
+  const tpl=all[key];
+  if(!tpl) return;
+  Object.keys(tpl).forEach(k=>{ if(k!=='name') S[k]=tpl[k]; });
+  S.template=key;
+  render();
+  showToast('Шаблон «'+tpl.name+'» применён');
+}
+function saveCustomTemplate(){
+  const name=prompt('Название нового шаблона:','Мой профиль');
+  if(!name) return;
+  const key='custom_'+Date.now().toString(36);
+  customTemplates[key]={
+    name:name, volume:S.volume, unit:S.unit, period:S.period, norm:S.norm, shifts:S.shifts,
+    absCoeff:S.absCoeff, actualStaff:S.actualStaff, rCore:S.rCore, rAux:S.rAux, rMgmt:S.rMgmt,
+    turnover:S.turnover, hireCap:S.hireCap, fillDays:S.fillDays, sepCap:S.sepCap, autoPace:S.autoPace
+  };
+  S.template=key;
+  render();
+  showToast('Шаблон «'+name+'» сохранён');
+}
+
+/* ---------- ВВОД/ВЫВОД ФАЙЛОВ ---------- */
+function downloadFile(name,content,mime){
+  const blob=new Blob([content],{type:(mime||'application/octet-stream')+';charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },100);
+}
+function snapshot(kind){
+  return JSON.stringify({
+    app:'SWP-Кадровый прогноз', kind:kind, version:1,
+    savedAt:new Date().toISOString(),
+    state:S, professions:profDB
+  },null,2);
+}
+function exportJSON(kind,label){
+  const stamp=new Date().toISOString().slice(0,10);
+  downloadFile('SWP_'+kind+'_'+stamp+'.json', snapshot(kind), 'application/json');
+  showToast((label||'Данные')+' выгружены в JSON');
+}
+function professionsToCSV(){
+  const head=['id','name','type','salary','trainingBase','skillRate','headcount','avgAge','market','skills'];
+  const esc=v=>{ v=String(v==null?'':v); return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const lines=[head.join(';')];
+  Object.values(profDB).forEach(p=>lines.push(head.map(h=>esc(p[h])).join(';')));
+  return '\uFEFF'+lines.join('\n'); // BOM для Excel
+}
+function exportCSV(){
+  downloadFile('SWP_справочник_'+new Date().toISOString().slice(0,10)+'.csv', professionsToCSV(),'text/csv');
+  showToast('Справочник выгружен в CSV');
+}
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,'').replace(/\r/g,'');
+  const rows=[]; let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){
+      if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=ch;
+    }else{
+      if(ch==='"') q=true;
+      else if(ch===';'||ch===','){ row.push(cur); cur=''; }
+      else if(ch==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+      else cur+=ch;
+    }
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows.filter(r=>r.length>1||(r.length===1&&r[0].trim()!==''));
+}
+function importCSVText(text){
+  const rows=parseCSV(text);
+  if(rows.length<2){ showToast('CSV пуст или не распознан','err'); return; }
+  const head=rows[0].map(h=>h.trim());
+  const idx=n=>head.indexOf(n);
+  const next={};
+  let count=0;
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i]; if(!r||r.join('').trim()==='') continue;
+    const name=(idx('name')>=0?r[idx('name')]:r[1]||'').trim();
+    if(!name) continue;
+    let id=(idx('id')>=0?r[idx('id')]:'').trim();
+    if(!id) id='p_'+Math.random().toString(36).slice(2,8);
+    const num=(n,def)=>{ const v=parseFloat(idx(n)>=0?r[idx(n)]:''); return isNaN(v)?def:v; };
+    let type=(idx('type')>=0?r[idx('type')]:'core').trim();
+    if(!['core','aux','mgmt'].includes(type)) type='core';
+    next[id]={ id, name, type,
+      salary:num('salary',300000), trainingBase:num('trainingBase',80000),
+      skillRate:num('skillRate',12000),
+      headcount:num('headcount',PROF_DEFAULTS.headcount),
+      avgAge:num('avgAge',PROF_DEFAULTS.avgAge),
+      market:num('market',PROF_DEFAULTS.market),
+      skills:(idx('skills')>=0?r[idx('skills')]:'').trim() };
+    count++;
+  }
+  if(!count){ showToast('Не найдено ни одной должности','err'); return; }
+  profDB=next; tempDB=JSON.parse(JSON.stringify(next)); isDirty=false;
+  // починить выбранные профессии в CBA, если исчезли
+  const ids=Object.keys(profDB);
+  if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
+  if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
+  render();
+  showToast('Импортировано должностей: '+count);
+}
+function importJSONText(text){
+  let data;
+  try{ data=JSON.parse(text); }catch(e){ showToast('Файл не является корректным JSON','err'); return; }
+  const st=data.state||data; // допускаем как «снимок», так и голый объект состояния
+  let applied=0;
+  Object.keys(S).forEach(k=>{ if(st[k]!==undefined){ S[k]=st[k]; applied++; } });
+  if(data.professions && typeof data.professions==='object'){
+    profDB=JSON.parse(JSON.stringify(data.professions));
+    tempDB=JSON.parse(JSON.stringify(data.professions));
+    isDirty=false;
+  }
+  const ids=Object.keys(profDB);
+  if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
+  if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
+  if(!applied && !data.professions){ showToast('В файле не найдено параметров сценария','warn'); return; }
+  render();
+  showToast('Сценарий загружен из файла');
+}
+
+let pendingImport=null; // 'json' | 'csv'
+function triggerImport(kind){
+  pendingImport=kind;
+  const f=document.getElementById('fileImport');
+  f.accept = kind==='csv' ? '.csv' : '.json';
+  f.value='';
+  f.click();
+}
+
+/* ---------- ГЛОССАРИЙ ---------- */
+function openGlossary(){
+  const body=document.getElementById('glossaryBody');
+  body.innerHTML = GLOSSARY.map(g=>
+    '<div class="gitem"><div class="gterm">'+g.t+'</div><div class="gdesc">'+g.d+'</div></div>'
+  ).join('');
+  document.getElementById('modal').classList.add('show');
+}
+function closeGlossary(){ document.getElementById('modal').classList.remove('show'); }
+
+/* ---------- ДЕЙСТВИЯ КНОПОК ---------- */
+function handleAction(act){
+  switch(act){
+    case 'print': window.print(); break;
+    case 'exp-norm': exportJSON('normative','Параметры'); break;
+    case 'exp-life': exportJSON('lifecycle','Сценарий'); break;
+    case 'exp-pred': exportJSON('predictive','Прогноз'); break;
+    case 'exp-cba':  exportJSON('cba','Расчёт CBA'); break;
+    case 'exp-dash': exportJSON('dashboard','Сводка'); break;
+    case 'exp-risk': exportJSON('risk','Реестр рисков'); break;
+    case 'exp-act':  exportJSON('action','План действий'); break;
+    case 'imp-norm':
+    case 'imp-life': triggerImport('json'); break;
+    case 'exp-csv': exportCSV(); break;
+    case 'imp-csv': triggerImport('csv'); break;
+    case 'add-prof': addProfession(); break;
+    case 'discard':  tempDB=JSON.parse(JSON.stringify(profDB)); isDirty=false; render(); showToast('Изменения отменены'); break;
+    case 'save-db':  saveDictionary(); break;
+    case 'save-scenario': saveScenario(); break;
+  }
+}
+function saveScenario(){
+  const name=prompt('Название сценария:','Сценарий '+(scenarios.length+1));
+  if(name===null) return;
+  scenarios.push(currentScenarioSnapshot(name.trim()||('Сценарий '+(scenarios.length+1))));
+  render();
+  showToast('Сценарий сохранён ('+scenarios.length+' в сравнении)');
+}
+function loadScenario(id){
+  const sc=scenarios.find(s=>s.id===id); if(!sc) return;
+  Object.keys(S).forEach(k=>{ if(sc.state[k]!==undefined) S[k]=sc.state[k]; });
+  profDB=JSON.parse(JSON.stringify(sc.professions));
+  tempDB=JSON.parse(JSON.stringify(sc.professions));
+  isDirty=false;
+  const ids=Object.keys(profDB);
+  if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
+  if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
+  render();
+  showToast('Сценарий «'+sc.name+'» загружен в рабочую область');
+}
+function setBaseline(id){
+  scenarios.forEach(s=>{ s.baseline=(s.id===id)?!s.baseline:false; });
+  render();
+}
+function deleteScenario(id){
+  scenarios=scenarios.filter(s=>s.id!==id);
+  render();
+  showToast('Сценарий удалён');
+}
+function addProfession(){
+  const id='p_'+Math.random().toString(36).slice(2,8);
+  tempDB[id]={id,name:'Новая должность',type:'core',...JSON.parse(JSON.stringify(PROF_DEFAULTS))};
+  isDirty=true; render();
+}
+function saveDictionary(){
+  // подчистить пустые имена
+  Object.values(tempDB).forEach(p=>{ if(!p.name||!p.name.trim()) p.name='Без названия'; });
+  profDB=JSON.parse(JSON.stringify(tempDB));
+  isDirty=false;
+  const ids=Object.keys(profDB);
+  if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
+  if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
+  render();
+  showToast('Справочник сохранён — расчёты обновлены');
+}
+
+/* ---------- ОБРАБОТКА ВВОДА ---------- */
+function applyInput(el){
+  const id=el.id;
+  if(id && S[id]!==undefined){
+    if(NUM_KEYS.has(id)){
+      let v=parseFloat(el.value);
+      if(isNaN(v)) return; // не затираем при пустом поле
+      S[id]=v;
+    }else{
+      S[id]=el.value;
+    }
+    return true;
+  }
+  // редактирование ячеек справочника
+  if(el.classList.contains('cell-edit')){
+    const tr=el.closest('[data-row]'); if(!tr) return false;
+    const rid=tr.dataset.row, f=el.dataset.f;
+    if(!tempDB[rid]) return false;
+    if(['salary','trainingBase','skillRate','headcount','avgAge','market'].includes(f)){
+      const v=parseFloat(el.value); tempDB[rid][f]=isNaN(v)?0:v;
+    }else{
+      tempDB[rid][f]=el.value;
+    }
+    isDirty=true;
+    return 'cell';
+  }
+  return false;
+}
+
+/* ---------- ПРИВЯЗКА СОБЫТИЙ ---------- */
+function bindEvents(){
+  const view=document.getElementById('view');
+
+  // живое обновление значения без перерисовки (плавные ползунки, без скачков курсора)
+  view.addEventListener('input', e=>{
+    const el=e.target;
+    if(el.id==='saveTpl'||el.id==='tpl') return;
+    applyInput(el);
+  });
+
+  // фиксация — перерисовка
+  view.addEventListener('change', e=>{
+    const el=e.target;
+    if(el.id==='tpl'){ applyTemplate(el.value); return; }
+    const r=applyInput(el);
+    if(r) render();
+  });
+
+  // клики
+  view.addEventListener('click', e=>{
+    const actBtn=e.target.closest('[data-act]');
+    if(actBtn){ handleAction(actBtn.dataset.act); return; }
+    if(e.target.closest('#saveTpl')){ saveCustomTemplate(); return; }
+    const del=e.target.closest('[data-del]');
+    if(del){
+      const id=del.dataset.del;
+      delete tempDB[id]; isDirty=true; render();
+      return;
+    }
+    // операции со сценариями
+    const loadSc=e.target.closest('[data-load-sc]');
+    if(loadSc){ loadScenario(loadSc.dataset.loadSc); return; }
+    const baseSc=e.target.closest('[data-base-sc]');
+    if(baseSc){ setBaseline(baseSc.dataset.baseSc); return; }
+    const delSc=e.target.closest('[data-del-sc]');
+    if(delSc){ deleteScenario(delSc.dataset.delSc); return; }
+  });
+
+  // вкладки
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const b=e.target.closest('[data-tab]');
+    if(!b) return;
+    if(activeTab===b.dataset.tab) return;
+    activeTab=b.dataset.tab;
+    syncTabs();
+    render();
+  });
+
+  // глоссарий
+  document.getElementById('glossaryBtn').addEventListener('click', openGlossary);
+  document.getElementById('modalClose').addEventListener('click', closeGlossary);
+  document.getElementById('modal').addEventListener('click', e=>{
+    if(e.target.id==='modal') closeGlossary();
+  });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeGlossary(); });
+
+  // импорт файлов
+  document.getElementById('fileImport').addEventListener('change', e=>{
+    const file=e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const text=ev.target.result;
+      if(pendingImport==='csv') importCSVText(text);
+      else importJSONText(text);
+      pendingImport=null;
+    };
+    reader.onerror=()=>showToast('Не удалось прочитать файл','err');
+    reader.readAsText(file,'utf-8');
+  });
+}
+
+/* ---------- СТАРТ ---------- */
+function init(){
+  restore(); // подтянуть сохранённое состояние из localStorage (если есть)
+  buildTabs();
+  bindEvents();
+  render();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+
+</script>
+</body>
+</html>
