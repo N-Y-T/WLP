@@ -1576,13 +1576,25 @@ function renderDashboard(){
    ============================================================ */
 function renderRisks(){
   const r=riskAnalysis();
-  const FAC=[['demo','Демография'],['bus','Ключевой спец.'],['skill','Навыки'],
-             ['turn','Текучесть'],['market','Рынок'],['redund','Избыточность']];
+  const FAC=[['demo','Демография','Доля персонала роли, близкого к пенсионному возрасту'],
+             ['bus','Ключевой спец.','Зависимость от единственного носителя компетенции'],
+             ['skill','Навыки','Автоматизируемость/устаревание компетенций роли'],
+             ['turn','Текучесть','Риск ухода персонала роли'],
+             ['market','Рынок','Дефицитность профессии и срок закрытия вакансии'],
+             ['redund','Избыточность','Риск вытеснения роли автоматизацией']];
   const cell=v=>{const c=light(v*100,40,66);
     return '<td class="c" style="background:'+(v>=0.66?'var(--red-l)':v>=0.4?'var(--amber-l)':'var(--green-l)')+'">'
-      +'<span class="mono" style="font-weight:700;color:'+c+'">'+pct(v)+'</span></td>';};
-  const wslider=(id,label)=>'<div class="field" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px">'
-    +'<span class="muted">'+label+'</span><span class="mono" style="color:var(--primary);font-weight:800">'+S[id]+'</span></div>'
+      +'<span class="mono" style="font-weight:700;color:'+c+'">'+pct(v)+'%</span></td>';};
+  const fdesc={demo:'Близость среднего возраста роли к пенсионному ('+PENSION_AGE+' лет)',
+    bus:'Мало носителей компетенции × критичность роли',
+    skill:'Автоматизируемость навыков роли',
+    turn:'Риск ухода: текучесть × рыночная дефицитность',
+    market:'Дефицитность профессии × срок закрытия вакансии',
+    redund:'Риск вытеснения автоматизацией (анализ дожития)'};
+  const wslider=(id,key,label)=>'<div class="field" style="margin-bottom:12px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:700;margin-bottom:5px">'
+      +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+label+hint(fdesc[key])+'</span>'
+      +'<span class="mono" style="font-weight:800"><span style="color:var(--t3)" title="положение ползунка">'+S[id]+'</span>&nbsp;→&nbsp;<span style="color:var(--primary)" title="доля фактора в индексе">'+pct(r.w[key])+'%</span></span></div>'
     +'<input type="range" min="0" max="40" id="'+id+'" value="'+S[id]+'"></div>';
 
   return '<div class="fadein">'
@@ -1599,18 +1611,26 @@ function renderRisks(){
 
   +'<div class="grid g12">'
   +'<div class="col-span-4"><div class="card accent"><div class="ctitle">'+ic('sliders')+'Веса факторов риска'
-    +hint('Приоритеты предприятия. Система нормирует веса к сумме — можно задавать в любых единицах.')+'</div>'
-    +wslider('wDemo','Демографический')+wslider('wBus','Ключевой специалист (bus factor)')
-    +wslider('wSkill','Компетентностный разрыв')+wslider('wTurn','Текучесть')
-    +wslider('wMarket','Внешний рыночный')+wslider('wRedund','Избыточность (автоматизация)')
-    +'<div class="note note-blue" style="margin-top:8px">'+ic('info')+'<div>Демография считается от среднего возраста роли (пенсия '+PENSION_AGE+' лет), bus-factor — от числа носителей, избыточность — из анализа дожития по навыкам.</div></div>'
+    +hint('Насколько каждый из 6 факторов важен для вашего предприятия. Влияет на итоговый индекс.')+'</div>'
+    +'<div class="note note-amber" style="margin-bottom:14px">'+ic('info')+'<div>Число слева (0–40) — лишь <b>положение ползунка</b>, само по себе оно ничего не значит. Важна <b>доля фактора</b> (справа, в сумме 100%): именно она задаёт вклад в индекс. Удвоив вес — вдвое усиливаете влияние фактора.</div></div>'
+    +wslider('wDemo','demo','Демографический')+wslider('wBus','bus','Ключевой специалист')
+    +wslider('wSkill','skill','Компетентностный разрыв')+wslider('wTurn','turn','Текучесть')
+    +wslider('wMarket','market','Внешний рыночный')+wslider('wRedund','redund','Избыточность')
   +'</div></div>'
 
   +'<div class="col-span-8"><div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('gauge')+'Тепловая карта рисков по ролям'
-    +hint('Цвет ячейки — уровень фактора (зелёный/жёлтый/красный). Итоговый индекс — взвешенная сумма. Сортировка по убыванию риска.')+'</div>'
+    +hint('Строка — должность. 6 столбцов — факторы риска. Цвет и число — уровень фактора 0–100%. «Индекс» — их взвешенная сумма.')+'</div>'
+    +'<div style="padding:0 22px 12px">'
+      +'<div class="note note-blue" style="margin-bottom:10px">'+ic('info')+'<div>В каждой ячейке — <b>уровень фактора для роли</b>: 0% — риска нет, 100% — максимум. Столбец «<b>Индекс</b>» = взвешенная сумма всех 6 факторов по вашим весам слева (0–100). Строки отсортированы по убыванию индекса.</div></div>'
+      +'<div class="legend" style="margin-top:0">'
+        +'<span><span class="swatch" style="background:var(--green-l);border:1px solid var(--green-bd)"></span>низкий &lt;40%</span>'
+        +'<span><span class="swatch" style="background:var(--amber-l);border:1px solid var(--amber-bd)"></span>средний 40–65%</span>'
+        +'<span><span class="swatch" style="background:var(--red-l);border:1px solid var(--red-bd)"></span>высокий ≥66%</span>'
+      +'</div>'
+    +'</div>'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-    +'<th>Роль</th>'+FAC.map(f=>'<th class="c">'+f[1]+'</th>').join('')
-    +'<th class="c">Индекс</th><th class="c">Уровень</th><th>Рекомендация</th></tr></thead><tbody>'
+    +'<th>Роль</th>'+FAC.map(f=>'<th class="c" title="'+f[2]+'">'+f[1]+'</th>').join('')
+    +'<th class="c" title="Взвешенная сумма 6 факторов, 0–100">Индекс</th><th class="c">Уровень</th><th>Рекомендация</th></tr></thead><tbody>'
     +r.rows.map(row=>'<tr><td style="font-weight:700">'+row.p.name+'</td>'
       +FAC.map(f=>cell(row.f[f[0]])).join('')
       +'<td class="c"><span class="mono" style="font-weight:800;font-size:15px;color:'+light(row.index,40,66)+'">'+row.index+'</span></td>'
