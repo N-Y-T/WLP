@@ -375,7 +375,7 @@ svg.chart{width:100%;height:auto;display:block}
   <div class="ai-head">
     <div class="ai-title">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.142M12 5a3 3 0 1 1 5.997.142M12 5v14M6 8a3 3 0 0 0-1 5.8M18 8a3 3 0 0 1 1 5.8M7.5 14a3 3 0 0 0 4.5 4 3 3 0 0 0 4.5-4"/></svg>
-      <div><b>ИИ-ассистент SWP</b><div class="ai-sub">Claude · сопровождение проекта</div></div>
+      <div><b>ИИ-ассистент SWP</b><div class="ai-sub">сопровождение проекта</div></div>
     </div>
     <div style="display:flex;gap:6px">
       <button class="xbtn" id="aiSettingsBtn" title="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -530,9 +530,22 @@ const S = {
   works:[]           // заполняется worksInit() — см. ниже
 };
 
-// настройки ИИ-ассистента (ключ хранится отдельно, не в снимках сценариев)
-let AI = { model:'claude-opus-4-8', research:true };
-const AI_KEY_LS = 'swp_ai_key_v1';
+// настройки ИИ-ассистента (ключи хранятся отдельно по провайдеру, не в снимках сценариев)
+const PROVIDERS = {
+  gemini:{ label:'Google Gemini — бесплатно', free:true,
+    keyUrl:'https://aistudio.google.com/apikey', keyHint:'AIza...',
+    note:'Бесплатный тариф Google AI Studio: ключ бесплатный, лимиты есть, карта не требуется. Запросы идут напрямую в generativelanguage.googleapis.com.',
+    models:[['gemini-2.5-flash','Gemini 2.5 Flash — бесплатно, рекомендуется'],
+            ['gemini-2.0-flash','Gemini 2.0 Flash — бесплатно, быстрый'],
+            ['gemini-2.5-pro','Gemini 2.5 Pro — мощнее (лимиты строже)']] },
+  anthropic:{ label:'Anthropic Claude — платно', free:false,
+    keyUrl:'https://console.anthropic.com/settings/keys', keyHint:'sk-ant-...',
+    note:'Платный API (у новых аккаунтов есть стартовые кредиты). Запросы идут напрямую в api.anthropic.com.',
+    models:[['claude-opus-4-8','Claude Opus 4.8 — максимум'],
+            ['claude-sonnet-4-6','Claude Sonnet 4.6 — баланс'],
+            ['claude-haiku-4-5','Claude Haiku 4.5 — быстрый (без веб-поиска)']] }
+};
+let AI = { provider:'gemini', model:'gemini-2.5-flash', research:true };
 
 // сохранённые сценарии «что если» (каждый — полный снимок S + справочника)
 let scenarios = [];
@@ -2153,10 +2166,19 @@ let aiAttachments = [];        // прикреплённые файлы (ожи�
 let aiBusy = false;
 let aiSettingsOpen = false;
 
-function getAiKey(){ try{ return localStorage.getItem(AI_KEY_LS)||''; }catch(e){ return ''; } }
-function setAiKey(k){ try{ k?localStorage.setItem(AI_KEY_LS,k):localStorage.removeItem(AI_KEY_LS); }catch(e){} }
-function saveAiCfg(){ try{ localStorage.setItem('swp_ai_cfg', JSON.stringify(AI)); }catch(e){} }
-function loadAiCfg(){ try{ const d=JSON.parse(localStorage.getItem('swp_ai_cfg')||'null'); if(d){ AI.model=d.model||AI.model; AI.research=d.research!==false; } }catch(e){} }
+function aiKeyLS(p){ return 'swp_ai_key_'+(p||AI.provider); }
+function getAiKey(){ try{ return localStorage.getItem(aiKeyLS())||''; }catch(e){ return ''; } }
+function setAiKey(k){ try{ k?localStorage.setItem(aiKeyLS(),k):localStorage.removeItem(aiKeyLS()); }catch(e){} }
+function saveAiCfg(){ try{ localStorage.setItem('swp_ai_cfg', JSON.stringify({provider:AI.provider,model:AI.model,research:AI.research})); }catch(e){} }
+function loadAiCfg(){
+  try{ const d=JSON.parse(localStorage.getItem('swp_ai_cfg')||'null');
+    if(d){ if(PROVIDERS[d.provider]) AI.provider=d.provider; if(d.model) AI.model=d.model; AI.research=d.research!==false; }
+    // миграция старого ключа Anthropic
+    const old=localStorage.getItem('swp_ai_key_v1');
+    if(old && !localStorage.getItem('swp_ai_key_anthropic')) localStorage.setItem('swp_ai_key_anthropic',old);
+  }catch(e){}
+}
+function aiResearchOn(){ const el=document.getElementById('aiResearch'); return el?el.checked:AI.research; }
 
 /* ---------- снимок состояния для модели ---------- */
 function stateSnapshot(full){
@@ -2209,6 +2231,7 @@ function systemPrompt(){
 'ПРОЗРАЧНОСТЬ: все числа в системе выводятся из формул и заданных параметров (см. вкладку «Методология»). Если спрашивают «откуда цифра» — объясни формулу и входные значения.',
 'При загрузке ТЭО/проектных документов: извлеки производственную программу, мощность, режим, фазы и уровень автоматизации; затем спроектируй виды работ (set_works) и параметры (update_params), при необходимости добавь должности. Кратко перечисли допущения, требующие подтверждения.',
 '',
+(AI.provider==='gemini'?'ФОРМАТ ИНСТРУМЕНТОВ: аргументы-объекты передавай как JSON-строку в поле *_json, напр. update_params(params_json="{\\"turnover\\":12}"), set_works(works_json="[ {…} ]").\n':'')+
 'ТЕКУЩЕЕ СОСТОЯНИЕ ПРОЕКТА (JSON):',
 JSON.stringify(stateSnapshot(false))
   ].join('\n');
@@ -2231,6 +2254,36 @@ const AI_TOOLS = [
 const PARAM_ALLOW=new Set(['absCoeff','actualStaff',
   'stage','scenario','durDesign','durConstruction','durCommissioning','durOperation','durDecline',
   'turnover','hireCap','fillDays','sepCap','autoPace','mcRuns','sourceProf','targetProf']);
+// Декларации инструментов для Gemini: объекты-аргументы передаются как JSON-строки
+// (строгая схема Gemini не любит свободные object-параметры) и разбираются geminiNormArgs.
+const GEMINI_TOOLS = [
+  {name:'get_analysis',description:'Прочитать текущие вычисленные результаты системы (потребность, разрыв, прогноз Монте-Карло, индекс риска, FTE под автоматизацией, стоимость плана, должности, топ рисков). Вызывай перед обоснованными решениями.'},
+  {name:'update_params',description:'Изменить вводные/прогнозные параметры. params_json — JSON-строка объекта {ключ:значение}, напр. {"turnover":12,"stage":"operation","autoPace":1.3}.',parameters:{type:'object',properties:{params_json:{type:'string'}},required:['params_json']}},
+  {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). works_json — JSON-строка массива объектов work.',parameters:{type:'object',properties:{works_json:{type:'string'}},required:['works_json']}},
+  {name:'add_work',description:'Добавить один вид работ. work_json — JSON-строка объекта work.',parameters:{type:'object',properties:{work_json:{type:'string'}},required:['work_json']}},
+  {name:'upsert_profession',description:'Добавить/обновить должность. profession_json — JSON-строка объекта должности.',parameters:{type:'object',properties:{profession_json:{type:'string'}},required:['profession_json']}},
+  {name:'delete_profession',description:'Удалить должность по id.',parameters:{type:'object',properties:{id:{type:'string'}},required:['id']}},
+  {name:'set_risk_weights',description:'Задать веса факторов риска. weights_json — JSON-строка {wDemo,wBus,wSkill,wTurn,wMarket,wRedund}.',parameters:{type:'object',properties:{weights_json:{type:'string'}},required:['weights_json']}},
+  {name:'set_methodology',description:'Изменить методологические допущения. params_json — JSON-строка {cbaHire,cbaSever,cbaIdleMonths,hazardDefault,hazardLambda}.',parameters:{type:'object',properties:{params_json:{type:'string'}},required:['params_json']}},
+  {name:'save_scenario',description:'Сохранить текущее состояние как сценарий «что если».',parameters:{type:'object',properties:{name:{type:'string'}},required:['name']}},
+  {name:'switch_tab',description:'Открыть вкладку приложения.',parameters:{type:'object',properties:{tab:{type:'string'}},required:['tab']}}
+];
+function geminiNormArgs(name,args){
+  args=args||{};
+  const J=(s,def)=>{ try{ return typeof s==='string'?JSON.parse(s):(s&&typeof s==='object'?s:def); }catch(e){ return def; } };
+  switch(name){
+    case 'update_params': return {params:J(args.params_json,{})};
+    case 'set_methodology': return {params:J(args.params_json,{})};
+    case 'set_works': return {works:J(args.works_json,[])};
+    case 'add_work': return {work:J(args.work_json,{})};
+    case 'upsert_profession': return {profession:J(args.profession_json,{})};
+    case 'set_risk_weights': return {weights:J(args.weights_json,{})};
+    case 'delete_profession': return {id:args.id};
+    case 'save_scenario': return {name:args.name};
+    case 'switch_tab': return {tab:args.tab};
+    default: return args;
+  }
+}
 function aiNormalizeWork(w){
   if(!w||typeof w!=='object') return null;
   const m=['output','time','service','workplace'].includes(w.method)?w.method:'output';
@@ -2301,62 +2354,102 @@ function executeAiTool(name,input){
   }catch(e){ return {ok:false,note:'Сбой инструмента ('+name+'): '+(e.message||''),result:'Ошибка: '+(e.message||'')}; }
 }
 
-/* ---------- вызов Claude API (прямой, из браузера) ---------- */
-async function callClaude(messages){
-  const key=getAiKey(); if(!key) throw new Error('Не задан API-ключ');
-  const model=AI.model||'claude-opus-4-8';
-  const tools=AI_TOOLS.slice();
-  const research=document.getElementById('aiResearch'); const useSearch=research?research.checked:AI.research;
-  if(useSearch && !/haiku/.test(model)) tools.push({type:'web_search_20260209',name:'web_search',max_uses:5});
-  const resp=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'content-type':'application/json','x-api-key':key,
-      'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model,max_tokens:8000,system:systemPrompt(),messages,tools})
-  });
-  if(!resp.ok){
-    let msg='Ошибка API '+resp.status;
-    try{ const e=await resp.json(); if(e&&e.error&&e.error.message) msg=e.error.message; }catch(_){ }
-    if(resp.status===401) msg='Неверный API-ключ. Проверьте ключ в настройках (шестерёнка).';
-    throw new Error(msg);
+/* ---------- провайдеро-независимые адаптеры LLM ----------
+   Каждый адаптер ведёт собственную нативную историю в aiMessages.
+   step(history) → {assistant, texts[], tools[], searches[], stop, ...}      */
+const ADAPTERS = {
+  anthropic:{
+    userMsg(text,atts){
+      const content=[];
+      atts.forEach(a=>{ if(a.kind==='pdf') content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.data},title:a.name});
+        else content.push({type:'text',text:'[Содержимое файла «'+a.name+'»]\n'+a.text}); });
+      if(text) content.push({type:'text',text});
+      return {role:'user',content};
+    },
+    toolResultMsg(outs){ return {role:'user',content:outs.map(o=>({type:'tool_result',tool_use_id:o.id,content:o.result,is_error:!o.ok}))}; },
+    async step(history){
+      const key=getAiKey(); if(!key) throw new Error('Не задан API-ключ');
+      const model=AI.model||'claude-opus-4-8';
+      const tools=AI_TOOLS.slice();
+      if(aiResearchOn() && !/haiku/.test(model)) tools.push({type:'web_search_20260209',name:'web_search',max_uses:5});
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+        headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model,max_tokens:8000,system:systemPrompt(),messages:history,tools})});
+      if(!resp.ok){ let msg='Ошибка API '+resp.status; try{const e=await resp.json(); if(e&&e.error&&e.error.message) msg=e.error.message;}catch(_){}
+        if(resp.status===401) msg='Неверный ключ Anthropic. Проверьте в настройках.'; throw new Error(msg); }
+      const data=await resp.json(); const texts=[],tools2=[],searches=[];
+      (data.content||[]).forEach(b=>{ if(b.type==='text'&&b.text&&b.text.trim())texts.push(b.text);
+        else if(b.type==='server_tool_use'&&b.name==='web_search')searches.push((b.input&&b.input.query)||'…');
+        else if(b.type==='tool_use')tools2.push({id:b.id,name:b.name,input:b.input}); });
+      const stop=data.stop_reason==='tool_use'?'tool':data.stop_reason==='pause_turn'?'pause':data.stop_reason==='refusal'?'refusal':'end';
+      return {assistant:{role:'assistant',content:data.content||[]},texts,tools:tools2,searches,stop};
+    }
+  },
+  gemini:{
+    userMsg(text,atts){
+      const parts=[];
+      atts.forEach(a=>{ if(a.kind==='pdf') parts.push({inlineData:{mimeType:'application/pdf',data:a.data}});
+        else parts.push({text:'[Содержимое файла «'+a.name+'»]\n'+a.text}); });
+      if(text) parts.push({text});
+      return {role:'user',parts};
+    },
+    toolResultMsg(outs){ return {role:'user',parts:outs.map(o=>({functionResponse:{name:o.name,response:{result:o.result}}}))}; },
+    async step(history){
+      const key=getAiKey(); if(!key) throw new Error('Не задан API-ключ');
+      const model=AI.model||'gemini-2.5-flash';
+      const url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(key);
+      const decls=GEMINI_TOOLS.slice();
+      const useSearch=aiResearchOn();
+      const mkBody=ground=>{ const t=[{functionDeclarations:decls}]; if(ground) t.push({googleSearch:{}});
+        return {system_instruction:{parts:[{text:systemPrompt()}]},contents:history,tools:t,generationConfig:{maxOutputTokens:6000,temperature:0.4}}; };
+      const doFetch=async ground=>{
+        const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(mkBody(ground))});
+        const d=await r.json().catch(()=>({}));
+        if(!r.ok){ let msg=(d&&d.error&&d.error.message)||('Ошибка API '+r.status);
+          if(r.status===400&&/API key not valid|API_KEY_INVALID/i.test(msg)) msg='Неверный ключ Gemini. Получите его на aistudio.google.com и вставьте в настройках.'; throw new Error(msg); }
+        return d;
+      };
+      let data, degraded=false;
+      try{ data=await doFetch(useSearch); }
+      catch(e){ if(useSearch && /search|grounding|function|tool|combine|unsupported|not supported/i.test(e.message)){ degraded=true; data=await doFetch(false); } else throw e; }
+      const cand=data.candidates&&data.candidates[0];
+      if(!cand){ const br=data.promptFeedback&&data.promptFeedback.blockReason; return {assistant:null,texts:[],tools:[],searches:[],stop:'refusal',blocked:br,degraded}; }
+      const parts=(cand.content&&cand.content.parts)||[]; const texts=[],tools2=[],searches=[];
+      parts.forEach(p=>{ if(p.text&&p.text.trim())texts.push(p.text);
+        else if(p.functionCall)tools2.push({id:p.functionCall.name,name:p.functionCall.name,input:geminiNormArgs(p.functionCall.name,p.functionCall.args)}); });
+      const gm=cand.groundingMetadata; if(gm&&gm.webSearchQueries) gm.webSearchQueries.forEach(q=>searches.push(q));
+      let stop=tools2.length?'tool':'end';
+      if(cand.finishReason==='SAFETY'||cand.finishReason==='PROHIBITED_CONTENT'||cand.finishReason==='BLOCKLIST') stop='refusal';
+      return {assistant:{role:'model',parts},texts,tools:tools2,searches,stop,degraded};
+    }
   }
-  return resp.json();
-}
+};
 async function runAssistant(userText){
   if(aiBusy) return;
   if(!getAiKey()){ aiSettingsOpen=true; renderAiSettings(); return; }
-  const content=[];
-  aiAttachments.forEach(a=>{
-    if(a.kind==='pdf') content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.data},title:a.name});
-    else content.push({type:'text',text:'[Содержимое файла «'+a.name+'»]\n'+a.text});
-  });
-  if(userText) content.push({type:'text',text:userText});
-  if(!content.length) return;
-  const attNames=aiAttachments.map(a=>a.name);
-  aiAddBubble('user',(userText||'')+(attNames.length?(userText?'\n':'')+'📎 '+attNames.join(', '):''));
-  aiMessages.push({role:'user',content});
+  const ad=ADAPTERS[AI.provider]||ADAPTERS.gemini;
+  const atts=aiAttachments.slice();
+  if(!userText && !atts.length) return;
+  aiAddBubble('user',(userText||'')+(atts.length?((userText?'\n':'')+'📎 '+atts.map(a=>a.name).join(', ')):''));
+  aiMessages.push(ad.userMsg(userText,atts));
   aiAttachments=[]; renderAttachBar();
   aiBusy=true; updateSendState(); const typing=showTyping();
   try{
     for(let i=0;i<8;i++){
-      const resp=await callClaude(aiMessages);
-      aiMessages.push({role:'assistant',content:resp.content||[]});
-      (resp.content||[]).forEach(b=>{
-        if(b.type==='text' && b.text && b.text.trim()) aiAddBubble('bot',b.text);
-        else if(b.type==='server_tool_use' && b.name==='web_search') aiAddTool('search','Веб-поиск: '+((b.input&&b.input.query)||'…'));
-      });
-      if(resp.stop_reason==='tool_use'){
-        const results=[];
-        for(const b of (resp.content||[])){ if(b.type==='tool_use'){
-          const out=executeAiTool(b.name,b.input);
-          aiAddTool(out.ok?'tool':'err',out.note);
-          results.push({type:'tool_result',tool_use_id:b.id,content:out.result,is_error:!out.ok});
-        }}
-        aiMessages.push({role:'user',content:results});
+      const r=await ad.step(aiMessages);
+      if(r.assistant) aiMessages.push(r.assistant);
+      (r.searches||[]).forEach(q=>aiAddTool('search','Веб-поиск: '+q));
+      if(r.degraded) aiAddTool('err','Веб-поиск недоступен с этой моделью — отвечаю без него.');
+      (r.texts||[]).forEach(t=>aiAddBubble('bot',t));
+      if(r.stop==='tool' && r.tools.length){
+        const outs=[];
+        for(const c of r.tools){ const out=executeAiTool(c.name,c.input); aiAddTool(out.ok?'tool':'err',out.note);
+          outs.push({id:c.id,name:c.name,result:out.result,ok:out.ok}); }
+        aiMessages.push(ad.toolResultMsg(outs));
         continue;
       }
-      if(resp.stop_reason==='pause_turn') continue; // серверный инструмент продолжает
-      if(resp.stop_reason==='refusal') aiAddTool('err','Запрос отклонён классификатором безопасности.');
+      if(r.stop==='pause') continue; // серверный инструмент Anthropic продолжает
+      if(r.stop==='refusal') aiAddTool('err','Запрос отклонён'+(r.blocked?(' ('+r.blocked+')'):'')+'.');
       break;
     }
   }catch(e){ aiAddTool('err',e.message||'Сбой запроса'); }
@@ -2405,15 +2498,16 @@ function aiEnsureHello(){
 }
 function renderAiSettings(){
   const box=document.getElementById('aiSettings'); if(!box) return;
-  const key=getAiKey();
+  const key=getAiKey(); const P=PROVIDERS[AI.provider];
   if(key && !aiSettingsOpen){ box.innerHTML=''; return; }
   box.innerHTML='<div class="ai-setbox">'
-    +'<h4>Подключение Claude API</h4>'
-    +'<p>Ассистент работает на <b>вашем</b> ключе Anthropic. Ключ хранится только в этом браузере (localStorage) и используется для прямых запросов к api.anthropic.com — отдельный сервер не нужен. Ключ: <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> (у новых аккаунтов есть стартовые кредиты).</p>'
-    +'<div class="field" style="margin-bottom:10px"><input class="input" type="password" id="aiKeyInput" placeholder="sk-ant-..." value="'+aiEsc(key)+'"></div>'
+    +'<h4>Подключение ИИ</h4>'
+    +'<div class="field" style="margin-bottom:10px"><label class="flabel">Провайдер</label><select class="select" id="aiProviderSel">'
+      +Object.entries(PROVIDERS).map(([k,v])=>'<option value="'+k+'"'+(AI.provider===k?' selected':'')+'>'+v.label+'</option>').join('')+'</select></div>'
+    +'<p>'+P.note+' Ключ хранится только в этом браузере (localStorage), отдельный сервер не нужен. Получить ключ: <a href="'+P.keyUrl+'" target="_blank" rel="noopener">'+P.keyUrl.replace(/^https?:\/\//,'')+'</a></p>'
+    +'<div class="field" style="margin-bottom:10px"><input class="input" type="password" id="aiKeyInput" placeholder="'+P.keyHint+'" value="'+aiEsc(key)+'"></div>'
     +'<div class="field" style="margin-bottom:12px"><label class="flabel">Модель</label><select class="select" id="aiModelSel">'
-      +[['claude-opus-4-8','Claude Opus 4.8 — максимум возможностей'],['claude-sonnet-4-6','Claude Sonnet 4.6 — баланс цена/скорость'],['claude-haiku-4-5','Claude Haiku 4.5 — быстрый, дешёвый (без веб-поиска)']]
-        .map(([v,t])=>'<option value="'+v+'"'+(AI.model===v?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'
+      +P.models.map(([v,t])=>'<option value="'+v+'"'+(AI.model===v?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'
     +'<div style="display:flex;gap:8px"><button class="tool" id="aiKeySave" style="background:var(--primary);color:#fff;border-color:var(--primary);flex:1;justify-content:center">'+ic('save')+'Сохранить</button>'
     +(key?'<button class="tool red" id="aiKeyClear">Удалить</button>':'')+'</div>'
   +'</div>';
@@ -2469,6 +2563,14 @@ function initAssistant(){
     for(const f of files){ try{ aiAttachments.push(await readAiFile(f)); }catch(err){ aiAddTool('err','Файл «'+f.name+'»: '+err.message); } }
     renderAttachBar();
   });
+  // смена провайдера: дефолтная модель, сброс диалога (форматы истории несовместимы)
+  document.getElementById('aiSettings').addEventListener('change',e=>{
+    if(e.target.id==='aiProviderSel'){
+      AI.provider=e.target.value; AI.model=PROVIDERS[AI.provider].models[0][0]; saveAiCfg();
+      aiMessages=[]; aiChatEl().innerHTML=''; aiEnsureHello();
+      renderAiSettings();
+    }
+  });
   // делегированные клики внутри панели: подсказки, удаление вложений, кнопки настроек
   document.getElementById('aiPanel').addEventListener('click',e=>{
     const chip=e.target.closest('[data-suggest]');
@@ -2476,10 +2578,11 @@ function initAssistant(){
     const rm=e.target.closest('[data-rmatt]');
     if(rm){ aiAttachments.splice(+rm.dataset.rmatt,1); renderAttachBar(); return; }
     if(e.target.closest('#aiKeySave')){
-      const k=document.getElementById('aiKeyInput').value.trim();
-      AI.model=document.getElementById('aiModelSel').value; setAiKey(k); saveAiCfg();
+      const ps=document.getElementById('aiProviderSel'); if(ps&&PROVIDERS[ps.value]) AI.provider=ps.value;
+      AI.model=document.getElementById('aiModelSel').value;
+      setAiKey(document.getElementById('aiKeyInput').value.trim()); saveAiCfg();
       aiSettingsOpen=false; renderAiSettings();
-      showToast(k?'Ключ сохранён — ассистент готов':'Ключ удалён'); return;
+      showToast(getAiKey()?'Готово — ассистент подключён ('+PROVIDERS[AI.provider].label+')':'Ключ удалён'); return;
     }
     if(e.target.closest('#aiKeyClear')){ setAiKey(''); aiSettingsOpen=true; renderAiSettings(); showToast('Ключ удалён'); return; }
   });
