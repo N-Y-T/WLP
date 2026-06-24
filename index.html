@@ -347,6 +347,10 @@ svg.chart{width:100%;height:auto;display:block}
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.142M12 5a3 3 0 1 1 5.997.142M12 5v14M6 8a3 3 0 0 0-1 5.8M18 8a3 3 0 0 1 1 5.8M7.5 14a3 3 0 0 0 4.5 4 3 3 0 0 0 4.5-4"/></svg>
           ИИ-ассистент
         </button>
+        <button class="hbtn" id="guideBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          Руководство
+        </button>
         <button class="hbtn" id="glossaryBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
           Глоссарий
@@ -360,7 +364,7 @@ svg.chart{width:100%;height:auto;display:block}
 <div id="toast"></div>
 <div id="modal"><div class="modal-box">
   <div class="modal-head">
-    <h3><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Глоссарий терминов и методик</h3>
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span id="modalTitle">Глоссарий терминов и методик</span></h3>
     <button class="xbtn" id="modalClose"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="modal-body" id="glossaryBody"></div>
@@ -534,8 +538,9 @@ const S = {
 const PROVIDERS = {
   gemini:{ label:'Google Gemini — бесплатно', free:true,
     keyUrl:'https://aistudio.google.com/apikey', keyHint:'AIza...',
-    note:'Бесплатный тариф Google AI Studio: ключ бесплатный, лимиты есть, карта не требуется. Запросы идут напрямую в generativelanguage.googleapis.com.',
-    models:[['gemini-2.5-flash','Gemini 2.5 Flash — бесплатно, рекомендуется'],
+    note:'Бесплатный тариф Google AI Studio: ключ бесплатный, карта не требуется. Есть лимит запросов в минуту (RPM) — он сбрасывается каждую минуту (в аналитике виден только суточный расход). Ассистент делает несколько запросов на одно сообщение (раунды инструментов + поиск), поэтому при лимите он сам ждёт и повторяет. Если упирается часто — выберите Flash-Lite (больший лимит).',
+    models:[['gemini-2.5-flash-lite','Gemini 2.5 Flash-Lite — бесплатно, больший лимит/мин'],
+            ['gemini-2.5-flash','Gemini 2.5 Flash — бесплатно, рекомендуется'],
             ['gemini-2.0-flash','Gemini 2.0 Flash — бесплатно, быстрый'],
             ['gemini-2.5-pro','Gemini 2.5 Pro — мощнее (лимиты строже)']] },
   anthropic:{ label:'Anthropic Claude — платно', free:false,
@@ -1958,9 +1963,98 @@ function triggerImport(kind){
 
 /* ---------- ГЛОССАРИЙ ---------- */
 function openGlossary(){
+  const t=document.getElementById('modalTitle'); if(t) t.textContent='Глоссарий терминов и методик';
   const body=document.getElementById('glossaryBody');
   body.innerHTML = GLOSSARY.map(g=>
     '<div class="gitem"><div class="gterm">'+g.t+'</div><div class="gdesc">'+g.d+'</div></div>'
+  ).join('');
+  document.getElementById('modal').classList.add('show');
+}
+/* ---------- РУКОВОДСТВО: каждый пункт — что / зачем / как считается ---------- */
+const GUIDE=[
+  {section:'1. Виды работ и нормирование (вкладка «Нормативный расчёт»)', items:[
+    {t:'Вид работ', why:'Реальное производство состоит из множества разных работ. Каждая нормируется отдельно и относится к группе персонала (Основной/ТОиР/ИТР).', how:'Списочная FTE работы = Явочная × Сменность × k_сп. Потребность объекта = сумма по всем работам.'},
+    {t:'Методика «По выработке»', why:'Когда известен объём продукции и норма выработки на человека.', how:'Чяв = Объём ÷ Норма выработки.'},
+    {t:'Методика «По норме времени»', why:'Когда задано нормированное время на единицу работы (ЕНиР, хронометраж).', how:'Чяв = (Объём × Нвр) ÷ (Фсм × kвн); Фсм — фонд смены в минутах, kвн — коэффициент выполнения норм.'},
+    {t:'Методика «По обслуживанию»', why:'Аппаратурные и непрерывные процессы: оператор обслуживает несколько агрегатов.', how:'Чяв = Число агрегатов ÷ Норма обслуживания.'},
+    {t:'Методика «По рабочим местам»', why:'Когда численность определяется числом постов/рабочих мест.', how:'Чяв = Рабочие места × Коэффициент загрузки.'},
+    {t:'Сменность', why:'Сколько смен покрывает работа (1, 2, 3=круглосуточно, 4=вахта).', how:'Множитель к явочной численности.'},
+    {t:'k_сп — коэффициент списочного состава (Резерв)', why:'Перевод явочной численности в списочную: запас на отпуска, больничные, обучение.', how:'Списочная = Явочная × k_сп. Напр. 1.15 = +15% к штату.'},
+    {t:'Текущий (фактический) штат', why:'Сколько людей оформлено сейчас — база сравнения с расчётом.', how:'Вводится вручную или из HRIS; разница с потребностью = разрыв (GAP).'},
+    {t:'Структура штата (Core/Aux/Mgmt)', why:'Доли основного персонала, служб ТОиР и ИТР.', how:'Выводится из групп видов работ; при сценарии «Индустрия 4.0» сдвигается в сторону ИТР/поддержки.'}
+  ]},
+  {section:'2. Сводные показатели расчёта', items:[
+    {t:'Расчётная потребность (FTE)', why:'Сколько человек нужно по нормам на выбранном этапе.', how:'Σ(списочная FTE по работам) × множитель этапа жизненного цикла.'},
+    {t:'Разрыв (GAP)', why:'Главный управленческий сигнал: дефицит или профицит.', how:'GAP = Потребность − Фактический штат. >0 — дефицит (нужен найм), <0 — профицит (переобучение/высвобождение).'},
+    {t:'FTE (Full-Time Equivalent)', why:'Единая мера численности.', how:'1 FTE = 1 сотрудник на полной ставке; все расчёты ведутся в FTE.'}
+  ]},
+  {section:'3. Жизненный цикл объекта (вкладка «Жизненный цикл»)', items:[
+    {t:'Фазы (Проект → СМР → ПНР → Эксплуатация → Вывод)', why:'Кадровая потребность кардинально меняется по фазам.', how:'Длительности задаются в месяцах; горизонт планирования = их сумма.'},
+    {t:'Множитель этапа (K)', why:'Грубый ориентир уровня потребности фазы относительно эксплуатации.', how:'Эксплуатация=1.0; СМР≈2.2 (пик); ПНР≈1.4; Проект≈0.15; Вывод≈0.3.'},
+    {t:'Кривая этапа (Q1–Q4)', why:'Форма потребности ВНУТРИ фазы (нарастание/спад).', how:'4 контрольные точки, между ними — линейная интерполяция по времени фазы.'},
+    {t:'Макро-сценарий', why:'Сравнить стратегические решения.', how:'Базовый ×1.0; Агрессивный рост ×1.25; «Индустрия 4.0» ×0.65 на эксплуатации + сдвиг структуры к ИТР.'}
+  ]},
+  {section:'4. Предиктивная аналитика и прогноз (вкладка «Предиктивный анализ»)', items:[
+    {t:'Годовая текучесть', why:'Скорость убыли персонала — главный драйвер дефицита.', how:'Переводится в месячную вероятность ухода: 1−(1−p)^(1/12).'},
+    {t:'Ёмкость найма (чел/мес)', why:'Сколько реально можно нанять за месяц.', how:'Ограничивает восполнение дефицита в прогнозе.'},
+    {t:'Срок закрытия вакансии (дн)', why:'Долгие вакансии снижают реальный найм.', how:'Реализуемость hireEff = clamp(1−(дни−30)/200; 0.30…1.0); фактический найм = Ёмкость × hireEff.'},
+    {t:'Ёмкость высвобождения (чел/мес)', why:'Сколько профицита можно управляемо сократить/перевести за месяц.', how:'Ограничивает скорость снижения штата при профиците.'},
+    {t:'Темп автоматизации', why:'Скорость вытеснения ролей технологиями.', how:'Множитель к годовому hazard в анализе дожития (см. п.5).'},
+    {t:'Симуляций Монте-Карло', why:'Больше прогонов — стабильнее перцентили (но дольше расчёт).', how:'Число случайных сценариев (сид детерминирован — результат воспроизводим).'},
+    {t:'Прогноз численности P10/P50/P90', why:'Не одна линия, а «веер» вероятных исходов.', how:'Симуляция со случайным оттоком (±40%), спросом (±5%), успешностью найма; P50 — медиана, P10–P90 — коридор 80% исходов.'},
+    {t:'Вероятность дефицита к концу горизонта', why:'Числовая мера риска недоукомплектования.', how:'Доля симуляций, где на последнем месяце потребность > доступного штата.'},
+    {t:'Пиковый дефицит (медиана / P90)', why:'Насколько глубока «яма» и когда она наступит.', how:'Максимум разрыва по медианному сценарию; P90 — в худших 10% исходов.'}
+  ]},
+  {section:'5. Анализ дожития профессий (риск автоматизации)', items:[
+    {t:'Риск навыков', why:'Насколько задачи роли автоматизируемы.', how:'Среднее по навыкам должности из лексикона (вкладка «Методология»); неизвестный навык = hazardDefault.'},
+    {t:'Вероятность вытеснения', why:'Шанс, что роль будет вытеснена технологиями за горизонт.', how:'1−S(t), где S(t)=exp(−λt), λ = Риск навыков × Темп автоматизации × hazardLambda.'},
+    {t:'FTE под риском', why:'Ожидаемое число позиций к высвобождению.', how:'Численность роли × Вероятность вытеснения.'}
+  ]},
+  {section:'6. Кадровые риски (вкладка «Кадровые риски»)', items:[
+    {t:'Индекс риска роли (0–100)', why:'Сводная приоритизация ролей по риску.', how:'Взвешенная сумма 6 факторов (каждый в 0..1) ×100; веса нормируются к сумме.'},
+    {t:'Демографический фактор', why:'«Обрыв» компетенций при массовом выходе на пенсию.', how:'От среднего возраста роли к пенсионному (63): clamp((возраст−45)/(63−45); 0..1).'},
+    {t:'Ключевой специалист (bus-factor)', why:'Зависимость от единственного носителя компетенции.', how:'clamp(1−(носители−1)/40; 0..1) × критичность роли (Mgmt 1.0 / Core 0.9 / Aux 0.6).'},
+    {t:'Компетентностный (навыки)', why:'Обсолесценция компетенций при смене технологий.', how:'Средняя автоматизируемость навыков роли.'},
+    {t:'Текучесть', why:'Риск ухода по роли/подразделению.', how:'clamp((текучесть/45) × (0.7+0.6×рыночная_дефицитность); 0..1).'},
+    {t:'Внешний рыночный', why:'Дефицитность профессии и долгие вакансии.', how:'clamp(рыночная_дефицитность × (0.5+срок_вакансии/180); 0..1).'},
+    {t:'Избыточность', why:'Риск высвобождения при автоматизации.', how:'Вероятность вытеснения из анализа дожития (п.5).'},
+    {t:'Веса факторов', why:'Приоритеты конкретного предприятия.', how:'Задаются ползунками; система нормирует к сумме.'},
+    {t:'Портфельный индекс', why:'Риск всего объекта одним числом.', how:'Индексы ролей, взвешенные по их численности.'}
+  ]},
+  {section:'7. Переобучение и CBA (вкладка «Переобучение / CBA»)', items:[
+    {t:'Совпадение / разрыв навыков', why:'Насколько близки роли — определяет стоимость и срок переобучения.', how:'Совпадение = доля общих навыков в целевой роли; разрыв = 100% − совпадение.'},
+    {t:'Сценарий 1 — Увольнение и найм', why:'Издержки замены человека.', how:'Высвобождение (cbaSever окладов исходной) + Найм (cbaHire окладов новой).'},
+    {t:'Сценарий 2 — Внутренний рескиллинг', why:'Издержки переобучения вместо замены.', how:'База ДПО + Недостающие навыки × Цена навыка + Простой на учёбу (cbaIdleMonths окладов).'},
+    {t:'ROI переобучения', why:'Что выгоднее — переобучить или заменить.', how:'ROI = (Замена − Рескиллинг) ÷ Рескиллинг × 100%. >0 — переобучать выгоднее.'}
+  ]},
+  {section:'8. План действий (вкладка «План действий»)', items:[
+    {t:'Найм', why:'Закрытие прогнозного дефицита.', how:'Кол-во ≈ пиковый дефицит; стоимость = кол-во × средний оклад × cbaHire; срок = кол-во ÷ (ёмкость найма × реализуемость).'},
+    {t:'Переобучение', why:'Внутренние переходы вместо найма с рынка.', how:'Из выполнимых «мостов» с положительным ROI; стоимость по модели CBA.'},
+    {t:'Высвобождение', why:'Управляемое сокращение ролей под автоматизацией.', how:'Кол-во ≈ FTE под риском; стоимость = кол-во × оклад × cbaSever; срок = кол-во ÷ ёмкость высвобождения.'},
+    {t:'Приоритет (P1–P3)', why:'Очередность действий.', how:'P1 — закрытие наступающего дефицита; далее по типу и стоимости.'}
+  ]},
+  {section:'9. Сценарии «что если» (вкладка «Сценарии»)', items:[
+    {t:'Сценарий', why:'Сравнить кадровые траектории при разных решениях.', how:'Полный снимок состояния (параметры + справочник); метрики пересчитываются полными моделями под этим состоянием.'},
+    {t:'Базовая линия (★)', why:'Опорный вариант для сравнения.', how:'Отмечается вручную; остальные сравниваются с ним.'}
+  ]},
+  {section:'10. Методология — редактируемые допущения (вкладка «Методология»)', items:[
+    {t:'cbaHire / cbaSever', why:'Стоимость найма и высвобождения в окладах.', how:'cbaHire (рекрутинг+адаптация, бенчмарк SHRM ≈1.5); cbaSever (выходные обязательства, ориентир ТК до 3).'},
+    {t:'cbaIdleMonths', why:'Оплачиваемый простой во время обучения.', how:'В окладах; входит в стоимость рескиллинга.'},
+    {t:'hazardDefault / hazardLambda', why:'Калибровка анализа автоматизации.', how:'hazardDefault — риск навыка вне лексикона; hazardLambda — масштаб скорости вытеснения (λ).'}
+  ]},
+  {section:'11. ИИ-ассистент', items:[
+    {t:'Что умеет', why:'Сопровождает проект и сам меняет данные — вручную вводить не нужно.', how:'Изучает ТЭО/PDF, исследует рынок (веб-поиск со ссылками), вызывает функции: параметры, виды работ, должности, веса рисков, методология, сценарии.'},
+    {t:'Прозрачность', why:'Доверие к цифрам.', how:'Все числа выводятся из формул этого руководства; ассистент объясняет «откуда цифра» и помечает допущения.'}
+  ]}
+];
+function openGuide(){
+  const t=document.getElementById('modalTitle'); if(t) t.textContent='Руководство пользователя';
+  document.getElementById('glossaryBody').innerHTML = GUIDE.map(g=>
+    '<div style="font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--primary);font-weight:800;margin:20px 0 10px;padding-top:4px;border-top:1px solid var(--line2)">'+g.section+'</div>'
+    + g.items.map(it=>'<div class="gitem"><div class="gterm">'+it.t+'</div>'
+        +(it.why?'<div class="gdesc"><b>Зачем:</b> '+it.why+'</div>':'')
+        +(it.how?'<div class="gdesc" style="margin-top:5px"><b>Как считается:</b> '+it.how+'</div>':'')
+      +'</div>').join('')
   ).join('');
   document.getElementById('modal').classList.add('show');
 }
@@ -2136,6 +2230,7 @@ function bindEvents(){
 
   // глоссарий
   document.getElementById('glossaryBtn').addEventListener('click', openGlossary);
+  document.getElementById('guideBtn').addEventListener('click', openGuide);
   document.getElementById('modalClose').addEventListener('click', closeGlossary);
   document.getElementById('modal').addEventListener('click', e=>{
     if(e.target.id==='modal') closeGlossary();
@@ -2357,6 +2452,18 @@ function executeAiTool(name,input){
 /* ---------- провайдеро-независимые адаптеры LLM ----------
    Каждый адаптер ведёт собственную нативную историю в aiMessages.
    step(history) → {assistant, texts[], tools[], searches[], stop, ...}      */
+const aiSleep=ms=>new Promise(r=>setTimeout(r,ms));
+// задержка повтора при лимите: из заголовка Retry-After, из RetryInfo Gemini или из текста
+function aiRetryDelay(data,status,hdr){
+  if(hdr){ const ra=parseFloat(hdr); if(!isNaN(ra)) return ra; }
+  try{
+    const det=data&&data.error&&data.error.details;
+    if(Array.isArray(det)) for(const d of det){ if(d.retryDelay){ const s=parseFloat(d.retryDelay); if(!isNaN(s)) return s; } }
+    const msg=(data&&data.error&&data.error.message)||'';
+    const mm=msg.match(/retry in ([\d.]+)\s*s/i); if(mm) return parseFloat(mm[1]);
+  }catch(e){}
+  return status===429?22:8;
+}
 const ADAPTERS = {
   anthropic:{
     userMsg(text,atts){
@@ -2372,12 +2479,24 @@ const ADAPTERS = {
       const model=AI.model||'claude-opus-4-8';
       const tools=AI_TOOLS.slice();
       if(aiResearchOn() && !/haiku/.test(model)) tools.push({type:'web_search_20260209',name:'web_search',max_uses:5});
-      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-        headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model,max_tokens:8000,system:systemPrompt(),messages:history,tools})});
-      if(!resp.ok){ let msg='Ошибка API '+resp.status; try{const e=await resp.json(); if(e&&e.error&&e.error.message) msg=e.error.message;}catch(_){}
-        if(resp.status===401) msg='Неверный ключ Anthropic. Проверьте в настройках.'; throw new Error(msg); }
-      const data=await resp.json(); const texts=[],tools2=[],searches=[];
+      const body=JSON.stringify({model,max_tokens:8000,system:systemPrompt(),messages:history,tools});
+      let data;
+      for(let attempt=0;;attempt++){
+        const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+          headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+          body});
+        if(resp.ok){ data=await resp.json(); break; }
+        const ed=await resp.json().catch(()=>({}));
+        if((resp.status===429||resp.status===529||resp.status===503) && attempt<3){
+          const wait=Math.min(60, aiRetryDelay(ed,resp.status, resp.headers&&resp.headers.get&&resp.headers.get('retry-after')));
+          aiAddTool('wait','Лимит запросов — повтор через '+Math.ceil(wait)+' с…'); await aiSleep(wait*1000); continue;
+        }
+        let msg=(ed&&ed.error&&ed.error.message)||('Ошибка API '+resp.status);
+        if(resp.status===401) msg='Неверный ключ Anthropic. Проверьте в настройках.';
+        if(resp.status===429) msg='Лимит запросов Anthropic. Подождите и повторите. '+msg;
+        throw new Error(msg);
+      }
+      const texts=[],tools2=[],searches=[];
       (data.content||[]).forEach(b=>{ if(b.type==='text'&&b.text&&b.text.trim())texts.push(b.text);
         else if(b.type==='server_tool_use'&&b.name==='web_search')searches.push((b.input&&b.input.query)||'…');
         else if(b.type==='tool_use')tools2.push({id:b.id,name:b.name,input:b.input}); });
@@ -2403,11 +2522,20 @@ const ADAPTERS = {
       const mkBody=ground=>{ const t=[{functionDeclarations:decls}]; if(ground) t.push({googleSearch:{}});
         return {system_instruction:{parts:[{text:systemPrompt()}]},contents:history,tools:t,generationConfig:{maxOutputTokens:6000,temperature:0.4}}; };
       const doFetch=async ground=>{
-        const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(mkBody(ground))});
-        const d=await r.json().catch(()=>({}));
-        if(!r.ok){ let msg=(d&&d.error&&d.error.message)||('Ошибка API '+r.status);
-          if(r.status===400&&/API key not valid|API_KEY_INVALID/i.test(msg)) msg='Неверный ключ Gemini. Получите его на aistudio.google.com и вставьте в настройках.'; throw new Error(msg); }
-        return d;
+        const payload=JSON.stringify(mkBody(ground));
+        for(let attempt=0;;attempt++){
+          const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:payload});
+          const d=await r.json().catch(()=>({}));
+          if(r.ok) return d;
+          let msg=(d&&d.error&&d.error.message)||('Ошибка API '+r.status);
+          if((r.status===429||r.status===503) && attempt<3){
+            const wait=Math.min(60, aiRetryDelay(d,r.status, r.headers&&r.headers.get&&r.headers.get('retry-after')));
+            aiAddTool('wait','Лимит бесплатного тарифа (в минуту) — повтор через '+Math.ceil(wait)+' с…'); await aiSleep(wait*1000); continue;
+          }
+          if(r.status===429) msg='Достигнут поминутный лимит бесплатного тарифа Gemini (он сбрасывается каждую минуту; в аналитике виден только суточный расход). Подождите минуту, выберите модель с бóльшим лимитом (Flash-Lite) или уменьшите частоту запросов. '+msg;
+          if(r.status===400&&/API key not valid|API_KEY_INVALID/i.test(msg)) msg='Неверный ключ Gemini. Получите его на aistudio.google.com и вставьте в настройках.';
+          throw new Error(msg);
+        }
       };
       let data, degraded=false;
       try{ data=await doFetch(useSearch); }
@@ -2472,8 +2600,8 @@ function aiAddBubble(role,text){
 }
 function aiAddTool(kind,text){
   const c=aiChatEl(); if(!c) return;
-  const icon = kind==='search'?ic('activity'):kind==='err'?ic('alert'):ic('check');
-  const d=document.createElement('div'); d.className='ai-tool '+(kind==='search'?'search':kind==='err'?'err':'');
+  const icon = kind==='search'?ic('activity'):kind==='err'?ic('alert'):kind==='wait'?ic('clock'):ic('check');
+  const d=document.createElement('div'); d.className='ai-tool '+(kind==='search'||kind==='wait'?'search':kind==='err'?'err':'');
   d.innerHTML=icon+'<span>'+aiEsc(text)+'</span>'; c.appendChild(d); aiScroll();
 }
 function showTyping(){
