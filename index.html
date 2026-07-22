@@ -455,7 +455,7 @@ const LANGS = [
   {code:'zh', name:'中文',      locale:'zh-CN', dir:'ltr'},
   {code:'es', name:'Español',  locale:'es-ES', dir:'ltr'},
   {code:'fr', name:'Français', locale:'fr-FR', dir:'ltr'},
-  {code:'ar', name:'العربية',  locale:'ar-SA', dir:'rtl'}
+  {code:'ar', name:'العربية',  locale:'ar-SA-u-nu-latn', dir:'rtl'}
 ];
 const LANG_CODES = new Set(LANGS.map(l=>l.code));
 let LANG = 'ru';
@@ -564,7 +564,7 @@ Object.assign(I18N.ru, { norm:{
   noWorks:'Нет видов работ — добавьте первый',
   totalRow:'Итого по всем работам (эксплуатация, до множителя этапа)',
   footnote:'Методики (раздел 5 ТЗ): «{output}», «{time}», «{service}», «{workplace}». Списочная = Явочная × Сменность × k_сп ({absCoeff}).',
-  fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ'
+  fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ', mainWorkName:'Основная технологическая работа'
 }, chart:{ monthAxis:'месяц проекта', deficitAxis:'дефицит', surplusAxis:'профицит' },
 life:{
   eyebrow:'Этап 2 · Моделирование во времени', title:'Траектория жизненного цикла',
@@ -795,7 +795,7 @@ Object.assign(I18N.en, { norm:{
   noWorks:'No work types — add the first one',
   totalRow:'Total across all work types (operation, before stage multiplier)',
   footnote:'Methods (spec section 5): "{output}", "{time}", "{service}", "{workplace}". Payroll = Attendance x Shifts x k_sp ({absCoeff}).',
-  fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type'
+  fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type', mainWorkName:'Main Production Work'
 }, chart:{ monthAxis:'project month', deficitAxis:'shortage', surplusAxis:'surplus' },
 life:{
   eyebrow:'Stage 2 · Modeling over Time', title:'Lifecycle Trajectory',
@@ -1173,6 +1173,12 @@ function templateLabel(key,tpl){
   if(ru && tpl && tpl.name===ru.name){ const m=TEMPLATE_I18N[LANG]; return (m&&m[key])||ru; }
   return tpl;
 }
+// переводы для отображения известных слов ед.измерения/периода (данные остаются как есть, меняется только показ)
+const UNIT_I18N = { 'баррелей':{ru:'баррелей',en:'barrels'}, 'изделий':{ru:'изделий',en:'units'},
+  'story points':{ru:'story points',en:'story points'} };
+const PERIOD_I18N = { 'месяц':{ru:'месяц',en:'month'}, 'год':{ru:'год',en:'year'}, 'спринт':{ru:'спринт',en:'sprint'} };
+function unitLabel(u){ const e=UNIT_I18N[u]; return e?(e[LANG]||e.ru):u; }
+function periodWordLabel(p){ const e=PERIOD_I18N[p]; return e?(e[LANG]||e.ru):p; }
 
 // Жизненный цикл: множитель = ориентир, qTrend = форма кривой внутри фазы
 const STAGES = {
@@ -1345,10 +1351,12 @@ function worksTotals(){
   return {total, grp};
 }
 // миграция: при отсутствии видов работ создаём один из «легаси»-полей
+const WORK_NAME_I18N = { ru:'Основная технологическая работа', en:'Main Production Work' };
+function workDisplayName(w){ if(w && w.name===WORK_NAME_I18N.ru) return WORK_NAME_I18N[LANG]||WORK_NAME_I18N.ru; return w?w.name:''; }
 function worksInit(){
   if(Array.isArray(S.works) && S.works.length) return;
-  S.works = [{ id:'w_main', name:'Основная технологическая работа', group:'core', method:'output',
-    volume:num(S.volume,1), unit:S.unit||'ед.', period:S.period||'месяц', norm:num(S.norm,1), shifts:num(S.shifts,1) }];
+  S.works = [{ id:'w_main', name:WORK_NAME_I18N.ru, group:'core', method:'output',
+    volume:num(S.volume,1), unit:S.unit||t('work.unitDefault'), period:S.period||t('work.periodMonth'), norm:num(S.norm,1), shifts:num(S.shifts,1) }];
 }
 
 /* ---------------- БАЗОВАЯ МОДЕЛЬ (срез «сейчас») ---------------- */
@@ -1397,7 +1405,7 @@ function buildPhases(){
   const phases=[]; let cur=0;
   STAGE_ORDER.forEach(id=>{
     const len = Math.max(0, Math.round(dur[id]));
-    if(len>0){ phases.push({id,name:STAGES[id].name,color:STAGES[id].color,start:cur,len,end:cur+len}); cur+=len; }
+    if(len>0){ phases.push({id,name:stageName(id),color:STAGES[id].color,start:cur,len,end:cur+len}); cur+=len; }
   });
   return {phases, horizon:cur};
 }
@@ -1810,7 +1818,7 @@ function toolbar(opts){ // opts: {pdf, exportFn, importType}
 function periodLabel(){
   const n=(S.works||[]).length;
   if(!n) return t('common.na');
-  if(n===1){const w=S.works[0]; return num(w.volume).toLocaleString(curLocale())+' '+(w.unit||t('work.unitDefault'))+' / '+(w.period||t('work.periodDefault'));}
+  if(n===1){const w=S.works[0]; return num(w.volume).toLocaleString(curLocale())+' '+unitLabel(w.unit||t('work.unitDefault'))+' / '+periodWordLabel(w.period||t('work.periodDefault'));}
   return t('norm.periodWorks',{n});
 }
 
@@ -1904,7 +1912,8 @@ function renderNormative(){
 function workParamCells(w){
   const inp=(f,ph,step)=>'<input class="cell-edit mono" data-work="'+w.id+'" data-wf="'+f+'" type="number"'+(step?' step="'+step+'"':'')
     +' value="'+(w[f]!=null?w[f]:'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:74px;text-align:right">';
-  const txt=(f,ph,wd)=>'<input class="cell-edit" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(w[f]||'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:'+(wd||58)+'px">';
+  const txt=(f,ph,wd)=>{ const raw=w[f]||''; const disp=f==='unit'?unitLabel(raw):f==='period'?periodWordLabel(raw):raw;
+    return '<input class="cell-edit" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(disp)+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:'+(wd||58)+'px">'; };
   const lbl=s=>'<span class="muted" style="font-size:10px">'+esc(s)+'</span> ';
   switch(w.method){
     case 'time':      return lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)
@@ -1927,7 +1936,7 @@ function worksEditor(){
       +Object.keys(WORK_METHODS).map(k=>'<option value="'+k+'"'+(w.method===k?' selected':'')+'>'+esc(methodName(k))+'</option>').join('')+'</select>';
     const shs='<input class="cell-edit mono" data-work="'+w.id+'" data-wf="shifts" type="number" min="1" max="4" value="'+num(w.shifts,1)+'" style="width:44px;text-align:center">';
     return '<tr data-workrow="'+w.id+'">'
-      +'<td><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(w.name||'')+'" style="font-weight:700;min-width:130px"></td>'
+      +'<td><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(workDisplayName(w))+'" style="font-weight:700;min-width:130px"></td>'
       +'<td class="c">'+gsel+'</td>'
       +'<td>'+msel+'</td>'
       +'<td style="font-size:11px;white-space:nowrap">'+workParamCells(w)+'</td>'
