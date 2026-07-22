@@ -3556,6 +3556,9 @@ function initAssistant(){
 
 /* ---------- СТАРТ ---------- */
 function init(){
+  loadLang(); // подтянуть сохранённый язык интерфейса
+  buildLangSelector();
+  applyLangToDom();
   restore(); // подтянуть сохранённое состояние из localStorage (если есть)
   worksInit(); // миграция: создать виды работ из легаси-полей при необходимости
   buildTabs();
