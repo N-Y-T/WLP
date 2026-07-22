@@ -337,23 +337,24 @@ svg.chart{width:100%;height:auto;display:block}
       <div class="brand">
         <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></div>
         <div>
-          <h1>SWP&nbsp;·&nbsp;Кадровый прогноз</h1>
+          <h1>SWP&nbsp;·&nbsp;<span id="brandSub">Кадровый прогноз</span></h1>
           <div class="sub">Strategic Workforce Planning</div>
         </div>
       </div>
       <nav class="tabs" id="tabs"></nav>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="hbtn" id="langSel" style="padding:9px 10px;appearance:none;-webkit-appearance:none;background-image:linear-gradient(150deg,transparent,transparent)"></select>
         <button class="hbtn" id="aiBtn" style="background:var(--primary);color:#fff;border-color:var(--primary-d)">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.142M12 5a3 3 0 1 1 5.997.142M12 5v14M6 8a3 3 0 0 0-1 5.8M18 8a3 3 0 0 1 1 5.8M7.5 14a3 3 0 0 0 4.5 4 3 3 0 0 0 4.5-4"/></svg>
-          ИИ-ассистент
+          <span id="aiBtnLabel">ИИ-ассистент</span>
         </button>
         <button class="hbtn" id="guideBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-          Руководство
+          <span id="guideBtnLabel">Руководство</span>
         </button>
         <button class="hbtn" id="glossaryBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          Глоссарий
+          <span id="glossaryBtnLabel">Глоссарий</span>
         </button>
       </div>
     </div>
@@ -364,7 +365,7 @@ svg.chart{width:100%;height:auto;display:block}
 <div id="toast"></div>
 <div id="modal"><div class="modal-box">
   <div class="modal-head">
-    <h3><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span id="modalTitle">Глоссарий терминов и методик</span></h3>
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span id="modalTitle">Glossary</span></h3>
     <button class="xbtn" id="modalClose"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <div class="modal-body" id="glossaryBody"></div>
@@ -379,7 +380,7 @@ svg.chart{width:100%;height:auto;display:block}
   <div class="ai-head">
     <div class="ai-title">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.997.142M12 5a3 3 0 1 1 5.997.142M12 5v14M6 8a3 3 0 0 0-1 5.8M18 8a3 3 0 0 1 1 5.8M7.5 14a3 3 0 0 0 4.5 4 3 3 0 0 0 4.5-4"/></svg>
-      <div><b>ИИ-ассистент SWP</b><div class="ai-sub">сопровождение проекта</div></div>
+      <div><b id="aiPanelTitle">ИИ-ассистент SWP</b><div class="ai-sub" id="aiPanelSub">сопровождение проекта</div></div>
     </div>
     <div style="display:flex;gap:6px">
       <button class="xbtn" id="aiSettingsBtn" title="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -395,7 +396,7 @@ svg.chart{width:100%;height:auto;display:block}
       <textarea id="aiInput" rows="1" placeholder="Опишите задачу: «спроектируй расчёт по ТЭО», «снизи текучесть до 12%», «исследуй дефицит буровиков в РК»…"></textarea>
       <button class="ai-send" id="aiSend" title="Отправить (Enter)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>
-    <label class="ai-research"><input type="checkbox" id="aiResearch" checked> Реальное исследование (веб-поиск источников)</label>
+    <label class="ai-research"><input type="checkbox" id="aiResearch" checked> <span id="aiResearchLabel">Реальное исследование (веб-поиск источников)</span></label>
   </div>
 </aside>
 
@@ -444,8 +445,272 @@ const IC = {
 };
 function ic(n,cls){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+(cls?' class="'+cls+'"':'')+'>'+IC[n]+'</svg>';}
 
+/* ============================================================
+   ИНТЕРНАЦИОНАЛИЗАЦИЯ (7 языков) — словарь, t(), переключатель
+   ============================================================ */
+const LANGS = [
+  {code:'ru', name:'Русский',  locale:'ru-RU', dir:'ltr'},
+  {code:'en', name:'English',  locale:'en-US', dir:'ltr'},
+  {code:'kk', name:'Қазақша',  locale:'kk-KZ', dir:'ltr'},
+  {code:'zh', name:'中文',      locale:'zh-CN', dir:'ltr'},
+  {code:'es', name:'Español',  locale:'es-ES', dir:'ltr'},
+  {code:'fr', name:'Français', locale:'fr-FR', dir:'ltr'},
+  {code:'ar', name:'العربية',  locale:'ar-SA', dir:'rtl'}
+];
+const LANG_CODES = new Set(LANGS.map(l=>l.code));
+let LANG = 'ru';
+const LS_LANG_KEY = 'swp_lang';
+function loadLang(){
+  try{ const s=localStorage.getItem(LS_LANG_KEY); if(s && LANG_CODES.has(s)) LANG=s; }catch(e){}
+}
+function saveLang(){ try{ localStorage.setItem(LS_LANG_KEY, LANG); }catch(e){} }
+function curLocale(){ const l=LANGS.find(x=>x.code===LANG); return l?l.locale:'ru-RU'; }
+function curDir(){ const l=LANGS.find(x=>x.code===LANG); return l?l.dir:'ltr'; }
+// словарь: I18N[lang][namespace][key] = строка (плейсхолдеры вида {name})
+const I18N = { ru:{}, en:{} };
+Object.assign(I18N.ru, {
+  app:{ title:'SWP · Прогнозное планирование персонала', brandSub:'Кадровый прогноз' },
+  header:{ aiBtn:'ИИ-ассистент', guideBtn:'Руководство', glossaryBtn:'Глоссарий' },
+  common:{ close:'Закрыть', pdf:'PDF / Печать', download:'Скачать', upload:'Загрузить',
+    exportJson:'Выгрузить (JSON)', save:'Сохранить', cancel:'Отменить', add:'Добавить', delete:'Удалить',
+    core:'Основной', aux:'ТОиР/Aux', mgmt:'ИТР/Mgmt',
+    coreShort:'Core', auxShort:'Aux', mgmtShort:'Mgmt',
+    person:'чел.', months:'мес.', days:'дн.', na:'—' },
+  nav:{ dashboard:'Дашборд', normative:'Нормативный расчёт', lifecycle:'Жизненный цикл',
+    predictive:'Предиктивный анализ', risks:'Кадровые риски', cba:'Переобучение / CBA',
+    actions:'План действий', scenarios:'Сценарии', dictionary:'Справочник', methodology:'Методология' },
+  glossary:{ title:'Глоссарий терминов и методик' },
+  guide:{ title:'Руководство пользователя', why:'Зачем', how:'Как считается' },
+  ai:{ panelTitle:'ИИ-ассистент SWP', panelSub:'сопровождение проекта', settingsTitle:'Настройки',
+    attachTitle:'Прикрепить файл (ТЭО, PDF, CSV)', sendTitle:'Отправить (Enter)',
+    inputPlaceholder:'Опишите задачу: «спроектируй расчёт по ТЭО», «снизи текучесть до 12%», «исследуй дефицит буровиков в РК»…',
+    researchLabel:'Реальное исследование (веб-поиск источников)',
+    connectTitle:'Подключение ИИ', providerLabel:'Провайдер',
+    keyNote:' Ключ хранится только в этом браузере (localStorage), отдельный сервер не нужен. Получить ключ:',
+    modelLabel:'Модель', helloTitle:'Здравствуйте! Я сопровождаю ваш кадровый расчёт.',
+    helloText:'Могу изучить ТЭО и спроектировать виды работ, подобрать параметры под цель, исследовать рынок труда (с источниками) и менять данные за вас — вручную ничего вводить не нужно.' }
+});
+Object.assign(I18N.en, {
+  app:{ title:'SWP · Strategic Workforce Planning', brandSub:'Workforce Forecast' },
+  header:{ aiBtn:'AI Assistant', guideBtn:'Guide', glossaryBtn:'Glossary' },
+  common:{ close:'Close', pdf:'PDF / Print', download:'Download', upload:'Upload',
+    exportJson:'Export (JSON)', save:'Save', cancel:'Cancel', add:'Add', delete:'Delete',
+    core:'Core', aux:'Maintenance/Aux', mgmt:'Engineering/Mgmt',
+    coreShort:'Core', auxShort:'Aux', mgmtShort:'Mgmt',
+    person:'people', months:'mo.', days:'days', na:'—' },
+  nav:{ dashboard:'Dashboard', normative:'Normative Calculation', lifecycle:'Lifecycle',
+    predictive:'Predictive Analysis', risks:'Workforce Risks', cba:'Reskilling / CBA',
+    actions:'Action Plan', scenarios:'Scenarios', dictionary:'Directory', methodology:'Methodology' },
+  glossary:{ title:'Glossary of Terms and Methods' },
+  guide:{ title:'User Guide', why:'Why', how:'How it\'s calculated' },
+  ai:{ panelTitle:'SWP AI Assistant', panelSub:'project support', settingsTitle:'Settings',
+    attachTitle:'Attach a file (feasibility study, PDF, CSV)', sendTitle:'Send (Enter)',
+    inputPlaceholder:'Describe the task: "design the calculation from my feasibility study", "reduce turnover to 12%", "research driller shortages in Kazakhstan"…',
+    researchLabel:'Real research (web search for sources)',
+    connectTitle:'AI Connection', providerLabel:'Provider',
+    keyNote:' The key is stored only in this browser (localStorage); no separate server is needed. Get a key:',
+    modelLabel:'Model', helloTitle:'Hello! I support your workforce calculation.',
+    helloText:'I can study a feasibility study and design work types, tune parameters toward a goal, research the labor market (with sources), and change data for you — no manual entry needed.' }
+});
+Object.assign(I18N.ru, { dash:{
+  eyebrow:'Обзор · Стратегический контур', title:'Сводный дашборд кадровой траектории',
+  lead:'Единый «светофор» состояния: разрыв сейчас, вероятность дефицита на горизонте, портфель кадровых рисков и стоимость плана действий. Все показатели агрегируются из расчётных моделей.',
+  exportLabel:'Сводка (JSON)',
+  gapNow:'Разрыв «сейчас»', gapDeficit:'дефицит против факта', gapSurplus:'профицит против расчёта', gapBalance:'баланс',
+  probDeficit:'Вероятность дефицита', probSub:'к {month}-му мес. ({runs} симуляций)',
+  riskIndex:'Индекс риска (портфель)', riskSub:'{critical} критич. · {elevated} повыш. ролей',
+  peakDeficit:'Пиковый дефицит', peakSub:'медиана; до {p90} (P90) на {month}-м мес.',
+  fteAuto:'FTE под автоматизацией', fteAutoSub:'к высвобождению за {years} г.',
+  planCost:'Стоимость плана', planCostSub:'{hire} найм · {reskill} переоб. · {release} высвоб.',
+  trajTitle:'Кадровая траектория объекта',
+  trajHint:'Потребность по фазам жизненного цикла против прогноза доступной численности (медиана Монте-Карло, коридор P10–P90).',
+  legendDemand:'Потребность', legendAvail:'Доступно (P50)', legendBand:'P10–P90',
+  deficitBold:'Разрыв с {month}-го месяца.', deficitText:'Требуется опережающий найм и переобучение — см. вкладку «План действий».',
+  noDeficitBold:'Устойчивого дефицита не прогнозируется', noDeficitText:'по медианному сценарию.',
+  topRisksTitle:'Топ кадровых рисков',
+  topRisksHint:'Роли с наибольшим взвешенным индексом риска (демография, bus-factor, навыки, текучесть, рынок, избыточность).',
+  topRisksNote:'Детальная тепловая карта и веса факторов — на вкладке «Кадровые риски».'
+}});
+Object.assign(I18N.ru, { norm:{
+  eyebrow:'Этап 1 · Детерминированный расчёт', title:'Нормативный расчёт потребности',
+  lead:'Базовая численность (FTE) от объёмов, режима работы и норм выработки. Управляющие параметры пересчитывают все вкладки.',
+  exportLabel:'Выгрузить (JSON)',
+  inputsTitle:'Вводные параметры', inputsHint:'Управляющий блок. Любое изменение мгновенно пересчитывает потребность и прогнозы на всех вкладках.',
+  templateLabel:'Отраслевой шаблон', templateHint:'Готовый профиль производства. Применение шаблона задаёт один основной вид работ.',
+  saveTplBtn:'Сохранить как свой шаблон',
+  reserveLabel:'Резерв — коэфф. списочного состава (k_сп)', reserveHint:'Перевод явочной численности в списочную: запас на отпуска, больничные, обучение. 1.15 = +15% к штату.',
+  actualLabel:'Текущий (фактический) штат', actualHint:'Сколько людей оформлено сейчас. Разница с расчётом даёт дефицит или профицит.',
+  structureLabel:'Структура штата (из видов работ)', structureHint:'Распределение по группам выводится из назначенных видам работ групп. Сдвигается при сценарии «Индустрия 4.0».',
+  noteVolume:'Объём и нормы задаются по каждому виду работ отдельно (таблица справа). Итоговая потребность — сумма по всем работам.',
+  summaryTitle:'Сводный результат (FTE)', summaryHint:'Списочная численность = Σ по видам работ (Явочная × Сменность × k_сп) × Множитель этапа («{stage}»).',
+  reqLabel:'Расчётная потребность', reqSub:'этап: {stage}',
+  actualFactLabel:'Текущий факт', gapLabel:'Разрыв (GAP)',
+  deficit:'Дефицит', surplus:'Избыток', balance:'Баланс',
+  needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
+  detailTitle:'Детализация по должностям', detailHint:'Распределение потребности по должностям из справочника с учётом оргструктуры и кривой этапа (Q1–Q4 — динамика внутри фазы).',
+  thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель',
+  groupCore:'Основной персонал', groupAux:'Службы ТОиР', groupMgmt:'ИТР и менеджмент',
+  noPositions:'Нет должностей в справочнике', periodWorks:'{n} видов работ'
+}, work:{
+  volume:'Объём', volumePh:'Объём за период', tNorm:'Нвр', tNormPh:'Норма времени на ед., мин',
+  fsm:'Фсм', fsmPh:'Фонд смены, мин', kvn:'kвн', kvnPh:'Коэфф. выполнения норм',
+  nObjects:'Агрегатов', nObjectsPh:'Число обслуживаемых объектов', serviceNorm:'Нобсл', serviceNormPh:'Норма обслуживания, объектов/чел',
+  workplaces:'Раб. места', workplacesPh:'Число рабочих мест', loadCoeff:'k загр', loadCoeffPh:'Коэфф. загрузки',
+  norm:'Норма', normPh:'Норма выработки на 1 чел', unitDefault:'ед.', periodDefault:'период', periodMonth:'месяц',
+  title:'Виды работ — расчёт явочной численности',
+  hint:'Каждый вид работ нормируется своей методикой (выработка / норма времени / обслуживание / рабочие места). Группа определяет, к какой части оргструктуры относится работа. Итог — сумма по всем работам.',
+  addBtn:'Добавить работу', thName:'Вид работ', thGroup:'Группа', thMethod:'Методика',
+  thParams:'Параметры нормирования', thShifts:'Смен', thFte:'FTE (списочн.)',
+  noWorks:'Нет видов работ — добавьте первый',
+  totalRow:'Итого по всем работам (эксплуатация, до множителя этапа)',
+  footnote:'Методики (раздел 5 ТЗ): «{output}», «{time}», «{service}», «{workplace}». Списочная = Явочная × Сменность × k_сп ({absCoeff}).',
+  fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ'
+}});
+Object.assign(I18N.en, { norm:{
+  eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
+  lead:'Base headcount (FTE) from volumes, work regime and output norms. Control parameters recalculate every tab.',
+  exportLabel:'Export (JSON)',
+  inputsTitle:'Input Parameters', inputsHint:'The control block. Any change instantly recalculates demand and forecasts across all tabs.',
+  templateLabel:'Industry Template', templateHint:'A ready-made production profile. Applying a template sets a single main work type.',
+  saveTplBtn:'Save as Custom Template',
+  reserveLabel:'Reserve — payroll ratio (k_sp)', reserveHint:'Converts attendance headcount into payroll headcount: a reserve for vacations, sick leave, training. 1.15 = +15% to headcount.',
+  actualLabel:'Current (Actual) Headcount', actualHint:'How many people are on staff right now. The difference from the calculation gives a shortage or surplus.',
+  structureLabel:'Staff Structure (from work types)', structureHint:'The group breakdown is derived from the groups assigned to work types. It shifts under the "Industry 4.0" scenario.',
+  noteVolume:'Volume and norms are set for each work type separately (table on the right). Total demand is the sum across all work types.',
+  summaryTitle:'Summary Result (FTE)', summaryHint:'Payroll headcount = Sum across work types (Attendance x Shifts x k_sp) x Stage multiplier ("{stage}").',
+  reqLabel:'Calculated Demand', reqSub:'stage: {stage}',
+  actualFactLabel:'Current Actual', gapLabel:'Gap (GAP)',
+  deficit:'Shortage', surplus:'Surplus', balance:'Balanced',
+  needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
+  detailTitle:'Breakdown by Position', detailHint:'Distribution of demand across directory positions, accounting for org structure and the stage curve (Q1-Q4 - dynamics within the phase).',
+  thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE',
+  groupCore:'Core Personnel', groupAux:'Maintenance Services', groupMgmt:'Engineering & Management',
+  noPositions:'No positions in the directory', periodWorks:'{n} work types'
+}, work:{
+  volume:'Volume', volumePh:'Volume per period', tNorm:'T-norm', tNormPh:'Time norm per unit, min',
+  fsm:'Shift fund', fsmPh:'Shift fund, min', kvn:'k-comp', kvnPh:'Norm compliance factor',
+  nObjects:'Units', nObjectsPh:'Number of serviced units', serviceNorm:'Service rate', serviceNormPh:'Service rate, units/person',
+  workplaces:'Workplaces', workplacesPh:'Number of workplaces', loadCoeff:'Load factor', loadCoeffPh:'Load factor',
+  norm:'Rate', normPh:'Output rate per person', unitDefault:'units', periodDefault:'period', periodMonth:'month',
+  title:'Work Types — Attendance Headcount Calculation',
+  hint:'Each work type is normed with its own method (output / time-norm / service / workplace). The group determines which part of the org structure the work belongs to. The total is the sum across all work types.',
+  addBtn:'Add Work Type', thName:'Work Type', thGroup:'Group', thMethod:'Method',
+  thParams:'Norming Parameters', thShifts:'Shifts', thFte:'FTE (payroll)',
+  noWorks:'No work types — add the first one',
+  totalRow:'Total across all work types (operation, before stage multiplier)',
+  footnote:'Methods (spec section 5): "{output}", "{time}", "{service}", "{workplace}". Payroll = Attendance x Shifts x k_sp ({absCoeff}).',
+  fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type'
+}});
+Object.assign(I18N.ru, { toast:{
+  tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
+  dataExported:'{label} выгружены в JSON', defaultDataLabel:'Данные',
+  dictExportedCsv:'Справочник выгружен в CSV', csvEmpty:'CSV пуст или не распознан',
+  noPositionsFound:'Не найдено ни одной должности', importedPositions:'Импортировано должностей: {count}',
+  invalidJson:'Файл не является корректным JSON', noScenarioParams:'В файле не найдено параметров сценария',
+  scenarioLoadedFile:'Сценарий загружен из файла', changesDiscarded:'Изменения отменены',
+  workAdded:'Вид работ добавлен', workDeleted:'Вид работ удалён',
+  scenarioSaved:'Сценарий сохранён ({n} в сравнении)', scenarioLoaded:'Сценарий «{name}» загружен в рабочую область',
+  scenarioDeleted:'Сценарий удалён', dictSaved:'Справочник сохранён — расчёты обновлены',
+  fileReadError:'Не удалось прочитать файл', aiConnected:'Готово — ассистент подключён ({provider})', keyRemoved:'Ключ удалён'
+}, prompt:{
+  newTemplateName:'Название нового шаблона:', newTemplateDefault:'Мой профиль',
+  scenarioName:'Название сценария:', scenarioDefault:'Сценарий {n}',
+  newProfessionName:'Новая должность', unnamed:'Без названия', workMain:'{name} — основная работа'
+}, exportLabel:{
+  normative:'Параметры', lifecycle:'Сценарий', predictive:'Прогноз', cba:'Расчёт CBA',
+  dashboard:'Сводка', risk:'Реестр рисков', action:'План действий', methodology:'Допущения'
+}});
+Object.assign(I18N.en, { toast:{
+  tplApplied:'Template "{name}" applied', tplSaved:'Template "{name}" saved',
+  dataExported:'{label} exported to JSON', defaultDataLabel:'Data',
+  dictExportedCsv:'Directory exported to CSV', csvEmpty:'CSV is empty or unrecognized',
+  noPositionsFound:'No positions found', importedPositions:'Imported positions: {count}',
+  invalidJson:'The file is not valid JSON', noScenarioParams:'No scenario parameters found in the file',
+  scenarioLoadedFile:'Scenario loaded from file', changesDiscarded:'Changes discarded',
+  workAdded:'Work type added', workDeleted:'Work type deleted',
+  scenarioSaved:'Scenario saved ({n} in comparison)', scenarioLoaded:'Scenario "{name}" loaded into the workspace',
+  scenarioDeleted:'Scenario deleted', dictSaved:'Directory saved — calculations updated',
+  fileReadError:'Could not read the file', aiConnected:'Done — assistant connected ({provider})', keyRemoved:'Key removed'
+}, prompt:{
+  newTemplateName:'New template name:', newTemplateDefault:'My Profile',
+  scenarioName:'Scenario name:', scenarioDefault:'Scenario {n}',
+  newProfessionName:'New Position', unnamed:'Untitled', workMain:'{name} — main work'
+}, exportLabel:{
+  normative:'Parameters', lifecycle:'Scenario', predictive:'Forecast', cba:'CBA Calculation',
+  dashboard:'Summary', risk:'Risk Register', action:'Action Plan', methodology:'Assumptions'
+}});
+Object.assign(I18N.en, { dash:{
+  eyebrow:'Overview · Strategic Outlook', title:'Workforce Trajectory Summary Dashboard',
+  lead:'A single status overview: the current gap, probability of shortage over the horizon, workforce risk portfolio, and the cost of the action plan. All metrics are aggregated from the calculation models.',
+  exportLabel:'Summary (JSON)',
+  gapNow:'Gap "now"', gapDeficit:'shortage vs. actual', gapSurplus:'surplus vs. calculated', gapBalance:'balanced',
+  probDeficit:'Probability of Shortage', probSub:'by month {month} ({runs} simulations)',
+  riskIndex:'Risk Index (portfolio)', riskSub:'{critical} critical · {elevated} elevated roles',
+  peakDeficit:'Peak Shortage', peakSub:'median; up to {p90} (P90) in month {month}',
+  fteAuto:'FTE at Automation Risk', fteAutoSub:'to be released within {years} yr',
+  planCost:'Plan Cost', planCostSub:'{hire} hire · {reskill} reskill · {release} release',
+  trajTitle:'Facility Workforce Trajectory',
+  trajHint:'Demand across lifecycle phases vs. the forecast of available headcount (Monte Carlo median, P10-P90 band).',
+  legendDemand:'Demand', legendAvail:'Available (P50)', legendBand:'P10-P90',
+  deficitBold:'A gap is projected starting month {month}.', deficitText:'Proactive hiring and reskilling are needed — see the Action Plan tab.',
+  noDeficitBold:'No sustained shortage is projected', noDeficitText:'under the median scenario.',
+  topRisksTitle:'Top Workforce Risks',
+  topRisksHint:'Roles with the highest weighted risk index (demographics, bus-factor, skills, turnover, market, redundancy).',
+  topRisksNote:'A detailed heat map and factor weights are on the Workforce Risks tab.'
+}});
+function tRaw(key){
+  const path=key.split('.');
+  let cur=I18N[LANG];
+  for(const p of path){ cur = cur ? cur[p] : undefined; }
+  if(cur===undefined){
+    cur=I18N.ru;
+    for(const p of path){ cur = cur ? cur[p] : undefined; }
+  }
+  return cur;
+}
+function t(key,vars){
+  let s=tRaw(key);
+  if(s===undefined) return key;
+  if(vars) Object.keys(vars).forEach(k=>{ s=s.split('{'+k+'}').join(vars[k]); });
+  return s;
+}
+function applyLangToDom(){
+  document.documentElement.lang=LANG;
+  document.documentElement.dir=curDir();
+  document.title=t('app.title');
+  const brandSub=document.getElementById('brandSub'); if(brandSub) brandSub.textContent=t('app.brandSub');
+  const aiBtnLabel=document.getElementById('aiBtnLabel'); if(aiBtnLabel) aiBtnLabel.textContent=t('header.aiBtn');
+  const guideBtnLabel=document.getElementById('guideBtnLabel'); if(guideBtnLabel) guideBtnLabel.textContent=t('header.guideBtn');
+  const glossaryBtnLabel=document.getElementById('glossaryBtnLabel'); if(glossaryBtnLabel) glossaryBtnLabel.textContent=t('header.glossaryBtn');
+  const aiPanelTitle=document.getElementById('aiPanelTitle'); if(aiPanelTitle) aiPanelTitle.textContent=t('ai.panelTitle');
+  const aiPanelSub=document.getElementById('aiPanelSub'); if(aiPanelSub) aiPanelSub.textContent=t('ai.panelSub');
+  const aiSettingsBtn=document.getElementById('aiSettingsBtn'); if(aiSettingsBtn) aiSettingsBtn.title=t('ai.settingsTitle');
+  const aiClose=document.getElementById('aiClose'); if(aiClose) aiClose.title=t('common.close');
+  const aiAttach=document.getElementById('aiAttach'); if(aiAttach) aiAttach.title=t('ai.attachTitle');
+  const aiInput=document.getElementById('aiInput'); if(aiInput) aiInput.placeholder=t('ai.inputPlaceholder');
+  const aiSend=document.getElementById('aiSend'); if(aiSend) aiSend.title=t('ai.sendTitle');
+  const aiResearchLabel=document.getElementById('aiResearchLabel'); if(aiResearchLabel) aiResearchLabel.textContent=t('ai.researchLabel');
+}
+function buildLangSelector(){
+  const sel=document.getElementById('langSel'); if(!sel) return;
+  sel.innerHTML=LANGS.map(l=>'<option value="'+l.code+'"'+(LANG===l.code?' selected':'')+'>'+esc(l.name)+'</option>').join('');
+  sel.value=LANG;
+}
+function setLang(code){
+  if(!LANG_CODES.has(code) || code===LANG) return;
+  LANG=code; saveLang();
+  applyLangToDom();
+  buildTabs();
+  render();
+  renderAiSettings();
+  if(document.getElementById('modal') && document.getElementById('modal').classList.contains('show')){
+    if(modalKind==='guide') openGuide(); else if(modalKind==='glossary') openGlossary();
+  }
+}
+let modalKind=null;
+
 /* ---------------- СПРАВОЧНЫЕ ДАННЫЕ ---------------- */
-const GLOSSARY = [
+const GLOSSARY_I18N = { ru:[
   {t:'FTE (Full-Time Equivalent)', d:'Эквивалент полной занятости — мера потребности, равная 1 сотруднику на полной ставке. Все расчёты численности ведутся в FTE.'},
   {t:'GAP / Разрыв', d:'Разница между расчётной потребностью и фактическим штатом. Положительный GAP = дефицит (нужен найм), отрицательный = профицит (переобучение или высвобождение).'},
   {t:'Прогноз оттока (Attrition)', d:'Экспоненциальная модель убыли персонала. Из годовой текучести выводится месячная вероятность увольнения; численность убывает как (1−ставка)^t.'},
@@ -458,7 +723,21 @@ const GLOSSARY = [
   {t:'Skill Gap Index', d:'Доля недостающих компетенций при переходе между ролями. Чем меньше пересечение навыков, тем дороже и длиннее переобучение.'},
   {t:'qTrend (кривая этапа)', d:'4 контрольные точки (Q1–Q4), задающие форму потребности внутри фазы жизненного цикла. Например, СМР: всплеск к пику, ПНР: спад к норме эксплуатации.'},
   {t:'СМР / ПНР', d:'Строительно-монтажные и пуско-наладочные работы — капиталоёмкие начальные фазы жизненного цикла актива с пиковой потребностью в инженерах и рабочих.'}
-];
+], en:[
+  {t:'FTE (Full-Time Equivalent)', d:'A measure of demand equal to 1 employee at full workload. All headcount calculations are expressed in FTE.'},
+  {t:'GAP', d:'The difference between calculated demand and actual headcount. Positive GAP = shortage (hiring needed), negative = surplus (reskilling or release).'},
+  {t:'Attrition Forecast', d:'Exponential model of staff outflow. A monthly separation probability is derived from annual turnover; headcount decays as (1−rate)^t.'},
+  {t:'Monte Carlo', d:'Probabilistic forecast: thousands of scenarios with random fluctuations in attrition, hiring success and demand. Produces a P10–P50–P90 "fan" instead of a single line.'},
+  {t:'P10 / P50 / P90', d:'Percentiles of simulation outcomes. P50 is the median (middle scenario); P10–P90 is the band containing 80% of outcomes. The wider the band, the higher the uncertainty.'},
+  {t:'Survival Analysis', d:'Model of the probability that a profession is displaced by automation. S(t)=exp(-λt), where hazard λ is derived from the role\'s skill vector rather than set manually.'},
+  {t:'Hazard / Automation Risk', d:'The speed at which a role is displaced by technology. Calculated from skills: routine operations (patrols, measurements) = high risk; analytics, ML, networks = low.'},
+  {t:'CBA (Cost-Benefit Analysis)', d:'Comparison of costs: severance + market hiring VS internal reskilling. Under SHRM methodology hiring is valued at 1.5 salaries, severance at 3.'},
+  {t:'Reskilling ROI', d:'Return on reskilling investment: (Savings from reskilling ÷ Cost of reskilling) × 100%. Positive ROI = reskilling is cheaper than replacing people.'},
+  {t:'Skill Gap Index', d:'Share of missing competencies when moving between roles. The smaller the skill overlap, the more expensive and longer the reskilling.'},
+  {t:'qTrend (stage curve)', d:'4 control points (Q1–Q4) defining the shape of demand within a lifecycle phase. E.g. Construction: ramp to peak; Commissioning: decline to steady-state operation.'},
+  {t:'Construction / Commissioning', d:'Capital-intensive early phases of an asset\'s lifecycle with peak demand for engineers and workers.'}
+] };
+function currentGlossary(){ return GLOSSARY_I18N[LANG]||GLOSSARY_I18N.ru; }
 
 // headcount — фактическая численность роли (для bus-factor и демографии)
 // avgAge — средний возраст носителей (демографический риск, выход на пенсию)
@@ -473,12 +752,35 @@ const INITIAL_PROFESSIONS = {
   data_scientist:{id:'data_scientist',name:'Аналитик данных (AI)',type:'mgmt',salary:900000,trainingBase:350000,skillRate:50000,skills:'Телеметрия;Python;Машинное обучение;SQL',headcount:12,avgAge:31,market:0.85}
 };
 const PROF_DEFAULTS = {salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ',headcount:20,avgAge:42,market:0.4};
+// переводы отображаемых названий встроенных (несен-пользовательских) должностей — по id
+const PROFESSION_NAME_I18N = {
+  ru:{ operator:'Оператор технологической установки', patrol:'Оператор-обходчик', driller:'Машинист буровой',
+    mechanic:'Слесарь ТОиР', electrician:'Электромонтёр', iot_tech:'Специалист IIoT (датчики)', data_scientist:'Аналитик данных (AI)' },
+  en:{ operator:'Process Plant Operator', patrol:'Patrol Operator', driller:'Drill Rig Operator',
+    mechanic:'Maintenance Fitter', electrician:'Electrician', iot_tech:'IIoT Specialist (sensors)', data_scientist:'Data Scientist (AI)' }
+};
+function profName(p){
+  if(!p) return '';
+  const ruName=PROFESSION_NAME_I18N.ru[p.id];
+  if(ruName && p.name===ruName){ const m=PROFESSION_NAME_I18N[LANG]; return (m&&m[p.id])||ruName; }
+  return p.name;
+}
 
 const DEFAULT_TEMPLATES = {
   oil_gas:{name:'Нефтегазодобыча',volume:500000,unit:'баррелей',period:'месяц',norm:1200,shifts:3,absCoeff:1.15,actualStaff:1800,rCore:60,rAux:30,rMgmt:10,turnover:16,hireCap:35,fillDays:75,sepCap:25,autoPace:1},
   manufacturing:{name:'Машиностроение (завод)',volume:15000,unit:'изделий',period:'год',norm:15,shifts:2,absCoeff:1.10,actualStaff:2100,rCore:75,rAux:15,rMgmt:10,turnover:13,hireCap:40,fillDays:55,sepCap:30,autoPace:1.1},
   tech_rnd:{name:'IT / R&D центр',volume:1000,unit:'story points',period:'спринт',norm:10,shifts:1,absCoeff:1.05,actualStaff:110,rCore:40,rAux:10,rMgmt:50,turnover:22,hireCap:8,fillDays:95,sepCap:5,autoPace:0.7}
 };
+// переводы названий и единиц измерения встроенных отраслевых шаблонов — по ключу
+const TEMPLATE_I18N = {
+  ru:{ oil_gas:{name:'Нефтегазодобыча',unit:'баррелей',period:'месяц'}, manufacturing:{name:'Машиностроение (завод)',unit:'изделий',period:'год'}, tech_rnd:{name:'IT / R&D центр',unit:'story points',period:'спринт'} },
+  en:{ oil_gas:{name:'Oil & Gas Production',unit:'barrels',period:'month'}, manufacturing:{name:'Manufacturing (Plant)',unit:'units',period:'year'}, tech_rnd:{name:'IT / R&D Center',unit:'story points',period:'sprint'} }
+};
+function templateLabel(key,tpl){
+  const ru=TEMPLATE_I18N.ru[key];
+  if(ru && tpl && tpl.name===ru.name){ const m=TEMPLATE_I18N[LANG]; return (m&&m[key])||ru; }
+  return tpl;
+}
 
 // Жизненный цикл: множитель = ориентир, qTrend = форма кривой внутри фазы
 const STAGES = {
@@ -489,6 +791,11 @@ const STAGES = {
   decline:{name:'Консервация / вывод',mult:0.3,qTrend:[0.9,0.65,0.4,0.2],color:'#c4361b'}
 };
 const STAGE_ORDER = ['design','construction','commissioning','operation','decline'];
+const STAGE_NAME_I18N = {
+  ru:{ design:'Проектирование', construction:'Строительство (СМР)', commissioning:'Пуско-наладка (ПНР)', operation:'Эксплуатация', decline:'Консервация / вывод' },
+  en:{ design:'Design', construction:'Construction', commissioning:'Commissioning', operation:'Operation', decline:'Decommissioning' }
+};
+function stageName(id){ const m=STAGE_NAME_I18N[LANG]; return (m&&m[id]) || (STAGE_NAME_I18N.ru[id]) || (STAGES[id]&&STAGES[id].name) || id; }
 
 // Лексикон рисков автоматизации навыков (вероятность, что задача автоматизируема)
 const SKILL_HAZARD = {
@@ -498,6 +805,15 @@ const SKILL_HAZARD = {
   'Телеметрия':0.25,'Сети':0.25,'Python':0.10,'Машинное обучение':0.08,'SQL':0.20
 };
 const HAZARD_DEFAULT = 0.40;
+// переводы названий навыков лексикона (для отображения; ключ сопоставления — канонический RU-текст)
+const SKILL_NAME_I18N = {
+  en:{ 'ТБ':'HSE / Safety','Обход':'Patrols','Замеры':'Measurements','Арматура':'Valves & Fittings','Давление':'Pressure',
+    'Диагностика':'Diagnostics','Бурение':'Drilling','Гидравлика':'Hydraulics','Тяжелая техника':'Heavy Machinery',
+    'Чертежи':'Technical Drawings','Инструмент':'Tools','Механика':'Mechanics','Электробезопасность':'Electrical Safety',
+    'Схемы':'Schematics','КИПиА':'Instrumentation & Automation','Датчики':'Sensors','Телеметрия':'Telemetry','Сети':'Networks',
+    'Python':'Python','Машинное обучение':'Machine Learning','SQL':'SQL' }
+};
+function skillLabel(s){ const m=SKILL_NAME_I18N[LANG]; return (m&&m[s]) || s; }
 
 /* ---------------- СОСТОЯНИЕ ---------------- */
 let profDB = JSON.parse(JSON.stringify(INITIAL_PROFESSIONS));
@@ -551,14 +867,32 @@ const PROVIDERS = {
             ['claude-haiku-4-5','Claude Haiku 4.5 — быстрый (без веб-поиска)']] }
 };
 let AI = { provider:'gemini', model:'gemini-2.5-flash', research:true };
+// переводы отображаемых текстов провайдеров ИИ (лейбл, описание, модели) — модели сопоставляются по id (значение option)
+const PROVIDER_I18N = {
+  ru:{ gemini:{ label:'Google Gemini — бесплатно',
+      note:'Бесплатный тариф Google AI Studio: ключ бесплатный, карта не требуется. Есть лимит запросов в минуту (RPM) — он сбрасывается каждую минуту (в аналитике виден только суточный расход). Ассистент делает несколько запросов на одно сообщение (раунды инструментов + поиск), поэтому при лимите он сам ждёт и повторяет. Если упирается часто — выберите Flash-Lite (больший лимит).',
+      models:{'gemini-2.5-flash-lite':'Gemini 2.5 Flash-Lite — бесплатно, больший лимит/мин','gemini-2.5-flash':'Gemini 2.5 Flash — бесплатно, рекомендуется','gemini-2.0-flash':'Gemini 2.0 Flash — бесплатно, быстрый','gemini-2.5-pro':'Gemini 2.5 Pro — мощнее (лимиты строже)'} },
+    anthropic:{ label:'Anthropic Claude — платно',
+      note:'Платный API (у новых аккаунтов есть стартовые кредиты). Запросы идут напрямую в api.anthropic.com.',
+      models:{'claude-opus-4-8':'Claude Opus 4.8 — максимум','claude-sonnet-4-6':'Claude Sonnet 4.6 — баланс','claude-haiku-4-5':'Claude Haiku 4.5 — быстрый (без веб-поиска)'} } },
+  en:{ gemini:{ label:'Google Gemini — free',
+      note:'Google AI Studio free tier: the key is free, no card required. There is a per-minute request limit (RPM) that resets every minute (analytics only show daily usage). The assistant makes several requests per message (tool rounds + search), so the per-minute limit is hit faster. If it hits the limit often, choose Flash-Lite (higher limit).',
+      models:{'gemini-2.5-flash-lite':'Gemini 2.5 Flash-Lite — free, higher limit/min','gemini-2.5-flash':'Gemini 2.5 Flash — free, recommended','gemini-2.0-flash':'Gemini 2.0 Flash — free, fast','gemini-2.5-pro':'Gemini 2.5 Pro — more capable (stricter limits)'} },
+    anthropic:{ label:'Anthropic Claude — paid',
+      note:'Paid API (new accounts get starting credits). Requests go directly to api.anthropic.com.',
+      models:{'claude-opus-4-8':'Claude Opus 4.8 — maximum','claude-sonnet-4-6':'Claude Sonnet 4.6 — balanced','claude-haiku-4-5':'Claude Haiku 4.5 — fast (no web search)'} } }
+};
+function providerLabel(key){ const m=PROVIDER_I18N[LANG]; return (m&&m[key]&&m[key].label)||PROVIDER_I18N.ru[key].label; }
+function providerNote(key){ const m=PROVIDER_I18N[LANG]; return (m&&m[key]&&m[key].note)||PROVIDER_I18N.ru[key].note; }
+function providerModelLabel(key,modelId){ const m=PROVIDER_I18N[LANG]; return (m&&m[key]&&m[key].models[modelId])||(PROVIDER_I18N.ru[key].models[modelId])||modelId; }
 
 // сохранённые сценарии «что если» (каждый — полный снимок S + справочника)
 let scenarios = [];
 const LS_KEY = 'swp_workforce_v1';
 
 /* ---------------- УТИЛИТЫ ---------------- */
-const fmtKZT = n => Math.round(n).toLocaleString('ru-RU')+' ₸';
-const fmtN = n => Math.round(n).toLocaleString('ru-RU');
+const fmtKZT = n => Math.round(n).toLocaleString(curLocale())+' ₸';
+const fmtN = n => Math.round(n).toLocaleString(curLocale());
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 const pct = v => Math.round(v*100);
 
@@ -586,6 +920,18 @@ const WORK_METHODS = {
   service:  {name:'По обслуживанию', hint:'Чяв = Кол-во агрегатов ÷ Норма обслуживания'},
   workplace:{name:'По рабочим местам',hint:'Чяв = Раб. места × Коэфф. загрузки'}
 };
+const WORK_METHOD_I18N = {
+  ru:{ output:{name:'По выработке',hint:'Чяв = Объём ÷ Норма выработки'},
+    time:{name:'По норме времени',hint:'Чяв = (Объём × Нвр) ÷ (Фсм × kвн)'},
+    service:{name:'По обслуживанию',hint:'Чяв = Кол-во агрегатов ÷ Норма обслуживания'},
+    workplace:{name:'По рабочим местам',hint:'Чяв = Раб. места × Коэфф. загрузки'} },
+  en:{ output:{name:'Output-based',hint:'Attendance = Volume ÷ Output rate'},
+    time:{name:'Time-norm',hint:'Attendance = (Volume × Time norm) ÷ (Shift fund × Compliance factor)'},
+    service:{name:'Service-based',hint:'Attendance = Number of units ÷ Service rate'},
+    workplace:{name:'Workplace-based',hint:'Attendance = Workplaces × Load factor'} }
+};
+function methodName(k){ const m=WORK_METHOD_I18N[LANG]; return (m&&m[k]&&m[k].name)||WORK_METHOD_I18N.ru[k].name; }
+function methodHint(k){ const m=WORK_METHOD_I18N[LANG]; return (m&&m[k]&&m[k].hint)||WORK_METHOD_I18N.ru[k].hint; }
 const WORK_DEFAULTS = {output:{}, time:{tNorm:0.5,Fsm:480,kvn:1.05}, service:{nObjects:20,serviceNorm:4}, workplace:{workplaces:10,loadCoeff:1}};
 // явочная численность по выбранной методике (на смену)
 function workYav(w){
@@ -947,7 +1293,7 @@ function scenarioMetrics(state,profs){
   });
 }
 function currentScenarioSnapshot(name){
-  return {id:'sc_'+Date.now().toString(36), name:name||('Сценарий '+(scenarios.length+1)),
+  return {id:'sc_'+Date.now().toString(36), name:name||t('prompt.scenarioDefault',{n:scenarios.length+1}),
     savedAt:new Date().toISOString(), baseline:false,
     state:JSON.parse(JSON.stringify(S)), professions:JSON.parse(JSON.stringify(profDB))};
 }
@@ -1066,17 +1412,17 @@ function hbar(val,color){ // val 0..100
 function hint(t){return '<span class="hint">'+ic('help')+'<span class="tip">'+t+'</span></span>';}
 function toolbar(opts){ // opts: {pdf, exportFn, importType}
   let h='<div class="actions">';
-  h+='<button class="tool red" data-act="print">'+ic('file')+'PDF / Печать</button>';
-  if(opts.exportLabel) h+='<button class="tool" data-act="'+opts.exportAct+'">'+ic('download')+opts.exportLabel+'</button>';
-  if(opts.importAct) h+='<button class="tool" data-act="'+opts.importAct+'">'+ic('upload')+'Загрузить</button>';
+  h+='<button class="tool red" data-act="print">'+ic('file')+esc(t('common.pdf'))+'</button>';
+  if(opts.exportLabel) h+='<button class="tool" data-act="'+opts.exportAct+'">'+ic('download')+esc(opts.exportLabel)+'</button>';
+  if(opts.importAct) h+='<button class="tool" data-act="'+opts.importAct+'">'+ic('upload')+esc(t('common.upload'))+'</button>';
   h+='</div>';
   return h;
 }
 function periodLabel(){
   const n=(S.works||[]).length;
-  if(!n) return '—';
-  if(n===1){const w=S.works[0]; return num(w.volume).toLocaleString('ru-RU')+' '+(w.unit||'ед.')+' / '+(w.period||'период');}
-  return n+' видов работ';
+  if(!n) return t('common.na');
+  if(n===1){const w=S.works[0]; return num(w.volume).toLocaleString(curLocale())+' '+(w.unit||t('work.unitDefault'))+' / '+(w.period||t('work.periodDefault'));}
+  return t('norm.periodWorks',{n});
 }
 
 /* ============================================================
@@ -1091,13 +1437,13 @@ function renderNormative(){
 
   const groupRows=(arr,type,label,bcls,clr)=>{
     const n=arr.length;
-    let h='<tr class="grouprow"><td colspan="7">'+label+' · '+pct(b.dist[type])+'% · '+fmtN(b.staff[type])+' чел.</td></tr>';
-    if(!n){h+='<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic">Нет должностей в справочнике</td></tr>';return h;}
+    let h='<tr class="grouprow"><td colspan="7">'+esc(label)+' · '+pct(b.dist[type])+'% · '+fmtN(b.staff[type])+' '+esc(t('common.person'))+'</td></tr>';
+    if(!n){h+='<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
     arr.forEach(p=>{
       const req=Math.round(b.staff[type]/n);
       const perQ=k=>Math.round((baseQ*b.dist[type]/n)*q[k]);
-      h+='<tr><td style="font-weight:700">'+p.name+'</td>'
-        +'<td class="c"><span class="badge '+bcls+'">'+type+'</span></td>'
+      h+='<tr><td style="font-weight:700">'+esc(profName(p))+'</td>'
+        +'<td class="c"><span class="badge '+bcls+'">'+esc(t('common.'+type+'Short'))+'</span></td>'
         +'<td class="c mono" style="font-weight:800;color:'+clr+'">'+req+'</td>'
         +'<td class="c mono muted">'+perQ(0)+'</td><td class="c mono muted">'+perQ(1)+'</td>'
         +'<td class="c mono muted">'+perQ(2)+'</td><td class="c mono" style="font-weight:700;color:'+clr+'">'+perQ(3)+'</td></tr>';
@@ -1106,61 +1452,61 @@ function renderNormative(){
   };
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Этап 1 · Детерминированный расчёт</div>'
-    +'<h2>Нормативный расчёт потребности</h2>'
-    +'<p class="lead">Базовая численность (FTE) от объёмов, режима работы и норм выработки. Управляющие параметры пересчитывают все вкладки.</p></div>'
-    +toolbar({exportLabel:'Выгрузить (JSON)',exportAct:'exp-norm',importAct:'imp-norm'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('norm.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('norm.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('norm.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('norm.exportLabel'),exportAct:'exp-norm',importAct:'imp-norm'})+'</div>'
 
   +'<div class="grid g12">'
   // ----- ЛЕВО: параметры -----
   +'<div class="col-span-4"><div class="card accent">'
-    +'<div class="ctitle">'+ic('sliders')+'Вводные параметры'+hint('Управляющий блок. Любое изменение мгновенно пересчитывает потребность и прогнозы на всех вкладках.')+'</div>'
+    +'<div class="ctitle">'+ic('sliders')+esc(t('norm.inputsTitle'))+hint(t('norm.inputsHint'))+'</div>'
 
     +'<div class="field" style="background:var(--surface2);padding:14px;border-radius:11px;border:1px solid var(--line)">'
-      +'<label class="flabel">Отраслевой шаблон'+hint('Готовый профиль производства. Применение шаблона задаёт один основной вид работ.')+'</label>'
-      +'<select class="select" id="tpl">'+Object.entries(allT).map(([k,v])=>'<option value="'+k+'"'+(S.template===k?' selected':'')+'>'+v.name+'</option>').join('')+'</select>'
-      +'<button class="tool" id="saveTpl" style="width:100%;justify-content:center;margin-top:9px;border-style:dashed;color:var(--primary)">'+ic('save')+'Сохранить как свой шаблон</button>'
+      +'<label class="flabel">'+esc(t('norm.templateLabel'))+hint(t('norm.templateHint'))+'</label>'
+      +'<select class="select" id="tpl">'+Object.entries(allT).map(([k,v])=>'<option value="'+k+'"'+(S.template===k?' selected':'')+'>'+esc(templateLabel(k,v).name)+'</option>').join('')+'</select>'
+      +'<button class="tool" id="saveTpl" style="width:100%;justify-content:center;margin-top:9px;border-style:dashed;color:var(--primary)">'+ic('save')+esc(t('norm.saveTplBtn'))+'</button>'
     +'</div>'
 
-    +'<div class="field"><label class="flabel">Резерв — коэфф. списочного состава (k_сп)'+hint('Перевод явочной численности в списочную: запас на отпуска, больничные, обучение. 1.15 = +15% к штату.')+'</label>'
+    +'<div class="field"><label class="flabel">'+esc(t('norm.reserveLabel'))+hint(t('norm.reserveHint'))+'</label>'
       +'<input class="input num" type="number" step="0.05" id="absCoeff" value="'+S.absCoeff+'"></div>'
 
     +'<div class="field" style="margin-top:4px;background:var(--surface2);padding:14px;border-radius:11px;border:1px solid var(--line)">'
-      +'<label class="flabel">Текущий (фактический) штат'+hint('Сколько людей оформлено сейчас. Разница с расчётом даёт дефицит или профицит.')+'</label>'
+      +'<label class="flabel">'+esc(t('norm.actualLabel'))+hint(t('norm.actualHint'))+'</label>'
       +'<input class="input big" type="number" id="actualStaff" value="'+S.actualStaff+'"></div>'
 
     +'<div class="divider"></div>'
-    +'<div class="section-label">Структура штата (из видов работ)'+hint('Распределение по группам выводится из назначенных видам работ групп. Сдвигается при сценарии «Индустрия 4.0».')+'</div>'
+    +'<div class="section-label">'+esc(t('norm.structureLabel'))+hint(t('norm.structureHint'))+'</div>'
     +'<div class="chips">'
-      +'<span class="chip" style="border-color:var(--line);background:var(--primary-l);color:var(--primary-d)">Core '+pct(b.dist.core)+'% · '+fmtN(b.staff.core)+'</span>'
-      +'<span class="chip" style="border-color:var(--line);background:var(--green-l);color:var(--green)">Aux '+pct(b.dist.aux)+'% · '+fmtN(b.staff.aux)+'</span>'
-      +'<span class="chip" style="border-color:var(--line);background:var(--purple-l);color:var(--purple)">Mgmt '+pct(b.dist.mgmt)+'% · '+fmtN(b.staff.mgmt)+'</span>'
+      +'<span class="chip" style="border-color:var(--line);background:var(--primary-l);color:var(--primary-d)">'+esc(t('common.coreShort'))+' '+pct(b.dist.core)+'% · '+fmtN(b.staff.core)+'</span>'
+      +'<span class="chip" style="border-color:var(--line);background:var(--green-l);color:var(--green)">'+esc(t('common.auxShort'))+' '+pct(b.dist.aux)+'% · '+fmtN(b.staff.aux)+'</span>'
+      +'<span class="chip" style="border-color:var(--line);background:var(--purple-l);color:var(--purple)">'+esc(t('common.mgmtShort'))+' '+pct(b.dist.mgmt)+'% · '+fmtN(b.staff.mgmt)+'</span>'
     +'</div>'
-    +'<div class="note note-blue" style="margin-top:14px">'+ic('info')+'<div>Объём и нормы задаются по каждому виду работ отдельно (таблица справа). Итоговая потребность — сумма по всем работам.</div></div>'
+    +'<div class="note note-blue" style="margin-top:14px">'+ic('info')+'<div>'+esc(t('norm.noteVolume'))+'</div></div>'
   +'</div></div>'
 
   // ----- ПРАВО: результаты -----
   +'<div class="col-span-8"><div class="grid" style="gap:18px">'
-    +'<div class="card"><div class="ctitle">'+ic('users')+'Сводный результат (FTE)'+hint('Списочная численность = Σ по видам работ (Явочная × Сменность × k_сп) × Множитель этапа («'+b.stage.name+'»).')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('users')+esc(t('norm.summaryTitle'))+hint(t('norm.summaryHint',{stage:stageName(S.stage)}))+'</div>'
       +'<div class="grid g3">'
-        +'<div class="metric"><div class="mlabel">Расчётная потребность</div><div class="mval">'+fmtN(b.required)+' <small>чел.</small></div><div class="msub">этап: '+b.stage.name+'</div></div>'
-        +'<div class="metric"><div class="mlabel">Текущий факт</div><div class="mval">'+fmtN(S.actualStaff)+' <small>чел.</small></div><div class="msub">'+periodLabel()+'</div></div>'
-        +'<div class="metric '+(b.diff>0?'gap-pos':b.diff<0?'gap-neg':'')+'"><div class="mlabel">Разрыв (GAP)</div>'
+        +'<div class="metric"><div class="mlabel">'+esc(t('norm.reqLabel'))+'</div><div class="mval">'+fmtN(b.required)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('norm.reqSub',{stage:stageName(S.stage)}))+'</div></div>'
+        +'<div class="metric"><div class="mlabel">'+esc(t('norm.actualFactLabel'))+'</div><div class="mval">'+fmtN(S.actualStaff)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(periodLabel())+'</div></div>'
+        +'<div class="metric '+(b.diff>0?'gap-pos':b.diff<0?'gap-neg':'')+'"><div class="mlabel">'+esc(t('norm.gapLabel'))+'</div>'
           +'<div class="mval" style="display:flex;align-items:center;gap:6px;font-size:27px">'
-          +(b.diff>0?ic('up')+'Дефицит '+fmtN(b.diff):b.diff<0?ic('down')+'Избыток '+fmtN(-b.diff):'Баланс')+'</div>'
-          +'<div class="msub">'+(b.diff>0?'требуется найм':b.diff<0?'переобучение / высвобождение':'штат сбалансирован')+'</div></div>'
+          +(b.diff>0?ic('up')+esc(t('norm.deficit'))+' '+fmtN(b.diff):b.diff<0?ic('down')+esc(t('norm.surplus'))+' '+fmtN(-b.diff):esc(t('norm.balance')))+'</div>'
+          +'<div class="msub">'+(b.diff>0?esc(t('norm.needHire')):b.diff<0?esc(t('norm.needReskill')):esc(t('norm.staffBalanced')))+'</div></div>'
       +'</div></div>'
 
     +worksEditor()
 
-    +'<div class="card"><div class="ctitle">'+ic('layers')+'Детализация по должностям'
-      +hint('Распределение потребности по должностям из справочника с учётом оргструктуры и кривой этапа (Q1–Q4 — динамика внутри фазы).')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('layers')+esc(t('norm.detailTitle'))
+      +hint(t('norm.detailHint'))+'</div>'
       +'<div class="tbl-wrap"><table><thead><tr>'
-        +'<th>Должность</th><th class="c">Роль</th><th class="c">FTE цель</th>'
+        +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th><th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
         +'<th class="c">Q1</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
-        +groupRows(groups.core,'core','Основной персонал','b-blue','var(--blue)')
-        +groupRows(groups.aux,'aux','Службы ТОиР','b-green','var(--green)')
-        +groupRows(groups.mgmt,'mgmt','ИТР и менеджмент','b-purple','var(--purple)')
+        +groupRows(groups.core,'core',t('norm.groupCore'),'b-blue','var(--blue)')
+        +groupRows(groups.aux,'aux',t('norm.groupAux'),'b-green','var(--green)')
+        +groupRows(groups.mgmt,'mgmt',t('norm.groupMgmt'),'b-purple','var(--purple)')
       +'</tbody></table></div></div>'
   +'</div></div>'
   +'</div></div>';
@@ -1168,28 +1514,28 @@ function renderNormative(){
 /* ----- РЕДАКТОР ВИДОВ РАБОТ (многоработное нормирование) ----- */
 function workParamCells(w){
   const inp=(f,ph,step)=>'<input class="cell-edit mono" data-work="'+w.id+'" data-wf="'+f+'" type="number"'+(step?' step="'+step+'"':'')
-    +' value="'+(w[f]!=null?w[f]:'')+'" title="'+ph+'" placeholder="'+ph+'" style="width:74px;text-align:right">';
-  const txt=(f,ph,wd)=>'<input class="cell-edit" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(w[f]||'')+'" title="'+ph+'" placeholder="'+ph+'" style="width:'+(wd||58)+'px">';
-  const lbl=t=>'<span class="muted" style="font-size:10px">'+t+'</span> ';
+    +' value="'+(w[f]!=null?w[f]:'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:74px;text-align:right">';
+  const txt=(f,ph,wd)=>'<input class="cell-edit" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(w[f]||'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:'+(wd||58)+'px">';
+  const lbl=s=>'<span class="muted" style="font-size:10px">'+esc(s)+'</span> ';
   switch(w.method){
-    case 'time':      return lbl('Объём')+inp('volume','Объём за период')+' '+txt('unit','ед.',46)
-                      +' · '+lbl('Нвр')+inp('tNorm','Норма времени на ед., мин',0.01)
-                      +' · '+lbl('Фсм')+inp('Fsm','Фонд смены, мин')
-                      +' · '+lbl('kвн')+inp('kvn','Коэфф. выполнения норм',0.01);
-    case 'service':   return lbl('Агрегатов')+inp('nObjects','Число обслуживаемых объектов')
-                      +' · '+lbl('Нобсл')+inp('serviceNorm','Норма обслуживания, объектов/чел',0.1);
-    case 'workplace': return lbl('Раб. места')+inp('workplaces','Число рабочих мест')
-                      +' · '+lbl('k загр')+inp('loadCoeff','Коэфф. загрузки',0.05);
-    default:          return lbl('Объём')+inp('volume','Объём за период')+' '+txt('unit','ед.',46)+'/'+txt('period','период',64)
-                      +' · '+lbl('Норма')+inp('norm','Норма выработки на 1 чел');
+    case 'time':      return lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)
+                      +' · '+lbl(t('work.tNorm'))+inp('tNorm',t('work.tNormPh'),0.01)
+                      +' · '+lbl(t('work.fsm'))+inp('Fsm',t('work.fsmPh'))
+                      +' · '+lbl(t('work.kvn'))+inp('kvn',t('work.kvnPh'),0.01);
+    case 'service':   return lbl(t('work.nObjects'))+inp('nObjects',t('work.nObjectsPh'))
+                      +' · '+lbl(t('work.serviceNorm'))+inp('serviceNorm',t('work.serviceNormPh'),0.1);
+    case 'workplace': return lbl(t('work.workplaces'))+inp('workplaces',t('work.workplacesPh'))
+                      +' · '+lbl(t('work.loadCoeff'))+inp('loadCoeff',t('work.loadCoeffPh'),0.05);
+    default:          return lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)+'/'+txt('period',t('work.periodDefault'),64)
+                      +' · '+lbl(t('work.norm'))+inp('norm',t('work.normPh'));
   }
 }
 function worksEditor(){
   const rows=(S.works||[]).map(w=>{
     const gsel='<select class="cell-edit" data-work="'+w.id+'" data-wf="group" style="text-align:center;width:88px">'
-      +[['core','Основной'],['aux','ТОиР/Aux'],['mgmt','ИТР/Mgmt']].map(([v,t])=>'<option value="'+v+'"'+(w.group===v?' selected':'')+'>'+t+'</option>').join('')+'</select>';
+      +[['core',t('common.core')],['aux',t('common.aux')],['mgmt',t('common.mgmt')]].map(([v,lb])=>'<option value="'+v+'"'+(w.group===v?' selected':'')+'>'+esc(lb)+'</option>').join('')+'</select>';
     const msel='<select class="cell-edit" data-work="'+w.id+'" data-wf="method" style="width:150px">'
-      +Object.entries(WORK_METHODS).map(([k,m])=>'<option value="'+k+'"'+(w.method===k?' selected':'')+'>'+m.name+'</option>').join('')+'</select>';
+      +Object.keys(WORK_METHODS).map(k=>'<option value="'+k+'"'+(w.method===k?' selected':'')+'>'+esc(methodName(k))+'</option>').join('')+'</select>';
     const shs='<input class="cell-edit mono" data-work="'+w.id+'" data-wf="shifts" type="number" min="1" max="4" value="'+num(w.shifts,1)+'" style="width:44px;text-align:center">';
     return '<tr data-workrow="'+w.id+'">'
       +'<td><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(w.name||'')+'" style="font-weight:700;min-width:130px"></td>'
@@ -1197,19 +1543,19 @@ function worksEditor(){
       +'<td>'+msel+'</td>'
       +'<td style="font-size:11px;white-space:nowrap">'+workParamCells(w)+'</td>'
       +'<td class="c">'+shs+'</td>'
-      +'<td class="r mono" style="font-weight:800;color:var(--primary)" title="Явочная '+fmtN(workYav(w))+' × сменность × k_сп">'+fmtN(workFTE(w))+'</td>'
+      +'<td class="r mono" style="font-weight:800;color:var(--primary)" title="'+esc(t('work.fteTitle',{yav:fmtN(workYav(w))}))+'">'+fmtN(workFTE(w))+'</td>'
       +'<td class="c"><button class="xbtn" data-delwork="'+w.id+'" style="width:28px;height:28px">'+ic('trash')+'</button></td></tr>';
   }).join('');
   const total=worksTotals().total;
-  return '<div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('layers')+'Виды работ — расчёт явочной численности'
-    +hint('Каждый вид работ нормируется своей методикой (выработка / норма времени / обслуживание / рабочие места). Группа определяет, к какой части оргструктуры относится работа. Итог — сумма по всем работам.')
-    +'<span class="sp"></span><button class="tool" data-act="add-work" style="padding:6px 11px">'+ic('plus')+'Добавить работу</button></div>'
+  return '<div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('layers')+esc(t('work.title'))
+    +hint(t('work.hint'))
+    +'<span class="sp"></span><button class="tool" data-act="add-work" style="padding:6px 11px">'+ic('plus')+esc(t('work.addBtn'))+'</button></div>'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-    +'<th>Вид работ</th><th class="c">Группа</th><th>Методика</th><th>Параметры нормирования</th><th class="c">Смен</th><th class="r">FTE (списочн.)</th><th class="c">×</th>'
-    +'</tr></thead><tbody>'+(rows||'<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic;padding:18px">Нет видов работ — добавьте первый</td></tr>')
-    +'</tbody>'+(S.works&&S.works.length?'<tfoot><tr style="background:var(--ink);color:#fff"><td colspan="5" style="font-weight:700;padding:11px 14px">Итого по всем работам (эксплуатация, до множителя этапа)</td><td class="r mono" style="font-weight:800;font-size:15px;color:#fff;padding:11px 14px">'+fmtN(total)+'</td><td></td></tr></tfoot>':'')
+    +'<th>'+esc(t('work.thName'))+'</th><th class="c">'+esc(t('work.thGroup'))+'</th><th>'+esc(t('work.thMethod'))+'</th><th>'+esc(t('work.thParams'))+'</th><th class="c">'+esc(t('work.thShifts'))+'</th><th class="r">'+esc(t('work.thFte'))+'</th><th class="c">×</th>'
+    +'</tr></thead><tbody>'+(rows||'<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic;padding:18px">'+esc(t('work.noWorks'))+'</td></tr>')
+    +'</tbody>'+(S.works&&S.works.length?'<tfoot><tr style="background:var(--ink);color:#fff"><td colspan="5" style="font-weight:700;padding:11px 14px">'+esc(t('work.totalRow'))+'</td><td class="r mono" style="font-weight:800;font-size:15px;color:#fff;padding:11px 14px">'+fmtN(total)+'</td><td></td></tr></tfoot>':'')
     +'</table></div>'
-    +'<div class="fnote" style="padding:0 22px 16px">Методики (раздел 5 ТЗ): «'+WORK_METHODS.output.hint+'», «'+WORK_METHODS.time.hint+'», «'+WORK_METHODS.service.hint+'», «'+WORK_METHODS.workplace.hint+'». Списочная = Явочная × Сменность × k_сп ('+S.absCoeff+').</div>'
+    +'<div class="fnote" style="padding:0 22px 16px">'+esc(t('work.footnote',{output:methodHint('output'),time:methodHint('time'),service:methodHint('service'),workplace:methodHint('workplace'),absCoeff:S.absCoeff}))+'</div>'
   +'</div>';
 }
 function slider(id,label,valPct,clr){
@@ -1524,49 +1870,49 @@ function renderDashboard(){
     +'<div class="kv" style="color:'+color+'">'+val+'</div><div class="kd">'+sub+'</div></div>';
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Обзор · Стратегический контур</div>'
-    +'<h2>Сводный дашборд кадровой траектории</h2>'
-    +'<p class="lead">Единый «светофор» состояния: разрыв сейчас, вероятность дефицита на горизонте, портфель кадровых рисков и стоимость плана действий. Все показатели агрегируются из расчётных моделей.</p></div>'
-    +toolbar({exportLabel:'Сводка (JSON)',exportAct:'exp-dash'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('dash.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('dash.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('dash.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('dash.exportLabel'),exportAct:'exp-dash'})+'</div>'
 
   +'<div class="grid g3" style="margin-bottom:18px">'
-    +tl('Разрыв «сейчас»', (b.diff>0?'−':b.diff<0?'+':'')+fmtN(Math.abs(b.diff)),
-        b.diff>0?'дефицит против факта':b.diff<0?'профицит против расчёта':'баланс', gapColor,'users')
-    +tl('Вероятность дефицита', pct(M.probDeficitEnd)+'%',
-        'к '+(M.H-1)+'-му мес. ('+M.runs.toLocaleString('ru-RU')+' симуляций)', probColor,'shield')
-    +tl('Индекс риска (портфель)', risk.portfolioIndex+'<small style="font-size:14px;color:var(--t3)"> /100</small>',
-        risk.critical+' критич. · '+risk.elevated+' повыш. ролей', riskColor,'gauge')
+    +tl(t('dash.gapNow'), (b.diff>0?'−':b.diff<0?'+':'')+fmtN(Math.abs(b.diff)),
+        b.diff>0?t('dash.gapDeficit'):b.diff<0?t('dash.gapSurplus'):t('dash.gapBalance'), gapColor,'users')
+    +tl(t('dash.probDeficit'), pct(M.probDeficitEnd)+'%',
+        t('dash.probSub',{month:M.H-1,runs:M.runs.toLocaleString(curLocale())}), probColor,'shield')
+    +tl(t('dash.riskIndex'), risk.portfolioIndex+'<small style="font-size:14px;color:var(--t3)"> /100</small>',
+        t('dash.riskSub',{critical:risk.critical,elevated:risk.elevated}), riskColor,'gauge')
   +'</div>'
   +'<div class="grid g3" style="margin-bottom:18px">'
-    +tl('Пиковый дефицит', fmtN(M.peakDeficitMed),
-        'медиана; до '+fmtN(M.peakDeficitP90)+' (P90) на '+M.peakMonth+'-м мес.', 'var(--red)','alert')
-    +tl('FTE под автоматизацией', fmtN(auto.totalAtRisk),
-        'к высвобождению за '+auto.years.toFixed(1)+' г.', 'var(--amber)','zap')
-    +tl('Стоимость плана', fmtKZT(plan.total),
-        plan.hire+' найм · '+plan.reskill+' переоб. · '+plan.release+' высвоб.', 'var(--primary)','dollar')
+    +tl(t('dash.peakDeficit'), fmtN(M.peakDeficitMed),
+        t('dash.peakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}), 'var(--red)','alert')
+    +tl(t('dash.fteAuto'), fmtN(auto.totalAtRisk),
+        t('dash.fteAutoSub',{years:auto.years.toFixed(1)}), 'var(--amber)','zap')
+    +tl(t('dash.planCost'), fmtKZT(plan.total),
+        t('dash.planCostSub',{hire:plan.hire,reskill:plan.reskill,release:plan.release}), 'var(--primary)','dollar')
   +'</div>'
 
   +'<div class="grid g12">'
-    +'<div class="col-span-8"><div class="card"><div class="ctitle">'+ic('trend')+'Кадровая траектория объекта'
-      +hint('Потребность по фазам жизненного цикла против прогноза доступной численности (медиана Монте-Карло, коридор P10–P90).')+'</div>'
+    +'<div class="col-span-8"><div class="card"><div class="ctitle">'+ic('trend')+esc(t('dash.trajTitle'))
+      +hint(t('dash.trajHint'))+'</div>'
       +svgForecast(M)
       +'<div class="legend">'
-        +'<span><span class="swatch line" style="background:#c4361b"></span>Потребность</span>'
-        +'<span><span class="swatch line" style="background:#0f766e"></span>Доступно (P50)</span>'
-        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>P10–P90</span>'
+        +'<span><span class="swatch line" style="background:#c4361b"></span>'+esc(t('dash.legendDemand'))+'</span>'
+        +'<span><span class="swatch line" style="background:#0f766e"></span>'+esc(t('dash.legendAvail'))+'</span>'
+        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>'+esc(t('dash.legendBand'))+'</span>'
       +'</div>'
       +(M.firstDeficit>=0
-        ? '<div class="note note-red" style="margin-top:14px">'+ic('alert')+'<div><b>Разрыв с '+M.firstDeficit+'-го месяца.</b> Требуется опережающий найм и переобучение — см. вкладку «План действий».</div></div>'
-        : '<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>Устойчивого дефицита не прогнозируется</b> по медианному сценарию.</div></div>')
+        ? '<div class="note note-red" style="margin-top:14px">'+ic('alert')+'<div><b>'+esc(t('dash.deficitBold',{month:M.firstDeficit}))+'</b> '+esc(t('dash.deficitText'))+'</div></div>'
+        : '<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>'+esc(t('dash.noDeficitBold'))+'</b> '+esc(t('dash.noDeficitText'))+'</div></div>')
     +'</div></div>'
 
-    +'<div class="col-span-4"><div class="card" style="height:100%"><div class="ctitle">'+ic('alert')+'Топ кадровых рисков'
-      +hint('Роли с наибольшим взвешенным индексом риска (демография, bus-factor, навыки, текучесть, рынок, избыточность).')+'</div>'
+    +'<div class="col-span-4"><div class="card" style="height:100%"><div class="ctitle">'+ic('alert')+esc(t('dash.topRisksTitle'))
+      +hint(t('dash.topRisksHint'))+'</div>'
       +top.map(r=>'<div style="margin-bottom:13px">'
         +'<div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px">'
-        +'<span>'+r.p.name+'</span><span class="mono" style="color:'+light(r.index,40,66)+'">'+r.index+'</span></div>'
+        +'<span>'+esc(profName(r.p))+'</span><span class="mono" style="color:'+light(r.index,40,66)+'">'+r.index+'</span></div>'
         +hbar(r.index, light(r.index,40,66))+'</div>').join('')
-      +'<div class="note note-blue" style="margin-top:10px">'+ic('info')+'<div>Детальная тепловая карта и веса факторов — на вкладке «Кадровые риски».</div></div>'
+      +'<div class="note note-blue" style="margin-top:10px">'+ic('info')+'<div>'+esc(t('dash.topRisksNote'))+'</div></div>'
     +'</div></div>'
   +'</div></div>';
 }
@@ -1777,16 +2123,16 @@ function renderMethodology(){
    ============================================================ */
 
 const TABS = [
-  {id:'dashboard',  label:'Дашборд',            icon:'gauge',    render:renderDashboard},
-  {id:'normative',  label:'Нормативный расчёт', icon:'sliders',  render:renderNormative},
-  {id:'lifecycle',  label:'Жизненный цикл',     icon:'activity', render:renderLifecycle},
-  {id:'predictive', label:'Предиктивный анализ',icon:'brain',    render:renderPredictive},
-  {id:'risks',      label:'Кадровые риски',     icon:'shield',   render:renderRisks},
-  {id:'cba',        label:'Переобучение / CBA', icon:'dollar',   render:renderCBA},
-  {id:'actions',    label:'План действий',      icon:'route',    render:renderActions},
-  {id:'scenarios',  label:'Сценарии',           icon:'layers',   render:renderScenarios},
-  {id:'dictionary', label:'Справочник',         icon:'db',       render:renderDictionary},
-  {id:'methodology',label:'Методология',        icon:'help',     render:renderMethodology}
+  {id:'dashboard',  icon:'gauge',    render:renderDashboard},
+  {id:'normative',  icon:'sliders',  render:renderNormative},
+  {id:'lifecycle',  icon:'activity', render:renderLifecycle},
+  {id:'predictive', icon:'brain',    render:renderPredictive},
+  {id:'risks',      icon:'shield',   render:renderRisks},
+  {id:'cba',        icon:'dollar',   render:renderCBA},
+  {id:'actions',    icon:'route',    render:renderActions},
+  {id:'scenarios',  icon:'layers',   render:renderScenarios},
+  {id:'dictionary', icon:'db',       render:renderDictionary},
+  {id:'methodology',icon:'help',     render:renderMethodology}
 ];
 
 // какие ключи состояния — числовые
@@ -1799,8 +2145,8 @@ const NUM_KEYS = new Set(['volume','norm','absCoeff','actualStaff','shifts',
 /* ---------- ВКЛАДКИ ---------- */
 function buildTabs(){
   const nav=document.getElementById('tabs');
-  nav.innerHTML = TABS.map(t=>
-    '<button class="tab'+(t.id===activeTab?' active':'')+'" data-tab="'+t.id+'">'+ic(t.icon)+'<span>'+t.label+'</span></button>'
+  nav.innerHTML = TABS.map(tb=>
+    '<button class="tab'+(tb.id===activeTab?' active':'')+'" data-tab="'+tb.id+'">'+ic(tb.icon)+'<span>'+esc(t('nav.'+tb.id))+'</span></button>'
   ).join('');
 }
 function syncTabs(){
@@ -1835,11 +2181,11 @@ function render(){
 /* ---------- УВЕДОМЛЕНИЯ ---------- */
 let toastTimer=null;
 function showToast(msg,type){
-  const t=document.getElementById('toast');
-  t.className='show'+(type?(' '+type):'');
-  t.innerHTML=ic(type==='err'?'alert':type==='warn'?'info':'check')+'<span>'+msg+'</span>';
+  const el=document.getElementById('toast');
+  el.className='show'+(type?(' '+type):'');
+  el.innerHTML=ic(type==='err'?'alert':type==='warn'?'info':'check')+'<span>'+esc(msg)+'</span>';
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>{ t.className=''; },2800);
+  toastTimer=setTimeout(()=>{ el.className=''; },2800);
 }
 
 /* ---------- ШАБЛОНЫ ---------- */
@@ -1849,14 +2195,15 @@ function applyTemplate(key){
   if(!tpl) return;
   Object.keys(tpl).forEach(k=>{ if(k!=='name') S[k]=tpl[k]; });
   S.template=key;
+  const tl=templateLabel(key,tpl);
   // шаблон задаёт один основной вид работ (по выработке); ранее добавленные работы заменяются
-  S.works=[{ id:'w_main', name:tpl.name+' — основная работа', group:'core', method:'output',
-    volume:num(tpl.volume,1), unit:tpl.unit||'ед.', period:tpl.period||'месяц', norm:num(tpl.norm,1), shifts:num(tpl.shifts,1) }];
+  S.works=[{ id:'w_main', name:t('prompt.workMain',{name:tl.name}), group:'core', method:'output',
+    volume:num(tpl.volume,1), unit:tl.unit||t('work.unitDefault'), period:tl.period||t('work.periodMonth'), norm:num(tpl.norm,1), shifts:num(tpl.shifts,1) }];
   render();
-  showToast('Шаблон «'+tpl.name+'» применён');
+  showToast(t('toast.tplApplied',{name:tl.name}));
 }
 function saveCustomTemplate(){
-  const name=prompt('Название нового шаблона:','Мой профиль');
+  const name=prompt(t('prompt.newTemplateName'),t('prompt.newTemplateDefault'));
   if(!name) return;
   const key='custom_'+Date.now().toString(36);
   customTemplates[key]={
@@ -1866,7 +2213,7 @@ function saveCustomTemplate(){
   };
   S.template=key;
   render();
-  showToast('Шаблон «'+name+'» сохранён');
+  showToast(t('toast.tplSaved',{name}));
 }
 
 /* ---------- ВВОД/ВЫВОД ФАЙЛОВ ---------- */
@@ -1888,7 +2235,7 @@ function snapshot(kind){
 function exportJSON(kind,label){
   const stamp=new Date().toISOString().slice(0,10);
   downloadFile('SWP_'+kind+'_'+stamp+'.json', snapshot(kind), 'application/json');
-  showToast((label||'Данные')+' выгружены в JSON');
+  showToast(t('toast.dataExported',{label:label||t('toast.defaultDataLabel')}));
 }
 function professionsToCSV(){
   const head=['id','name','type','salary','trainingBase','skillRate','headcount','avgAge','market','skills'];
@@ -1898,8 +2245,8 @@ function professionsToCSV(){
   return '\uFEFF'+lines.join('\n'); // BOM для Excel
 }
 function exportCSV(){
-  downloadFile('SWP_справочник_'+new Date().toISOString().slice(0,10)+'.csv', professionsToCSV(),'text/csv');
-  showToast('Справочник выгружен в CSV');
+  downloadFile('SWP_directory_'+new Date().toISOString().slice(0,10)+'.csv', professionsToCSV(),'text/csv');
+  showToast(t('toast.dictExportedCsv'));
 }
 function parseCSV(text){
   text=text.replace(/^\uFEFF/,'').replace(/\r/g,'');
@@ -1921,7 +2268,7 @@ function parseCSV(text){
 }
 function importCSVText(text){
   const rows=parseCSV(text);
-  if(rows.length<2){ showToast('CSV пуст или не распознан','err'); return; }
+  if(rows.length<2){ showToast(t('toast.csvEmpty'),'err'); return; }
   const head=rows[0].map(h=>h.trim());
   const idx=n=>head.indexOf(n);
   const next={};
@@ -1944,18 +2291,18 @@ function importCSVText(text){
       skills:(idx('skills')>=0?r[idx('skills')]:'').trim() };
     count++;
   }
-  if(!count){ showToast('Не найдено ни одной должности','err'); return; }
+  if(!count){ showToast(t('toast.noPositionsFound'),'err'); return; }
   profDB=next; tempDB=JSON.parse(JSON.stringify(next)); isDirty=false;
   // починить выбранные профессии в CBA, если исчезли
   const ids=Object.keys(profDB);
   if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
   if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
   render();
-  showToast('Импортировано должностей: '+count);
+  showToast(t('toast.importedPositions',{count}));
 }
 function importJSONText(text){
   let data;
-  try{ data=JSON.parse(text); }catch(e){ showToast('Файл не является корректным JSON','err'); return; }
+  try{ data=JSON.parse(text); }catch(e){ showToast(t('toast.invalidJson'),'err'); return; }
   const st=data.state||data; // допускаем как «снимок», так и голый объект состояния
   let applied=0;
   Object.keys(S).forEach(k=>{ if(st[k]!==undefined){ S[k]=st[k]; applied++; } });
@@ -1967,9 +2314,9 @@ function importJSONText(text){
   const ids=Object.keys(profDB);
   if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
   if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
-  if(!applied && !data.professions){ showToast('В файле не найдено параметров сценария','warn'); return; }
+  if(!applied && !data.professions){ showToast(t('toast.noScenarioParams'),'warn'); return; }
   render();
-  showToast('Сценарий загружен из файла');
+  showToast(t('toast.scenarioLoadedFile'));
 }
 
 let pendingImport=null; // 'json' | 'csv'
@@ -1981,17 +2328,8 @@ function triggerImport(kind){
   f.click();
 }
 
-/* ---------- ГЛОССАРИЙ ---------- */
-function openGlossary(){
-  const t=document.getElementById('modalTitle'); if(t) t.textContent='Глоссарий терминов и методик';
-  const body=document.getElementById('glossaryBody');
-  body.innerHTML = GLOSSARY.map(g=>
-    '<div class="gitem"><div class="gterm">'+g.t+'</div><div class="gdesc">'+g.d+'</div></div>'
-  ).join('');
-  document.getElementById('modal').classList.add('show');
-}
-/* ---------- РУКОВОДСТВО: каждый пункт — что / зачем / как считается ---------- */
-const GUIDE=[
+/* ---------- ГЛОССАРИЙ И РУКОВОДСТВО: каждый пункт — что / зачем / как считается ---------- */
+const GUIDE_I18N = { ru: [
   {section:'1. Виды работ и нормирование (вкладка «Нормативный расчёт»)', items:[
     {t:'Вид работ', why:'Реальное производство состоит из множества разных работ. Каждая нормируется отдельно и относится к группе персонала (Основной/ТОиР/ИТР).', how:'Списочная FTE работы = Явочная × Сменность × k_сп. Потребность объекта = сумма по всем работам.'},
     {t:'Методика «По выработке»', why:'Когда известен объём продукции и норма выработки на человека.', how:'Чяв = Объём ÷ Норма выработки.'},
@@ -2066,38 +2404,124 @@ const GUIDE=[
     {t:'Что умеет', why:'Сопровождает проект и сам меняет данные — вручную вводить не нужно.', how:'Изучает ТЭО/PDF, исследует рынок (веб-поиск со ссылками), вызывает функции: параметры, виды работ, должности, веса рисков, методология, сценарии.'},
     {t:'Прозрачность', why:'Доверие к цифрам.', how:'Все числа выводятся из формул этого руководства; ассистент объясняет «откуда цифра» и помечает допущения.'}
   ]}
-];
+], en: [
+  {section:'1. Work types and norming (Normative Calculation tab)', items:[
+    {t:'Work type', why:'Real-world production consists of many different jobs. Each is normed separately and belongs to a personnel group (Core/Aux/Mgmt).', how:'Payroll FTE of a work type = Attendance headcount x Shifts x k_sp. Facility demand = sum across all work types.'},
+    {t:'"Output-based" method', why:'Used when the production volume and the output rate per person are known.', how:'Attendance headcount = Volume / Output rate.'},
+    {t:'"Time-norm" method', why:'Used when a standardized time per unit of work is set (labor time standards, time studies).', how:'Attendance headcount = (Volume x Time norm) / (Shift fund x Compliance factor); shift fund is the shift length in minutes, compliance factor is the norm-fulfillment coefficient.'},
+    {t:'"Service-based" method', why:'Equipment-driven, continuous processes: one operator services several units.', how:'Attendance headcount = Number of units / Service rate.'},
+    {t:'"Workplace-based" method', why:'Used when headcount is determined by the number of posts/workstations.', how:'Attendance headcount = Workplaces x Load factor.'},
+    {t:'Shifts', why:'How many shifts the work covers (1, 2, 3 = round-the-clock, 4 = rotational shift-camp).', how:'A multiplier applied to attendance headcount.'},
+    {t:'k_sp - payroll ratio (Reserve)', why:'Converts attendance headcount into payroll headcount: a reserve for vacations, sick leave, training.', how:'Payroll headcount = Attendance x k_sp. E.g. 1.15 = +15% to headcount.'},
+    {t:'Current (actual) headcount', why:'How many people are on staff right now - the baseline for comparison with the calculation.', how:'Entered manually or from an HRIS; the difference from demand is the GAP.'},
+    {t:'Staff structure (Core/Aux/Mgmt)', why:'Shares of core personnel, maintenance/support staff, and engineering/management.', how:'Derived from the groups of the work types; under the "Industry 4.0" scenario it shifts toward engineering/support.'}
+  ]},
+  {section:'2. Summary calculation metrics', items:[
+    {t:'Calculated demand (FTE)', why:'How many people are needed under the norms at the selected stage.', how:'Sum(payroll FTE across work types) x lifecycle stage multiplier.'},
+    {t:'Gap (GAP)', why:'The key management signal: shortage or surplus.', how:'GAP = Demand - Actual headcount. >0 - shortage (hiring needed), <0 - surplus (reskilling/release).'},
+    {t:'FTE (Full-Time Equivalent)', why:'A single unit of measure for headcount.', how:'1 FTE = 1 employee at full workload; all calculations are done in FTE.'}
+  ]},
+  {section:'3. Facility lifecycle (Lifecycle tab)', items:[
+    {t:'Phases (Design -> Construction -> Commissioning -> Operation -> Decommissioning)', why:'Workforce demand changes dramatically across phases.', how:'Durations are set in months; the planning horizon is their sum.'},
+    {t:'Stage multiplier (K)', why:'A rough benchmark for the demand level of a phase relative to operation.', how:'Operation=1.0; Construction≈2.2 (peak); Commissioning≈1.4; Design≈0.15; Decommissioning≈0.3.'},
+    {t:'Stage curve (Q1-Q4)', why:'The shape of demand WITHIN a phase (ramp-up/decline).', how:'4 control points, linearly interpolated between them over the phase timeline.'},
+    {t:'Macro scenario', why:'Compare strategic decisions.', how:'Base x1.0; Aggressive growth x1.25; "Industry 4.0" x0.65 during operation plus a structural shift toward engineering.'}
+  ]},
+  {section:'4. Predictive analytics and forecasting (Predictive Analysis tab)', items:[
+    {t:'Annual turnover', why:'The rate of staff outflow - the main driver of shortages.', how:'Converted into a monthly separation probability: 1-(1-p)^(1/12).'},
+    {t:'Hiring capacity (people/month)', why:'How many people can realistically be hired per month.', how:'Limits how fast a shortage can be filled in the forecast.'},
+    {t:'Time-to-fill (days)', why:'Long-open vacancies reduce realized hiring.', how:'Realizability hireEff = clamp(1-(days-30)/200; 0.30...1.0); actual hiring = Capacity x hireEff.'},
+    {t:'Release capacity (people/month)', why:'How much surplus can be managedly reduced/transferred per month.', how:'Limits the speed of headcount reduction under a surplus.'},
+    {t:'Automation pace', why:'The speed at which technology displaces roles.', how:'A multiplier on the annual hazard in the survival analysis (see item 5).'},
+    {t:'Monte Carlo simulations', why:'More runs give more stable percentiles (but a longer calculation).', how:'The number of random scenarios (the seed is deterministic - results are reproducible).'},
+    {t:'Headcount forecast P10/P50/P90', why:'Not a single line, but a "fan" of likely outcomes.', how:'Simulation with random attrition (+/-40%), demand (+/-5%), hiring success; P50 is the median, P10-P90 is the band containing 80% of outcomes.'},
+    {t:'Probability of shortage by end of horizon', why:'A numerical measure of understaffing risk.', how:'The share of simulations where, in the final month, demand exceeds available headcount.'},
+    {t:'Peak shortage (median / P90)', why:'How deep the "hole" is and when it occurs.', how:'The maximum gap under the median scenario; P90 is the worst 10% of outcomes.'}
+  ]},
+  {section:'5. Profession survival analysis (automation risk)', items:[
+    {t:'Skill risk', why:'How automatable a role\'s tasks are.', how:'The average across the role\'s skills from the lexicon (Methodology tab); an unknown skill defaults to hazardDefault.'},
+    {t:'Displacement probability', why:'The chance that a role will be displaced by technology within the horizon.', how:'1-S(t), where S(t)=exp(-λt), λ = Skill risk x Automation pace x hazardLambda.'},
+    {t:'FTE at risk', why:'The expected number of positions to be released.', how:'Role headcount x Displacement probability.'}
+  ]},
+  {section:'6. Workforce risks (Workforce Risks tab)', items:[
+    {t:'Role risk index (0-100)', why:'Overall risk-based prioritization of roles.', how:'A weighted sum of 6 factors (each 0..1) x100; weights are normalized to sum to 1.'},
+    {t:'Demographic factor', why:'A "cliff" in competencies from mass retirement.', how:'From the role\'s average age toward retirement age (63): clamp((age-45)/(63-45); 0..1).'},
+    {t:'Key specialist (bus-factor)', why:'Dependence on a single holder of a competency.', how:'clamp(1-(headcount-1)/40; 0..1) x role criticality (Mgmt 1.0 / Core 0.9 / Aux 0.6).'},
+    {t:'Skill (competency) factor', why:'Obsolescence of competencies as technology changes.', how:'The average automatability of the role\'s skills.'},
+    {t:'Turnover', why:'The risk of departure for a role/department.', how:'clamp((turnover/45) x (0.7+0.6 x market scarcity); 0..1).'},
+    {t:'External market factor', why:'Scarcity of the profession and long-open vacancies.', how:'clamp(market scarcity x (0.5+time-to-fill/180); 0..1).'},
+    {t:'Redundancy', why:'The risk of release due to automation.', how:'The displacement probability from the survival analysis (item 5).'},
+    {t:'Factor weights', why:'The priorities of a specific enterprise.', how:'Set via sliders; the system normalizes them to sum to 1.'},
+    {t:'Portfolio index', why:'The risk of the whole facility as a single number.', how:'Role indices weighted by their headcount.'}
+  ]},
+  {section:'7. Reskilling and CBA (Reskilling / CBA tab)', items:[
+    {t:'Skill match / gap', why:'How close two roles are - determines the cost and duration of reskilling.', how:'Match = share of the target role\'s skills already held; gap = 100% - match.'},
+    {t:'Scenario 1 - Severance and hiring', why:'The cost of replacing a person.', how:'Severance (cbaSever source salaries) + Hiring (cbaHire new-role salaries).'},
+    {t:'Scenario 2 - Internal reskilling', why:'The cost of reskilling instead of replacement.', how:'Base training cost + Missing skills x Price per skill + Idle time for training (cbaIdleMonths salaries).'},
+    {t:'Reskilling ROI', why:'Which is more cost-effective - reskilling or replacement.', how:'ROI = (Replacement - Reskilling) / Reskilling x 100%. >0 - reskilling is cheaper.'}
+  ]},
+  {section:'8. Action plan (Action Plan tab)', items:[
+    {t:'Hiring', why:'Closing the forecast shortage.', how:'Quantity ≈ peak shortage; cost = quantity x average salary x cbaHire; duration = quantity / (hiring capacity x realizability).'},
+    {t:'Reskilling', why:'Internal transitions instead of hiring from the market.', how:'From feasible "bridges" with a positive ROI; cost per the CBA model.'},
+    {t:'Release', why:'Managed downsizing of roles under automation.', how:'Quantity ≈ FTE at risk; cost = quantity x salary x cbaSever; duration = quantity / release capacity.'},
+    {t:'Priority (P1-P3)', why:'The sequencing of actions.', how:'P1 - closing an imminent shortage; the rest ordered by type and cost.'}
+  ]},
+  {section:'9. What-if scenarios (Scenarios tab)', items:[
+    {t:'Scenario', why:'Compare workforce trajectories under different decisions.', how:'A full snapshot of state (parameters + directory); metrics are recalculated with the full models under that state.'},
+    {t:'Baseline (★)', why:'The reference option for comparison.', how:'Marked manually; all others are compared against it.'}
+  ]},
+  {section:'10. Methodology - editable assumptions (Methodology tab)', items:[
+    {t:'cbaHire / cbaSever', why:'The cost of hiring and release, in salaries.', how:'cbaHire (recruiting+onboarding, SHRM benchmark ≈1.5); cbaSever (severance obligations, labor-code benchmark up to 3).'},
+    {t:'cbaIdleMonths', why:'Paid downtime during training.', how:'In salaries; included in the reskilling cost.'},
+    {t:'hazardDefault / hazardLambda', why:'Calibration of the automation analysis.', how:'hazardDefault - the risk of a skill outside the lexicon; hazardLambda - the scale of displacement speed (λ).'}
+  ]},
+  {section:'11. AI assistant', items:[
+    {t:'What it can do', why:'Supports the project and changes data itself - no manual entry needed.', how:'Studies feasibility studies/PDFs, researches the market (web search with sources), calls functions: parameters, work types, positions, risk weights, methodology, scenarios.'},
+    {t:'Transparency', why:'Trust in the numbers.', how:'All numbers are derived from the formulas in this guide; the assistant explains "where a number comes from" and flags assumptions.'}
+  ]}
+] };
+function currentGuide(){ return GUIDE_I18N[LANG]||GUIDE_I18N.ru; }
+function openGlossary(){
+  const mt=document.getElementById('modalTitle'); if(mt) mt.textContent=t('glossary.title');
+  modalKind='glossary';
+  const body=document.getElementById('glossaryBody');
+  body.innerHTML = currentGlossary().map(g=>
+    '<div class="gitem"><div class="gterm">'+esc(g.t)+'</div><div class="gdesc">'+esc(g.d)+'</div></div>'
+  ).join('');
+  document.getElementById('modal').classList.add('show');
+}
 function openGuide(){
-  const t=document.getElementById('modalTitle'); if(t) t.textContent='Руководство пользователя';
-  document.getElementById('glossaryBody').innerHTML = GUIDE.map(g=>
-    '<div style="font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--primary);font-weight:800;margin:20px 0 10px;padding-top:4px;border-top:1px solid var(--line2)">'+g.section+'</div>'
-    + g.items.map(it=>'<div class="gitem"><div class="gterm">'+it.t+'</div>'
-        +(it.why?'<div class="gdesc"><b>Зачем:</b> '+it.why+'</div>':'')
-        +(it.how?'<div class="gdesc" style="margin-top:5px"><b>Как считается:</b> '+it.how+'</div>':'')
+  const mt=document.getElementById('modalTitle'); if(mt) mt.textContent=t('guide.title');
+  modalKind='guide';
+  document.getElementById('glossaryBody').innerHTML = currentGuide().map(g=>
+    '<div style="font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--primary);font-weight:800;margin:20px 0 10px;padding-top:4px;border-top:1px solid var(--line2)">'+esc(g.section)+'</div>'
+    + g.items.map(it=>'<div class="gitem"><div class="gterm">'+esc(it.t)+'</div>'
+        +(it.why?'<div class="gdesc"><b>'+esc(t('guide.why'))+':</b> '+esc(it.why)+'</div>':'')
+        +(it.how?'<div class="gdesc" style="margin-top:5px"><b>'+esc(t('guide.how'))+':</b> '+esc(it.how)+'</div>':'')
       +'</div>').join('')
   ).join('');
   document.getElementById('modal').classList.add('show');
 }
-function closeGlossary(){ document.getElementById('modal').classList.remove('show'); }
+function closeGlossary(){ document.getElementById('modal').classList.remove('show'); modalKind=null; }
 
 /* ---------- ДЕЙСТВИЯ КНОПОК ---------- */
 function handleAction(act){
   switch(act){
     case 'print': window.print(); break;
-    case 'exp-norm': exportJSON('normative','Параметры'); break;
-    case 'exp-life': exportJSON('lifecycle','Сценарий'); break;
-    case 'exp-pred': exportJSON('predictive','Прогноз'); break;
-    case 'exp-cba':  exportJSON('cba','Расчёт CBA'); break;
-    case 'exp-dash': exportJSON('dashboard','Сводка'); break;
-    case 'exp-risk': exportJSON('risk','Реестр рисков'); break;
-    case 'exp-act':  exportJSON('action','План действий'); break;
-    case 'exp-meth': exportJSON('methodology','Допущения'); break;
+    case 'exp-norm': exportJSON('normative',t('exportLabel.normative')); break;
+    case 'exp-life': exportJSON('lifecycle',t('exportLabel.lifecycle')); break;
+    case 'exp-pred': exportJSON('predictive',t('exportLabel.predictive')); break;
+    case 'exp-cba':  exportJSON('cba',t('exportLabel.cba')); break;
+    case 'exp-dash': exportJSON('dashboard',t('exportLabel.dashboard')); break;
+    case 'exp-risk': exportJSON('risk',t('exportLabel.risk')); break;
+    case 'exp-act':  exportJSON('action',t('exportLabel.action')); break;
+    case 'exp-meth': exportJSON('methodology',t('exportLabel.methodology')); break;
     case 'imp-norm':
     case 'imp-life': triggerImport('json'); break;
     case 'exp-csv': exportCSV(); break;
     case 'imp-csv': triggerImport('csv'); break;
     case 'add-prof': addProfession(); break;
-    case 'discard':  tempDB=JSON.parse(JSON.stringify(profDB)); isDirty=false; render(); showToast('Изменения отменены'); break;
+    case 'discard':  tempDB=JSON.parse(JSON.stringify(profDB)); isDirty=false; render(); showToast(t('toast.changesDiscarded')); break;
     case 'save-db':  saveDictionary(); break;
     case 'save-scenario': saveScenario(); break;
     case 'add-work': addWork(); break;
@@ -2105,20 +2529,20 @@ function handleAction(act){
 }
 function addWork(){
   if(!Array.isArray(S.works)) S.works=[];
-  S.works.push({ id:'w_'+Math.random().toString(36).slice(2,8), name:'Новый вид работ', group:'core',
-    method:'output', volume:1000, unit:'ед.', period:'месяц', norm:100, shifts:1 });
-  render(); showToast('Вид работ добавлен');
+  S.works.push({ id:'w_'+Math.random().toString(36).slice(2,8), name:t('work.newWorkName'), group:'core',
+    method:'output', volume:1000, unit:t('work.unitDefault'), period:t('work.periodMonth'), norm:100, shifts:1 });
+  render(); showToast(t('toast.workAdded'));
 }
 function delWork(id){
   S.works=(S.works||[]).filter(w=>w.id!==id);
-  render(); showToast('Вид работ удалён');
+  render(); showToast(t('toast.workDeleted'));
 }
 function saveScenario(){
-  const name=prompt('Название сценария:','Сценарий '+(scenarios.length+1));
+  const name=prompt(t('prompt.scenarioName'),t('prompt.scenarioDefault',{n:scenarios.length+1}));
   if(name===null) return;
-  scenarios.push(currentScenarioSnapshot(name.trim()||('Сценарий '+(scenarios.length+1))));
+  scenarios.push(currentScenarioSnapshot(name.trim()||t('prompt.scenarioDefault',{n:scenarios.length+1})));
   render();
-  showToast('Сценарий сохранён ('+scenarios.length+' в сравнении)');
+  showToast(t('toast.scenarioSaved',{n:scenarios.length}));
 }
 function loadScenario(id){
   const sc=scenarios.find(s=>s.id===id); if(!sc) return;
@@ -2130,7 +2554,7 @@ function loadScenario(id){
   if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
   if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
   render();
-  showToast('Сценарий «'+sc.name+'» загружен в рабочую область');
+  showToast(t('toast.scenarioLoaded',{name:sc.name}));
 }
 function setBaseline(id){
   scenarios.forEach(s=>{ s.baseline=(s.id===id)?!s.baseline:false; });
@@ -2139,23 +2563,23 @@ function setBaseline(id){
 function deleteScenario(id){
   scenarios=scenarios.filter(s=>s.id!==id);
   render();
-  showToast('Сценарий удалён');
+  showToast(t('toast.scenarioDeleted'));
 }
 function addProfession(){
   const id='p_'+Math.random().toString(36).slice(2,8);
-  tempDB[id]={id,name:'Новая должность',type:'core',...JSON.parse(JSON.stringify(PROF_DEFAULTS))};
+  tempDB[id]={id,name:t('prompt.newProfessionName'),type:'core',...JSON.parse(JSON.stringify(PROF_DEFAULTS))};
   isDirty=true; render();
 }
 function saveDictionary(){
   // подчистить пустые имена
-  Object.values(tempDB).forEach(p=>{ if(!p.name||!p.name.trim()) p.name='Без названия'; });
+  Object.values(tempDB).forEach(p=>{ if(!p.name||!p.name.trim()) p.name=t('prompt.unnamed'); });
   profDB=JSON.parse(JSON.stringify(tempDB));
   isDirty=false;
   const ids=Object.keys(profDB);
   if(!profDB[S.sourceProf]) S.sourceProf=ids[0];
   if(!profDB[S.targetProf]) S.targetProf=ids[ids.length>1?1:0];
   render();
-  showToast('Справочник сохранён — расчёты обновлены');
+  showToast(t('toast.dictSaved'));
 }
 
 /* ---------- ОБРАБОТКА ВВОДА ---------- */
@@ -2248,6 +2672,9 @@ function bindEvents(){
     render();
   });
 
+  // язык интерфейса
+  document.getElementById('langSel').addEventListener('change', e=>{ setLang(e.target.value); });
+
   // глоссарий
   document.getElementById('glossaryBtn').addEventListener('click', openGlossary);
   document.getElementById('guideBtn').addEventListener('click', openGuide);
@@ -2268,7 +2695,7 @@ function bindEvents(){
       else importJSONText(text);
       pendingImport=null;
     };
-    reader.onerror=()=>showToast('Не удалось прочитать файл','err');
+    reader.onerror=()=>showToast(t('toast.fileReadError'),'err');
     reader.readAsText(file,'utf-8');
   });
 }
@@ -2321,9 +2748,10 @@ function stateSnapshot(full){
   }
   return snap;
 }
+const AI_REPLY_LANG_NAME = { ru:'русском', en:'английском (English)', kk:'казахском (қазақ тілінде)', zh:'китайском (中文)', es:'испанском (español)', fr:'французском (français)', ar:'арабском (العربية)' };
 function systemPrompt(){
   return [
-'Ты — встроенный ИИ-ассистент системы стратегического планирования персонала (SWP) для тяжёлой промышленности (горнодобыча, металлургия, энергетика, нефтегаз). Отвечай по-русски, кратко и по делу, как опытный экономист труда и нормировщик.',
+'Ты — встроенный ИИ-ассистент системы стратегического планирования персонала (SWP) для тяжёлой промышленности (горнодобыча, металлургия, энергетика, нефтегаз). Отвечай на языке: '+(AI_REPLY_LANG_NAME[LANG]||AI_REPLY_LANG_NAME.ru)+', кратко и по делу, как опытный экономист труда и нормировщик.',
 'НАЗНАЧЕНИЕ: помогать проектировать и сопровождать кадровый расчёт объекта на всём жизненном цикле — рассчитывать численность по нормам, находить разрывы, оценивать риски, моделировать сценарии «что если», формировать планы действий.',
 '',
 'ТЫ УПРАВЛЯЕШЬ ПРИЛОЖЕНИЕМ ЧЕРЕЗ ИНСТРУМЕНТЫ. Когда пользователь просит изменить/добавить/спроектировать/настроить — НЕ описывай словами, а ВЫЗЫВАЙ инструменты (update_params, set_works, add_work, upsert_profession, delete_profession, set_risk_weights, set_methodology, save_scenario, switch_tab). Можешь вызвать get_analysis, чтобы увидеть текущие вычисленные результаты перед решением. После применения изменений кратко поясни, что сделал и как это повлияло на ключевые показатели.',
@@ -2629,19 +3057,25 @@ function showTyping(){
   d.innerHTML='<span></span><span></span><span></span>'; c.appendChild(d); aiScroll(); return d;
 }
 function updateSendState(){ const b=document.getElementById('aiSend'); if(b) b.disabled=aiBusy; }
-const AI_SUGGEST=[
-  'Спроектируй виды работ и параметры по моему ТЭО (я прикреплю файл)',
-  'Разбей объём на 3 вида работ по разным методикам нормирования',
-  'Снизь вероятность дефицита: подбери параметры найма и темпа автоматизации',
-  'Исследуй дефицитность и зарплаты машинистов буровых в Казахстане',
-  'Объясни, откуда берётся индекс кадрового риска'
-];
+const AI_SUGGEST_I18N = {
+  ru:[ 'Спроектируй виды работ и параметры по моему ТЭО (я прикреплю файл)',
+    'Разбей объём на 3 вида работ по разным методикам нормирования',
+    'Снизь вероятность дефицита: подбери параметры найма и темпа автоматизации',
+    'Исследуй дефицитность и зарплаты машинистов буровых в Казахстане',
+    'Объясни, откуда берётся индекс кадрового риска' ],
+  en:[ 'Design work types and parameters from my feasibility study (I will attach a file)',
+    'Split the volume into 3 work types using different norming methods',
+    'Reduce the shortage probability: tune hiring and automation-pace parameters',
+    'Research driller shortages and salaries in Kazakhstan',
+    'Explain where the workforce risk index comes from' ]
+};
 function aiEnsureHello(){
   const c=aiChatEl(); if(!c || c.children.length) return;
   const d=document.createElement('div'); d.className='ai-hello';
-  d.innerHTML='<b>Здравствуйте! Я сопровождаю ваш кадровый расчёт.</b><br>'
-    +'Могу изучить ТЭО и спроектировать виды работ, подобрать параметры под цель, исследовать рынок труда (с источниками) и менять данные за вас — вручную ничего вводить не нужно.'
-    +'<div style="margin-top:10px">'+AI_SUGGEST.map(t=>'<span class="ai-chip" data-suggest="'+aiEsc(t)+'">'+aiEsc(t)+'</span>').join('')+'</div>';
+  const sugg=AI_SUGGEST_I18N[LANG]||AI_SUGGEST_I18N.ru;
+  d.innerHTML='<b>'+aiEsc(t('ai.helloTitle'))+'</b><br>'
+    +aiEsc(t('ai.helloText'))
+    +'<div style="margin-top:10px">'+sugg.map(s=>'<span class="ai-chip" data-suggest="'+aiEsc(s)+'">'+aiEsc(s)+'</span>').join('')+'</div>';
   c.appendChild(d);
 }
 function renderAiSettings(){
@@ -2649,15 +3083,15 @@ function renderAiSettings(){
   const key=getAiKey(); const P=PROVIDERS[AI.provider];
   if(key && !aiSettingsOpen){ box.innerHTML=''; return; }
   box.innerHTML='<div class="ai-setbox">'
-    +'<h4>Подключение ИИ</h4>'
-    +'<div class="field" style="margin-bottom:10px"><label class="flabel">Провайдер</label><select class="select" id="aiProviderSel">'
-      +Object.entries(PROVIDERS).map(([k,v])=>'<option value="'+k+'"'+(AI.provider===k?' selected':'')+'>'+v.label+'</option>').join('')+'</select></div>'
-    +'<p>'+P.note+' Ключ хранится только в этом браузере (localStorage), отдельный сервер не нужен. Получить ключ: <a href="'+P.keyUrl+'" target="_blank" rel="noopener">'+P.keyUrl.replace(/^https?:\/\//,'')+'</a></p>'
-    +'<div class="field" style="margin-bottom:10px"><input class="input" type="password" id="aiKeyInput" placeholder="'+P.keyHint+'" value="'+aiEsc(key)+'"></div>'
-    +'<div class="field" style="margin-bottom:12px"><label class="flabel">Модель</label><select class="select" id="aiModelSel">'
-      +P.models.map(([v,t])=>'<option value="'+v+'"'+(AI.model===v?' selected':'')+'>'+t+'</option>').join('')+'</select></div>'
-    +'<div style="display:flex;gap:8px"><button class="tool" id="aiKeySave" style="background:var(--primary);color:#fff;border-color:var(--primary);flex:1;justify-content:center">'+ic('save')+'Сохранить</button>'
-    +(key?'<button class="tool red" id="aiKeyClear">Удалить</button>':'')+'</div>'
+    +'<h4>'+esc(t('ai.connectTitle'))+'</h4>'
+    +'<div class="field" style="margin-bottom:10px"><label class="flabel">'+esc(t('ai.providerLabel'))+'</label><select class="select" id="aiProviderSel">'
+      +Object.keys(PROVIDERS).map(k=>'<option value="'+k+'"'+(AI.provider===k?' selected':'')+'>'+esc(providerLabel(k))+'</option>').join('')+'</select></div>'
+    +'<p>'+esc(providerNote(AI.provider))+esc(t('ai.keyNote'))+' <a href="'+P.keyUrl+'" target="_blank" rel="noopener">'+esc(P.keyUrl.replace(/^https?:\/\//,''))+'</a></p>'
+    +'<div class="field" style="margin-bottom:10px"><input class="input" type="password" id="aiKeyInput" placeholder="'+esc(P.keyHint)+'" value="'+aiEsc(key)+'"></div>'
+    +'<div class="field" style="margin-bottom:12px"><label class="flabel">'+esc(t('ai.modelLabel'))+'</label><select class="select" id="aiModelSel">'
+      +P.models.map(([v])=>'<option value="'+v+'"'+(AI.model===v?' selected':'')+'>'+esc(providerModelLabel(AI.provider,v))+'</option>').join('')+'</select></div>'
+    +'<div style="display:flex;gap:8px"><button class="tool" id="aiKeySave" style="background:var(--primary);color:#fff;border-color:var(--primary);flex:1;justify-content:center">'+ic('save')+esc(t('common.save'))+'</button>'
+    +(key?'<button class="tool red" id="aiKeyClear">'+esc(t('common.delete'))+'</button>':'')+'</div>'
   +'</div>';
 }
 function renderAttachBar(){
@@ -2671,7 +3105,7 @@ function readAiFile(file){
     const r=new FileReader();
     r.onload=()=>{ if(isPdf){ const d=String(r.result).split(',')[1]||''; res({name:file.name,kind:'pdf',data:d}); }
                    else res({name:file.name,kind:'text',text:String(r.result).slice(0,200000)}); };
-    r.onerror=()=>rej(new Error('Не удалось прочитать файл'));
+    r.onerror=()=>rej(new Error(t('toast.fileReadError')));
     if(isPdf) r.readAsDataURL(file); else r.readAsText(file,'utf-8');
   });
 }
@@ -2730,9 +3164,9 @@ function initAssistant(){
       AI.model=document.getElementById('aiModelSel').value;
       setAiKey(document.getElementById('aiKeyInput').value.trim()); saveAiCfg();
       aiSettingsOpen=false; renderAiSettings();
-      showToast(getAiKey()?'Готово — ассистент подключён ('+PROVIDERS[AI.provider].label+')':'Ключ удалён'); return;
+      showToast(getAiKey()?t('toast.aiConnected',{provider:providerLabel(AI.provider)}):t('toast.keyRemoved')); return;
     }
-    if(e.target.closest('#aiKeyClear')){ setAiKey(''); aiSettingsOpen=true; renderAiSettings(); showToast('Ключ удалён'); return; }
+    if(e.target.closest('#aiKeyClear')){ setAiKey(''); aiSettingsOpen=true; renderAiSettings(); showToast(t('toast.keyRemoved')); return; }
   });
   document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.getElementById('aiPanel').classList.contains('show')) closeAiPanel(); });
 }
