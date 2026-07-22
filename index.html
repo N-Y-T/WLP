@@ -729,6 +729,38 @@ life:{
   lexiconTitle:'Лексикон автоматизируемости навыков',
   lexiconHint:'Вероятность того, что задача навыка автоматизируема. Питает анализ дожития и компетентностный риск.',
   thSkill:'Навык', thLevel:'Уровень', thRisk:'Риск'
+}, aiTool:{
+  readAnalysis:'Прочитал текущий расчёт и прогноз',
+  noValidParams:'Нет допустимых параметров', noValidParamsResult:'Ошибка: ни один ключ не распознан',
+  paramsNote:'Параметры: {list}', paramsResult:'Обновлено. Потребность={req} чел., разрыв={diff}',
+  emptyWorks:'Пустой список работ', emptyWorksResult:'Ошибка: нет валидных работ',
+  worksSetNote:'Задано видов работ: {n}', worksSetResult:'Установлено {n} видов работ; суммарная списочная FTE={fte}',
+  invalidWork:'Некорректная работа', errorResult:'Ошибка',
+  workAddedNote:'Добавлена работа: {name}', workAddedResult:'FTE работы={fte}',
+  profSavedNote:'Должность сохранена: {name}', profSavedResult:'Сохранено (id={id})',
+  profNotFound:'Должность не найдена', notFoundResult:'Не найдено',
+  profDeletedNote:'Удалена должность {id}', deletedResult:'Удалено',
+  riskWeightsNote:'Веса рисков: {list}', riskWeightsResult:'OK. Индекс риска={idx}',
+  methodologyNote:'Методология: {list}', okResult:'OK',
+  scenarioSavedNote:'Сохранён сценарий: {name}', scenarioSavedResult:'Сохранено ({n} в сравнении)',
+  tabOpenedNote:'Открыта вкладка: {tab}',
+  unknownTab:'Неизвестная вкладка: {tab}',
+  unknownTool:'Неизвестный инструмент: {name}',
+  defaultProfessionName:'Должность', defaultScenarioName:'Сценарий ИИ',
+  toolFailNote:'Сбой инструмента ({name}): {msg}', toolFailResult:'Ошибка: {msg}'
+}, aiErr:{
+  fileContentPrefix:'[Содержимое файла «{name}»]',
+  noApiKey:'Не задан API-ключ',
+  rateLimitWait:'Лимит запросов — повтор через {s} с…',
+  apiError:'Ошибка API {status}',
+  invalidKeyAnthropic:'Неверный ключ Anthropic. Проверьте в настройках.',
+  rateLimitAnthropic:'Лимит запросов Anthropic. Подождите и повторите. {msg}',
+  freeRateLimitWait:'Лимит бесплатного тарифа (в минуту) — повтор через {s} с…',
+  geminiRateLimit:'Достигнут поминутный лимит бесплатного тарифа Gemini (он сбрасывается каждую минуту; в аналитике виден только суточный расход). Подождите минуту, выберите модель с бóльшим лимитом (Flash-Lite) или уменьшите частоту запросов. {msg}',
+  invalidKeyGemini:'Неверный ключ Gemini. Получите его на aistudio.google.com и вставьте в настройках.',
+  searchNote:'Веб-поиск: {q}',
+  searchUnavailable:'Веб-поиск недоступен с этой моделью — отвечаю без него.',
+  requestRejected:'Запрос отклонён', attachFileError:'Файл «{name}»: {msg}'
 }});
 Object.assign(I18N.en, { norm:{
   eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
@@ -928,6 +960,38 @@ life:{
   lexiconTitle:'Skill Automatability Lexicon',
   lexiconHint:'The probability that a skill\'s task is automatable. Feeds the survival analysis and the competency risk factor.',
   thSkill:'Skill', thLevel:'Level', thRisk:'Risk'
+}, aiTool:{
+  readAnalysis:'Read the current calculation and forecast',
+  noValidParams:'No valid parameters', noValidParamsResult:'Error: no key was recognized',
+  paramsNote:'Parameters: {list}', paramsResult:'Updated. Demand={req} people, gap={diff}',
+  emptyWorks:'Empty list of work types', emptyWorksResult:'Error: no valid work types',
+  worksSetNote:'Work types set: {n}', worksSetResult:'Set {n} work types; total payroll FTE={fte}',
+  invalidWork:'Invalid work type', errorResult:'Error',
+  workAddedNote:'Added work type: {name}', workAddedResult:'Work type FTE={fte}',
+  profSavedNote:'Position saved: {name}', profSavedResult:'Saved (id={id})',
+  profNotFound:'Position not found', notFoundResult:'Not found',
+  profDeletedNote:'Deleted position {id}', deletedResult:'Deleted',
+  riskWeightsNote:'Risk weights: {list}', riskWeightsResult:'OK. Risk index={idx}',
+  methodologyNote:'Methodology: {list}', okResult:'OK',
+  scenarioSavedNote:'Scenario saved: {name}', scenarioSavedResult:'Saved ({n} in comparison)',
+  tabOpenedNote:'Opened tab: {tab}',
+  unknownTab:'Unknown tab: {tab}',
+  unknownTool:'Unknown tool: {name}',
+  defaultProfessionName:'Position', defaultScenarioName:'AI Scenario',
+  toolFailNote:'Tool failure ({name}): {msg}', toolFailResult:'Error: {msg}'
+}, aiErr:{
+  fileContentPrefix:'[Content of file "{name}"]',
+  noApiKey:'API key is not set',
+  rateLimitWait:'Rate limit — retrying in {s}s…',
+  apiError:'API error {status}',
+  invalidKeyAnthropic:'Invalid Anthropic key. Check it in settings.',
+  rateLimitAnthropic:'Anthropic rate limit. Wait and retry. {msg}',
+  freeRateLimitWait:'Free-tier limit (per minute) — retrying in {s}s…',
+  geminiRateLimit:'The Gemini free-tier per-minute limit was reached (it resets every minute; analytics only show daily usage). Wait a minute, choose a model with a higher limit (Flash-Lite), or reduce request frequency. {msg}',
+  invalidKeyGemini:'Invalid Gemini key. Get one at aistudio.google.com and paste it in settings.',
+  searchNote:'Web search: {q}',
+  searchUnavailable:'Web search is unavailable with this model — answering without it.',
+  requestRejected:'Request rejected', attachFileError:'File "{name}": {msg}'
 }});
 Object.assign(I18N.ru, { toast:{
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
@@ -3161,59 +3225,59 @@ function executeAiTool(name,input){
   input=input||{};
   try{
     switch(name){
-      case 'get_analysis': return {ok:true, note:'Прочитал текущий расчёт и прогноз', result:JSON.stringify(stateSnapshot(true))};
+      case 'get_analysis': return {ok:true, note:t('aiTool.readAnalysis'), result:JSON.stringify(stateSnapshot(true))};
       case 'update_params':{
         const p=input.params||{}; const ch=[];
         Object.entries(p).forEach(([k,v])=>{ if(PARAM_ALLOW.has(k)){ S[k]=NUM_KEYS.has(k)?num(v,S[k]):v; ch.push(k+'='+v); } });
-        if(!ch.length) return {ok:false,note:'Нет допустимых параметров',result:'Ошибка: ни один ключ не распознан'};
-        aiApplyAfterMutation(); return {ok:true,note:'Параметры: '+ch.join(', '),result:'Обновлено. Потребность='+fmtN(computeBase().required)+' чел., разрыв='+fmtN(computeBase().diff)};
+        if(!ch.length) return {ok:false,note:t('aiTool.noValidParams'),result:t('aiTool.noValidParamsResult')};
+        aiApplyAfterMutation(); return {ok:true,note:t('aiTool.paramsNote',{list:ch.join(', ')}),result:t('aiTool.paramsResult',{req:fmtN(computeBase().required),diff:fmtN(computeBase().diff)})};
       }
       case 'set_works':{
         const arr=(input.works||[]).map(aiNormalizeWork).filter(Boolean);
-        if(!arr.length) return {ok:false,note:'Пустой список работ',result:'Ошибка: нет валидных работ'};
+        if(!arr.length) return {ok:false,note:t('aiTool.emptyWorks'),result:t('aiTool.emptyWorksResult')};
         S.works=arr; aiApplyAfterMutation();
-        return {ok:true,note:'Задано видов работ: '+arr.length,result:'Установлено '+arr.length+' видов работ; суммарная списочная FTE='+fmtN(worksTotals().total)};
+        return {ok:true,note:t('aiTool.worksSetNote',{n:arr.length}),result:t('aiTool.worksSetResult',{n:arr.length,fte:fmtN(worksTotals().total)})};
       }
       case 'add_work':{
-        const w=aiNormalizeWork(input.work); if(!w) return {ok:false,note:'Некорректная работа',result:'Ошибка'};
+        const w=aiNormalizeWork(input.work); if(!w) return {ok:false,note:t('aiTool.invalidWork'),result:t('aiTool.errorResult')};
         S.works=S.works||[]; S.works.push(w); aiApplyAfterMutation();
-        return {ok:true,note:'Добавлена работа: '+w.name,result:'FTE работы='+fmtN(workFTE(w))};
+        return {ok:true,note:t('aiTool.workAddedNote',{name:w.name}),result:t('aiTool.workAddedResult',{fte:fmtN(workFTE(w))})};
       }
       case 'upsert_profession':{
         const pr=input.profession||{}; const id=pr.id||('p_'+Math.random().toString(36).slice(2,8));
-        profDB[id]={id,name:pr.name||'Должность',type:['core','aux','mgmt'].includes(pr.type)?pr.type:'core',
+        profDB[id]={id,name:pr.name||t('aiTool.defaultProfessionName'),type:['core','aux','mgmt'].includes(pr.type)?pr.type:'core',
           salary:num(pr.salary,300000),trainingBase:num(pr.trainingBase,80000),skillRate:num(pr.skillRate,12000),
           skills:pr.skills||'',headcount:num(pr.headcount,20),avgAge:num(pr.avgAge,42),market:num(pr.market,0.4)};
         tempDB=JSON.parse(JSON.stringify(profDB)); aiApplyAfterMutation();
-        return {ok:true,note:'Должность сохранена: '+profDB[id].name,result:'Сохранено (id='+id+')'};
+        return {ok:true,note:t('aiTool.profSavedNote',{name:profDB[id].name}),result:t('aiTool.profSavedResult',{id})};
       }
       case 'delete_profession':{
-        if(!profDB[input.id]) return {ok:false,note:'Должность не найдена',result:'Не найдено'};
+        if(!profDB[input.id]) return {ok:false,note:t('aiTool.profNotFound'),result:t('aiTool.notFoundResult')};
         delete profDB[input.id]; tempDB=JSON.parse(JSON.stringify(profDB)); aiApplyAfterMutation();
-        return {ok:true,note:'Удалена должность '+input.id,result:'Удалено'};
+        return {ok:true,note:t('aiTool.profDeletedNote',{id:input.id}),result:t('aiTool.deletedResult')};
       }
       case 'set_risk_weights':{
         const w=input.weights||{}; const ch=[];
         ['wDemo','wBus','wSkill','wTurn','wMarket','wRedund'].forEach(k=>{ if(w[k]!=null){ S[k]=num(w[k],S[k]); ch.push(k+'='+S[k]); } });
-        aiApplyAfterMutation(); return {ok:true,note:'Веса рисков: '+ch.join(', '),result:'OK. Индекс риска='+riskAnalysis().portfolioIndex};
+        aiApplyAfterMutation(); return {ok:true,note:t('aiTool.riskWeightsNote',{list:ch.join(', ')}),result:t('aiTool.riskWeightsResult',{idx:riskAnalysis().portfolioIndex})};
       }
       case 'set_methodology':{
         const p=input.params||{}; const ch=[];
         ['cbaHire','cbaSever','cbaIdleMonths','hazardDefault','hazardLambda'].forEach(k=>{ if(p[k]!=null){ S[k]=num(p[k],S[k]); ch.push(k+'='+S[k]); } });
-        aiApplyAfterMutation(); return {ok:true,note:'Методология: '+ch.join(', '),result:'OK'};
+        aiApplyAfterMutation(); return {ok:true,note:t('aiTool.methodologyNote',{list:ch.join(', ')}),result:t('aiTool.okResult')};
       }
       case 'save_scenario':{
-        const nm=(input.name||'Сценарий ИИ').trim()||'Сценарий ИИ';
+        const nm=(input.name||t('aiTool.defaultScenarioName')).trim()||t('aiTool.defaultScenarioName');
         scenarios.push(currentScenarioSnapshot(nm)); aiApplyAfterMutation();
-        return {ok:true,note:'Сохранён сценарий: '+nm,result:'Сохранено ('+scenarios.length+' в сравнении)'};
+        return {ok:true,note:t('aiTool.scenarioSavedNote',{name:nm}),result:t('aiTool.scenarioSavedResult',{n:scenarios.length})};
       }
       case 'switch_tab':{
-        if(TABS.find(x=>x.id===input.tab)){ activeTab=input.tab; syncTabs(); render(); return {ok:true,note:'Открыта вкладка: '+input.tab,result:'OK'}; }
-        return {ok:false,note:'Неизвестная вкладка: '+input.tab,result:'Ошибка'};
+        if(TABS.find(x=>x.id===input.tab)){ activeTab=input.tab; syncTabs(); render(); return {ok:true,note:t('aiTool.tabOpenedNote',{tab:input.tab}),result:t('aiTool.okResult')}; }
+        return {ok:false,note:t('aiTool.unknownTab',{tab:input.tab}),result:t('aiTool.errorResult')};
       }
-      default: return {ok:false,note:'Неизвестный инструмент: '+name,result:'Ошибка'};
+      default: return {ok:false,note:t('aiTool.unknownTool',{name}),result:t('aiTool.errorResult')};
     }
-  }catch(e){ return {ok:false,note:'Сбой инструмента ('+name+'): '+(e.message||''),result:'Ошибка: '+(e.message||'')}; }
+  }catch(e){ return {ok:false,note:t('aiTool.toolFailNote',{name,msg:e.message||''}),result:t('aiTool.toolFailResult',{msg:e.message||''})}; }
 }
 
 /* ---------- провайдеро-независимые адаптеры LLM ----------
@@ -3236,13 +3300,13 @@ const ADAPTERS = {
     userMsg(text,atts){
       const content=[];
       atts.forEach(a=>{ if(a.kind==='pdf') content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:a.data},title:a.name});
-        else content.push({type:'text',text:'[Содержимое файла «'+a.name+'»]\n'+a.text}); });
+        else content.push({type:'text',text:t('aiErr.fileContentPrefix',{name:a.name})+'\n'+a.text}); });
       if(text) content.push({type:'text',text});
       return {role:'user',content};
     },
     toolResultMsg(outs){ return {role:'user',content:outs.map(o=>({type:'tool_result',tool_use_id:o.id,content:o.result,is_error:!o.ok}))}; },
     async step(history){
-      const key=getAiKey(); if(!key) throw new Error('Не задан API-ключ');
+      const key=getAiKey(); if(!key) throw new Error(t('aiErr.noApiKey'));
       const model=AI.model||'claude-opus-4-8';
       const tools=AI_TOOLS.slice();
       if(aiResearchOn() && !/haiku/.test(model)) tools.push({type:'web_search_20260209',name:'web_search',max_uses:5});
@@ -3256,11 +3320,11 @@ const ADAPTERS = {
         const ed=await resp.json().catch(()=>({}));
         if((resp.status===429||resp.status===529||resp.status===503) && attempt<3){
           const wait=Math.min(60, aiRetryDelay(ed,resp.status, resp.headers&&resp.headers.get&&resp.headers.get('retry-after')));
-          aiAddTool('wait','Лимит запросов — повтор через '+Math.ceil(wait)+' с…'); await aiSleep(wait*1000); continue;
+          aiAddTool('wait',t('aiErr.rateLimitWait',{s:Math.ceil(wait)})); await aiSleep(wait*1000); continue;
         }
-        let msg=(ed&&ed.error&&ed.error.message)||('Ошибка API '+resp.status);
-        if(resp.status===401) msg='Неверный ключ Anthropic. Проверьте в настройках.';
-        if(resp.status===429) msg='Лимит запросов Anthropic. Подождите и повторите. '+msg;
+        let msg=(ed&&ed.error&&ed.error.message)||t('aiErr.apiError',{status:resp.status});
+        if(resp.status===401) msg=t('aiErr.invalidKeyAnthropic');
+        if(resp.status===429) msg=t('aiErr.rateLimitAnthropic',{msg});
         throw new Error(msg);
       }
       const texts=[],tools2=[],searches=[];
@@ -3275,32 +3339,32 @@ const ADAPTERS = {
     userMsg(text,atts){
       const parts=[];
       atts.forEach(a=>{ if(a.kind==='pdf') parts.push({inlineData:{mimeType:'application/pdf',data:a.data}});
-        else parts.push({text:'[Содержимое файла «'+a.name+'»]\n'+a.text}); });
+        else parts.push({text:t('aiErr.fileContentPrefix',{name:a.name})+'\n'+a.text}); });
       if(text) parts.push({text});
       return {role:'user',parts};
     },
     toolResultMsg(outs){ return {role:'user',parts:outs.map(o=>({functionResponse:{name:o.name,response:{result:o.result}}}))}; },
     async step(history){
-      const key=getAiKey(); if(!key) throw new Error('Не задан API-ключ');
+      const key=getAiKey(); if(!key) throw new Error(t('aiErr.noApiKey'));
       const model=AI.model||'gemini-2.5-flash';
       const url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(key);
       const decls=GEMINI_TOOLS.slice();
       const useSearch=aiResearchOn();
-      const mkBody=ground=>{ const t=[{functionDeclarations:decls}]; if(ground) t.push({googleSearch:{}});
-        return {system_instruction:{parts:[{text:systemPrompt()}]},contents:history,tools:t,generationConfig:{maxOutputTokens:6000,temperature:0.4}}; };
+      const mkBody=ground=>{ const tl=[{functionDeclarations:decls}]; if(ground) tl.push({googleSearch:{}});
+        return {system_instruction:{parts:[{text:systemPrompt()}]},contents:history,tools:tl,generationConfig:{maxOutputTokens:6000,temperature:0.4}}; };
       const doFetch=async ground=>{
         const payload=JSON.stringify(mkBody(ground));
         for(let attempt=0;;attempt++){
           const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:payload});
           const d=await r.json().catch(()=>({}));
           if(r.ok) return d;
-          let msg=(d&&d.error&&d.error.message)||('Ошибка API '+r.status);
+          let msg=(d&&d.error&&d.error.message)||t('aiErr.apiError',{status:r.status});
           if((r.status===429||r.status===503) && attempt<3){
             const wait=Math.min(60, aiRetryDelay(d,r.status, r.headers&&r.headers.get&&r.headers.get('retry-after')));
-            aiAddTool('wait','Лимит бесплатного тарифа (в минуту) — повтор через '+Math.ceil(wait)+' с…'); await aiSleep(wait*1000); continue;
+            aiAddTool('wait',t('aiErr.freeRateLimitWait',{s:Math.ceil(wait)})); await aiSleep(wait*1000); continue;
           }
-          if(r.status===429) msg='Достигнут поминутный лимит бесплатного тарифа Gemini (он сбрасывается каждую минуту; в аналитике виден только суточный расход). Подождите минуту, выберите модель с бóльшим лимитом (Flash-Lite) или уменьшите частоту запросов. '+msg;
-          if(r.status===400&&/API key not valid|API_KEY_INVALID/i.test(msg)) msg='Неверный ключ Gemini. Получите его на aistudio.google.com и вставьте в настройках.';
+          if(r.status===429) msg=t('aiErr.geminiRateLimit',{msg});
+          if(r.status===400&&/API key not valid|API_KEY_INVALID/i.test(msg)) msg=t('aiErr.invalidKeyGemini');
           throw new Error(msg);
         }
       };
@@ -3333,9 +3397,9 @@ async function runAssistant(userText){
     for(let i=0;i<8;i++){
       const r=await ad.step(aiMessages);
       if(r.assistant) aiMessages.push(r.assistant);
-      (r.searches||[]).forEach(q=>aiAddTool('search','Веб-поиск: '+q));
-      if(r.degraded) aiAddTool('err','Веб-поиск недоступен с этой моделью — отвечаю без него.');
-      (r.texts||[]).forEach(t=>aiAddBubble('bot',t));
+      (r.searches||[]).forEach(q=>aiAddTool('search',t('aiErr.searchNote',{q})));
+      if(r.degraded) aiAddTool('err',t('aiErr.searchUnavailable'));
+      (r.texts||[]).forEach(tx=>aiAddBubble('bot',tx));
       if(r.stop==='tool' && r.tools.length){
         const outs=[];
         for(const c of r.tools){ const out=executeAiTool(c.name,c.input); aiAddTool(out.ok?'tool':'err',out.note);
@@ -3344,7 +3408,7 @@ async function runAssistant(userText){
         continue;
       }
       if(r.stop==='pause') continue; // серверный инструмент Anthropic продолжает
-      if(r.stop==='refusal') aiAddTool('err','Запрос отклонён'+(r.blocked?(' ('+r.blocked+')'):'')+'.');
+      if(r.stop==='refusal') aiAddTool('err',t('aiErr.requestRejected')+(r.blocked?(' ('+r.blocked+')'):'')+'.');
       break;
     }
   }catch(e){ aiAddTool('err',e.message||'Сбой запроса'); }
@@ -3461,7 +3525,7 @@ function initAssistant(){
   document.getElementById('aiAttach').addEventListener('click',()=>document.getElementById('aiFile').click());
   document.getElementById('aiFile').addEventListener('change',async e=>{
     const files=Array.from(e.target.files||[]); e.target.value='';
-    for(const f of files){ try{ aiAttachments.push(await readAiFile(f)); }catch(err){ aiAddTool('err','Файл «'+f.name+'»: '+err.message); } }
+    for(const f of files){ try{ aiAttachments.push(await readAiFile(f)); }catch(err){ aiAddTool('err',t('aiErr.attachFileError',{name:f.name,msg:err.message})); } }
     renderAttachBar();
   });
   // смена провайдера: дефолтная модель, сброс диалога (форматы истории несовместимы)
