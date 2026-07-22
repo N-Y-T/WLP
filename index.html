@@ -640,6 +640,53 @@ life:{
   saveDbBtn:'Сохранить БД',
   thSalary:'Оклад ₸', thTrainingBase:'База ДПО ₸', thSkillPrice:'Цена навыка ₸',
   thHeadcount:'Числ.', thAvgAge:'Ср.возр.', thMarket:'Рынок', thSkills:'Навыки (через ;)'
+}, risk:{
+  eyebrow:'Управление рисками · §6', title:'Кадровые риски — многофакторная оценка',
+  lead:'Шесть факторов риска по каждой роли сводятся во взвешенный индекс 0–100. Веса настраиваются под приоритеты предприятия. Каждый риск связан с рекомендованным действием (митигейшн).',
+  exportLabel:'Реестр рисков (JSON)',
+  portfolioLabel:'Индекс риска (портфель)', portfolioSub:'взвешен по численности ролей',
+  criticalLabel:'Критических ролей', criticalSub:'индекс ≥ 66 — нужен план',
+  elevatedLabel:'Повышенный риск', elevatedSub:'индекс 40–65 — мониторинг',
+  weightsTitle:'Веса факторов риска', weightsHint:'Насколько каждый из 6 факторов важен для вашего предприятия. Влияет на итоговый индекс.',
+  weightsNote:'Число слева (0–40) — лишь <b>положение ползунка</b>, само по себе оно ничего не значит. Важна <b>доля фактора</b> (справа, в сумме 100%): именно она задаёт вклад в индекс. Удвоив вес — вдвое усиливаете влияние фактора.',
+  factorDemo:'Демографический', factorBus:'Ключевой специалист', factorSkill:'Компетентностный разрыв',
+  factorTurn:'Текучесть', factorMarket:'Внешний рыночный', factorRedund:'Избыточность',
+  heatmapTitle:'Тепловая карта рисков по ролям', heatmapHint:'Строка — должность. 6 столбцов — факторы риска. Цвет и число — уровень фактора 0–100%. «Индекс» — их взвешенная сумма.',
+  heatmapNote:'В каждой ячейке — <b>уровень фактора для роли</b>: 0% — риска нет, 100% — максимум. Столбец «<b>Индекс</b>» = взвешенная сумма всех 6 факторов по вашим весам слева (0–100). Строки отсортированы по убыванию индекса.',
+  legendLow:'низкий <40%', legendMed:'средний 40–65%', legendHigh:'высокий ≥66%',
+  thIndex:'Индекс', thIndexTitle:'Взвешенная сумма 6 факторов, 0–100', thLevel:'Уровень',
+  facDemoShort:'Демография', facDemoDesc:'Доля персонала роли, близкого к пенсионному возрасту',
+  facBusShort:'Ключевой спец.', facBusDesc:'Зависимость от единственного носителя компетенции',
+  facSkillShort:'Навыки', facSkillDesc:'Автоматизируемость/устаревание компетенций роли',
+  facTurnShort:'Текучесть', facTurnDesc:'Риск ухода персонала роли',
+  facMarketShort:'Рынок', facMarketDesc:'Дефицитность профессии и срок закрытия вакансии',
+  facRedundShort:'Избыточность', facRedundDesc:'Риск вытеснения роли автоматизацией',
+  fdescDemo:'Близость среднего возраста роли к пенсионному ({age} лет)', fdescBus:'Мало носителей компетенции × критичность роли',
+  fdescSkill:'Автоматизируемость навыков роли', fdescTurn:'Риск ухода: текучесть × рыночная дефицитность',
+  fdescMarket:'Дефицитность профессии × срок закрытия вакансии', fdescRedund:'Риск вытеснения автоматизацией (анализ дожития)',
+  sliderPos:'положение ползунка', sliderShare:'доля фактора в индексе',
+  levelCritical:'Критический', levelElevated:'Повышенный', levelModerate:'Умеренный',
+  actionDemo:'Кадровый резерв / наставничество (демография)',
+  actionBus:'Дублирование компетенции, снятие зависимости от ключевого носителя',
+  actionSkill:'Программа переобучения под смену технологии',
+  actionTurn:'Удержание: пересмотр мотивации и условий',
+  actionMarket:'Опережающий рекрутинг / пайплайн кандидатов',
+  actionRedund:'План перераспределения / переквалификации'
+}, act:{
+  hireType:'Найм', reskillType:'Переобучение', releaseType:'Высвобождение',
+  closeDeficitTarget:'Закрытие дефицита эксплуатации',
+  hireNote:'Старт с {month}-го мес.; реализуемость найма {pct}%',
+  reskillNote:'ROI {roi}%, совпадение навыков {overlap}%',
+  releaseNote:'Вероятность вытеснения {prob}% за {years} г.',
+  eyebrow:'Действия · §10', title:'План кадровых действий',
+  lead:'Из разрывов, рисков и анализа автоматизации формируется приоритизированный набор действий: найм, переобучение, высвобождение — с оценкой стоимости и сроков.',
+  exportLabel:'План (JSON)',
+  hireMetricSub:'закрытие дефицита', reskillMetricSub:'внутренние переходы',
+  totalCostLabel:'Полная стоимость плана', actsCount:'{n} действий',
+  thAction:'Действие', thTarget:'Объект', thQty:'Кол-во', thCost:'Стоимость',
+  thTerm:'Срок', thPriority:'Приоритет', thJustification:'Обоснование',
+  noActions:'Действий не требуется — траектория сбалансирована.',
+  footnote:'Стоимость найма — 1.5 оклада (рекрутинг+адаптация), высвобождения — 3 оклада (выходные обязательства), переобучения — по модели CBA. Сроки — из ёмкости найма/высвобождения и объёма разрыва навыков.'
 }});
 Object.assign(I18N.en, { norm:{
   eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
@@ -750,6 +797,53 @@ life:{
   saveDbBtn:'Save Database',
   thSalary:'Salary ₸', thTrainingBase:'Training Base ₸', thSkillPrice:'Price per Skill ₸',
   thHeadcount:'Count', thAvgAge:'Avg. Age', thMarket:'Market', thSkills:'Skills (semicolon-separated)'
+}, risk:{
+  eyebrow:'Risk Management · §6', title:'Workforce Risks — Multi-Factor Assessment',
+  lead:'Six risk factors for each role are combined into a weighted index of 0-100. Weights are tuned to enterprise priorities. Each risk is linked to a recommended mitigation action.',
+  exportLabel:'Risk Register (JSON)',
+  portfolioLabel:'Risk Index (portfolio)', portfolioSub:'weighted by role headcount',
+  criticalLabel:'Critical Roles', criticalSub:'index >= 66 — a plan is needed',
+  elevatedLabel:'Elevated Risk', elevatedSub:'index 40-65 — monitor',
+  weightsTitle:'Risk Factor Weights', weightsHint:'How important each of the 6 factors is for your enterprise. Affects the final index.',
+  weightsNote:'The number on the left (0-40) is only the <b>slider position</b> — on its own it means nothing. What matters is the <b>factor share</b> (right, summing to 100%): that is what sets the contribution to the index. Doubling the weight doubles the factor\'s influence.',
+  factorDemo:'Demographic', factorBus:'Key Specialist', factorSkill:'Competency Gap',
+  factorTurn:'Turnover', factorMarket:'External Market', factorRedund:'Redundancy',
+  heatmapTitle:'Role Risk Heat Map', heatmapHint:'Each row is a position. The 6 columns are risk factors. Color and number show the factor level 0-100%. "Index" is their weighted sum.',
+  heatmapNote:'Each cell shows the <b>factor level for the role</b>: 0% - no risk, 100% - maximum. The "<b>Index</b>" column is the weighted sum of all 6 factors using your weights on the left (0-100). Rows are sorted by descending index.',
+  legendLow:'low <40%', legendMed:'medium 40-65%', legendHigh:'high >=66%',
+  thIndex:'Index', thIndexTitle:'Weighted sum of 6 factors, 0-100', thLevel:'Level',
+  facDemoShort:'Demographics', facDemoDesc:'Share of the role\'s staff near retirement age',
+  facBusShort:'Key Specialist', facBusDesc:'Dependence on a single holder of the competency',
+  facSkillShort:'Skills', facSkillDesc:'Automatability/obsolescence of the role\'s competencies',
+  facTurnShort:'Turnover', facTurnDesc:'Risk of the role\'s staff leaving',
+  facMarketShort:'Market', facMarketDesc:'Scarcity of the profession and time-to-fill',
+  facRedundShort:'Redundancy', facRedundDesc:'Risk of the role being displaced by automation',
+  fdescDemo:'Closeness of the role\'s average age to retirement ({age} years)', fdescBus:'Few holders of the competency x role criticality',
+  fdescSkill:'Automatability of the role\'s skills', fdescTurn:'Departure risk: turnover x market scarcity',
+  fdescMarket:'Profession scarcity x time-to-fill', fdescRedund:'Automation displacement risk (survival analysis)',
+  sliderPos:'slider position', sliderShare:'factor share of the index',
+  levelCritical:'Critical', levelElevated:'Elevated', levelModerate:'Moderate',
+  actionDemo:'Talent pipeline / mentoring (demographics)',
+  actionBus:'Duplicate the competency, remove dependence on the key holder',
+  actionSkill:'Reskilling program for the technology shift',
+  actionTurn:'Retention: revisit motivation and conditions',
+  actionMarket:'Proactive recruiting / candidate pipeline',
+  actionRedund:'Redeployment / requalification plan'
+}, act:{
+  hireType:'Hiring', reskillType:'Reskilling', releaseType:'Release',
+  closeDeficitTarget:'Closing the operational shortage',
+  hireNote:'Starts in month {month}; hiring realizability {pct}%',
+  reskillNote:'ROI {roi}%, skill overlap {overlap}%',
+  releaseNote:'Displacement probability {prob}% over {years} yr',
+  eyebrow:'Actions · §10', title:'Workforce Action Plan',
+  lead:'A prioritized set of actions is built from gaps, risks and the automation analysis: hiring, reskilling, release — with cost and timeline estimates.',
+  exportLabel:'Plan (JSON)',
+  hireMetricSub:'closing the shortage', reskillMetricSub:'internal transitions',
+  totalCostLabel:'Total Plan Cost', actsCount:'{n} actions',
+  thAction:'Action', thTarget:'Target', thQty:'Qty', thCost:'Cost',
+  thTerm:'Timeline', thPriority:'Priority', thJustification:'Justification',
+  noActions:'No actions needed — the trajectory is balanced.',
+  footnote:'Hiring cost is 1.5 salaries (recruiting+onboarding), release is 3 salaries (severance obligations), reskilling follows the CBA model. Timelines come from hiring/release capacity and the size of the skill gap.'
 }});
 Object.assign(I18N.ru, { toast:{
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
@@ -1333,6 +1427,7 @@ function reskillBridges(){
 /* ---------------- МНОГОФАКТОРНАЯ ОЦЕНКА КАДРОВОГО РИСКА (§6) ---------------- */
 // Каждый фактор нормируется в [0..1], затем взвешенно агрегируется в индекс 0..100.
 const PENSION_AGE = 63;          // возраст выхода на пенсию (параметр юрисдикции)
+function riskActionText(key){ return t('risk.action'+key.charAt(0).toUpperCase()+key.slice(1)); }
 const TYPE_CRIT = {core:0.9, aux:0.6, mgmt:1.0}; // критичность роли для bus-factor
 function riskWeights(){
   const w={demo:S.wDemo,bus:S.wBus,skill:S.wSkill,turn:S.wTurn,market:S.wMarket,redund:S.wRedund};
@@ -1364,16 +1459,12 @@ function riskAnalysis(){
       redund:redund
     };
     const index=Math.round(100*(w.demo*f.demo+w.bus*f.bus+w.skill*f.skill+w.turn*f.turn+w.market*f.market+w.redund*f.redund));
-    // доминирующий фактор → рекомендованное действие (митигейшн)
-    const FACT=[['demo',f.demo,'Кадровый резерв / наставничество (демография)'],
-                ['bus',f.bus,'Дублирование компетенции, снятие зависимости от ключевого носителя'],
-                ['skill',f.skill,'Программа переобучения под смену технологии'],
-                ['turn',f.turn,'Удержание: пересмотр мотивации и условий'],
-                ['market',f.market,'Опережающий рекрутинг / пайплайн кандидатов'],
-                ['redund',f.redund,'План перераспределения / переквалификации']];
+    // доминирующий фактор → рекомендованное действие (митигейшн); ключ переводится при рендере
+    const FACT=[['demo',f.demo],['bus',f.bus],['skill',f.skill],['turn',f.turn],['market',f.market],['redund',f.redund]];
     FACT.sort((a,b)=>b[1]-a[1]);
-    const lvl=index>=66?{t:'Критический',b:'b-red'}:index>=40?{t:'Повышенный',b:'b-amber'}:{t:'Умеренный',b:'b-green'};
-    return {p,f,index,lvl,dominant:FACT[0][0],action:FACT[0][2]};
+    const lvlKey=index>=66?'critical':index>=40?'elevated':'moderate';
+    const lvlB=index>=66?'b-red':index>=40?'b-amber':'b-green';
+    return {p,f,index,lvl:{key:lvlKey,b:lvlB},dominant:FACT[0][0],actionKey:FACT[0][0]};
   });
   rows.sort((a,b)=>b.index-a.index);
   const headcount=list.reduce((s,p)=>s+Math.max(0,Number(p.headcount||0)),0)||1;
@@ -1395,31 +1486,31 @@ function actionPlan(){
   if(M.peakVal>0){
     const qty=Math.round(M.peakVal);
     const months=Math.max(1, Math.ceil(qty/Math.max(1,S.hireCap*M.hireEff)));
-    acts.push({type:'Найм',cls:'b-red',target:'Закрытие дефицита эксплуатации',qty,
+    acts.push({type:'hire',cls:'b-red',target:t('act.closeDeficitTarget'),qty,
       cost:qty*avgSalary*num(S.cbaHire,1.5), months, priority:M.firstDeficit>=0?1:3,
-      note:'Старт с '+(Math.max(0,M.firstDeficit))+'-го мес.; реализуемость найма '+pct(M.hireEff)+'%'});
+      note:t('act.hireNote',{month:Math.max(0,M.firstDeficit),pct:pct(M.hireEff)})});
   }
   // 2) ПЕРЕОБУЧЕНИЕ — выполнимые мосты с положительным ROI
   bridges.filter(b=>b.feasible&&b.roi>=0).slice(0,3).forEach(b=>{
     const src=profDB[b.src.id]||b.src, tgt=profDB[b.tgt.id]||b.tgt;
     const qty=Math.max(1, Math.round((Number(src.headcount||10))*0.15));
     const c=cbaPair(src,tgt);
-    acts.push({type:'Переобучение',cls:'b-amber',target:src.name+' → '+tgt.name,qty,
+    acts.push({type:'reskill',cls:'b-amber',target:profName(src)+' → '+profName(tgt),qty,
       cost:qty*c.reskillCost, months:Math.max(2,Math.round(c.gapPct/15)), priority:2,
-      note:'ROI '+b.roi+'%, совпадение навыков '+b.overlap+'%'});
+      note:t('act.reskillNote',{roi:b.roi,overlap:b.overlap})});
   });
   // 3) ВЫСВОБОЖДЕНИЕ / ПЕРЕРАСПРЕДЕЛЕНИЕ — роли под риском автоматизации
   auto.rows.filter(r=>r.dispProb>=0.5).slice(0,3).forEach(r=>{
     const qty=Math.max(1,Math.round(r.dispFTE));
     const months=Math.max(2, Math.ceil(qty/Math.max(1,S.sepCap)));
-    acts.push({type:'Высвобождение',cls:'b-purple',target:r.p.name,qty,
+    acts.push({type:'release',cls:'b-purple',target:profName(r.p),qty,
       cost:qty*Number(r.p.salary||avgSalary)*num(S.cbaSever,3), months, priority:3,
-      note:'Вероятность вытеснения '+pct(r.dispProb)+'% за '+auto.years.toFixed(1)+' г.'});
+      note:t('act.releaseNote',{prob:pct(r.dispProb),years:auto.years.toFixed(1)})});
   });
   acts.sort((a,b)=>a.priority-b.priority || b.cost-a.cost);
   const total=acts.reduce((s,a)=>s+a.cost,0);
-  const byType=t=>acts.filter(a=>a.type===t).reduce((s,a)=>s+a.qty,0);
-  return {acts,total,hire:byType('Найм'),reskill:byType('Переобучение'),release:byType('Высвобождение'),M};
+  const byType=ty=>acts.filter(a=>a.type===ty).reduce((s,a)=>s+a.qty,0);
+  return {acts,total,hire:byType('hire'),reskill:byType('reskill'),release:byType('release'),M};
 }
 
 /* ---------------- СЦЕНАРИИ: расчёт сводных метрик под произвольным состоянием --- */
@@ -2073,66 +2164,64 @@ function renderDashboard(){
    ============================================================ */
 function renderRisks(){
   const r=riskAnalysis();
-  const FAC=[['demo','Демография','Доля персонала роли, близкого к пенсионному возрасту'],
-             ['bus','Ключевой спец.','Зависимость от единственного носителя компетенции'],
-             ['skill','Навыки','Автоматизируемость/устаревание компетенций роли'],
-             ['turn','Текучесть','Риск ухода персонала роли'],
-             ['market','Рынок','Дефицитность профессии и срок закрытия вакансии'],
-             ['redund','Избыточность','Риск вытеснения роли автоматизацией']];
+  const FAC=[['demo',t('risk.facDemoShort'),t('risk.facDemoDesc')],
+             ['bus',t('risk.facBusShort'),t('risk.facBusDesc')],
+             ['skill',t('risk.facSkillShort'),t('risk.facSkillDesc')],
+             ['turn',t('risk.facTurnShort'),t('risk.facTurnDesc')],
+             ['market',t('risk.facMarketShort'),t('risk.facMarketDesc')],
+             ['redund',t('risk.facRedundShort'),t('risk.facRedundDesc')]];
   const cell=v=>{const c=light(v*100,40,66);
     return '<td class="c" style="background:'+(v>=0.66?'var(--red-l)':v>=0.4?'var(--amber-l)':'var(--green-l)')+'">'
       +'<span class="mono" style="font-weight:700;color:'+c+'">'+pct(v)+'%</span></td>';};
-  const fdesc={demo:'Близость среднего возраста роли к пенсионному ('+PENSION_AGE+' лет)',
-    bus:'Мало носителей компетенции × критичность роли',
-    skill:'Автоматизируемость навыков роли',
-    turn:'Риск ухода: текучесть × рыночная дефицитность',
-    market:'Дефицитность профессии × срок закрытия вакансии',
-    redund:'Риск вытеснения автоматизацией (анализ дожития)'};
+  const fdesc={demo:t('risk.fdescDemo',{age:PENSION_AGE}), bus:t('risk.fdescBus'), skill:t('risk.fdescSkill'),
+    turn:t('risk.fdescTurn'), market:t('risk.fdescMarket'), redund:t('risk.fdescRedund')};
+  const LEVEL_LABEL={critical:t('risk.levelCritical'),elevated:t('risk.levelElevated'),moderate:t('risk.levelModerate')};
+  const ACTION_LABEL={demo:t('risk.actionDemo'),bus:t('risk.actionBus'),skill:t('risk.actionSkill'),turn:t('risk.actionTurn'),market:t('risk.actionMarket'),redund:t('risk.actionRedund')};
   const wslider=(id,key,label)=>'<div class="field" style="margin-bottom:12px">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:700;margin-bottom:5px">'
-      +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+label+hint(fdesc[key])+'</span>'
-      +'<span class="mono" style="font-weight:800"><span style="color:var(--t3)" title="положение ползунка">'+S[id]+'</span>&nbsp;→&nbsp;<span style="color:var(--primary)" title="доля фактора в индексе">'+pct(r.w[key])+'%</span></span></div>'
+      +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+esc(label)+hint(fdesc[key])+'</span>'
+      +'<span class="mono" style="font-weight:800"><span style="color:var(--t3)" title="'+esc(t('risk.sliderPos'))+'">'+S[id]+'</span>&nbsp;→&nbsp;<span style="color:var(--primary)" title="'+esc(t('risk.sliderShare'))+'">'+pct(r.w[key])+'%</span></span></div>'
     +'<input type="range" min="0" max="40" id="'+id+'" value="'+S[id]+'"></div>';
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Управление рисками · §6</div>'
-    +'<h2>Кадровые риски — многофакторная оценка</h2>'
-    +'<p class="lead">Шесть факторов риска по каждой роли сводятся во взвешенный индекс 0–100. Веса настраиваются под приоритеты предприятия. Каждый риск связан с рекомендованным действием (митигейшн).</p></div>'
-    +toolbar({exportLabel:'Реестр рисков (JSON)',exportAct:'exp-risk'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('risk.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('risk.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('risk.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('risk.exportLabel'),exportAct:'exp-risk'})+'</div>'
 
   +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="metric"><div class="mlabel">Индекс риска (портфель)</div><div class="mval" style="color:'+light(r.portfolioIndex,40,66)+'">'+r.portfolioIndex+'<small> /100</small></div><div class="msub">взвешен по численности ролей</div></div>'
-    +'<div class="metric gap-pos"><div class="mlabel">Критических ролей</div><div class="mval">'+r.critical+'</div><div class="msub">индекс ≥ 66 — нужен план</div></div>'
-    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">Повышенный риск</div><div class="mval" style="color:var(--amber)">'+r.elevated+'</div><div class="msub">индекс 40–65 — мониторинг</div></div>'
+    +'<div class="metric"><div class="mlabel">'+esc(t('risk.portfolioLabel'))+'</div><div class="mval" style="color:'+light(r.portfolioIndex,40,66)+'">'+r.portfolioIndex+'<small> /100</small></div><div class="msub">'+esc(t('risk.portfolioSub'))+'</div></div>'
+    +'<div class="metric gap-pos"><div class="mlabel">'+esc(t('risk.criticalLabel'))+'</div><div class="mval">'+r.critical+'</div><div class="msub">'+esc(t('risk.criticalSub'))+'</div></div>'
+    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">'+esc(t('risk.elevatedLabel'))+'</div><div class="mval" style="color:var(--amber)">'+r.elevated+'</div><div class="msub">'+esc(t('risk.elevatedSub'))+'</div></div>'
   +'</div>'
 
   +'<div class="grid g12">'
-  +'<div class="col-span-4"><div class="card accent"><div class="ctitle">'+ic('sliders')+'Веса факторов риска'
-    +hint('Насколько каждый из 6 факторов важен для вашего предприятия. Влияет на итоговый индекс.')+'</div>'
-    +'<div class="note note-amber" style="margin-bottom:14px">'+ic('info')+'<div>Число слева (0–40) — лишь <b>положение ползунка</b>, само по себе оно ничего не значит. Важна <b>доля фактора</b> (справа, в сумме 100%): именно она задаёт вклад в индекс. Удвоив вес — вдвое усиливаете влияние фактора.</div></div>'
-    +wslider('wDemo','demo','Демографический')+wslider('wBus','bus','Ключевой специалист')
-    +wslider('wSkill','skill','Компетентностный разрыв')+wslider('wTurn','turn','Текучесть')
-    +wslider('wMarket','market','Внешний рыночный')+wslider('wRedund','redund','Избыточность')
+  +'<div class="col-span-4"><div class="card accent"><div class="ctitle">'+ic('sliders')+esc(t('risk.weightsTitle'))
+    +hint(t('risk.weightsHint'))+'</div>'
+    +'<div class="note note-amber" style="margin-bottom:14px">'+ic('info')+'<div>'+t('risk.weightsNote')+'</div></div>'
+    +wslider('wDemo','demo',t('risk.factorDemo'))+wslider('wBus','bus',t('risk.factorBus'))
+    +wslider('wSkill','skill',t('risk.factorSkill'))+wslider('wTurn','turn',t('risk.factorTurn'))
+    +wslider('wMarket','market',t('risk.factorMarket'))+wslider('wRedund','redund',t('risk.factorRedund'))
   +'</div></div>'
 
-  +'<div class="col-span-8"><div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('gauge')+'Тепловая карта рисков по ролям'
-    +hint('Строка — должность. 6 столбцов — факторы риска. Цвет и число — уровень фактора 0–100%. «Индекс» — их взвешенная сумма.')+'</div>'
+  +'<div class="col-span-8"><div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('gauge')+esc(t('risk.heatmapTitle'))
+    +hint(t('risk.heatmapHint'))+'</div>'
     +'<div style="padding:0 22px 12px">'
-      +'<div class="note note-blue" style="margin-bottom:10px">'+ic('info')+'<div>В каждой ячейке — <b>уровень фактора для роли</b>: 0% — риска нет, 100% — максимум. Столбец «<b>Индекс</b>» = взвешенная сумма всех 6 факторов по вашим весам слева (0–100). Строки отсортированы по убыванию индекса.</div></div>'
+      +'<div class="note note-blue" style="margin-bottom:10px">'+ic('info')+'<div>'+t('risk.heatmapNote')+'</div></div>'
       +'<div class="legend" style="margin-top:0">'
-        +'<span><span class="swatch" style="background:var(--green-l);border:1px solid var(--green-bd)"></span>низкий &lt;40%</span>'
-        +'<span><span class="swatch" style="background:var(--amber-l);border:1px solid var(--amber-bd)"></span>средний 40–65%</span>'
-        +'<span><span class="swatch" style="background:var(--red-l);border:1px solid var(--red-bd)"></span>высокий ≥66%</span>'
+        +'<span><span class="swatch" style="background:var(--green-l);border:1px solid var(--green-bd)"></span>'+esc(t('risk.legendLow'))+'</span>'
+        +'<span><span class="swatch" style="background:var(--amber-l);border:1px solid var(--amber-bd)"></span>'+esc(t('risk.legendMed'))+'</span>'
+        +'<span><span class="swatch" style="background:var(--red-l);border:1px solid var(--red-bd)"></span>'+esc(t('risk.legendHigh'))+'</span>'
       +'</div>'
     +'</div>'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-    +'<th>Роль</th>'+FAC.map(f=>'<th class="c" title="'+f[2]+'">'+f[1]+'</th>').join('')
-    +'<th class="c" title="Взвешенная сумма 6 факторов, 0–100">Индекс</th><th class="c">Уровень</th><th>Рекомендация</th></tr></thead><tbody>'
-    +r.rows.map(row=>'<tr><td style="font-weight:700">'+row.p.name+'</td>'
+    +'<th>'+esc(t('norm.thRole'))+'</th>'+FAC.map(f=>'<th class="c" title="'+esc(f[2])+'">'+esc(f[1])+'</th>').join('')
+    +'<th class="c" title="'+esc(t('risk.thIndexTitle'))+'">'+esc(t('risk.thIndex'))+'</th><th class="c">'+esc(t('risk.thLevel'))+'</th><th>'+esc(t('pred.thRecommendation'))+'</th></tr></thead><tbody>'
+    +r.rows.map(row=>'<tr><td style="font-weight:700">'+esc(profName(row.p))+'</td>'
       +FAC.map(f=>cell(row.f[f[0]])).join('')
       +'<td class="c"><span class="mono" style="font-weight:800;font-size:15px;color:'+light(row.index,40,66)+'">'+row.index+'</span></td>'
-      +'<td class="c"><span class="badge '+row.lvl.b+'">'+row.lvl.t+'</span></td>'
-      +'<td class="small">'+row.action+'</td></tr>').join('')
+      +'<td class="c"><span class="badge '+row.lvl.b+'">'+esc(LEVEL_LABEL[row.lvl.key])+'</span></td>'
+      +'<td class="small">'+esc(ACTION_LABEL[row.actionKey])+'</td></tr>').join('')
     +'</tbody></table></div></div></div>'
   +'</div></div>';
 }
@@ -2142,33 +2231,34 @@ function renderRisks(){
    ============================================================ */
 function renderActions(){
   const plan=actionPlan();
+  const TYPE_LABEL={hire:t('act.hireType'),reskill:t('act.reskillType'),release:t('act.releaseType')};
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Действия · §10</div>'
-    +'<h2>План кадровых действий</h2>'
-    +'<p class="lead">Из разрывов, рисков и анализа автоматизации формируется приоритизированный набор действий: найм, переобучение, высвобождение — с оценкой стоимости и сроков.</p></div>'
-    +toolbar({exportLabel:'План (JSON)',exportAct:'exp-act'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('act.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('act.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('act.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('act.exportLabel'),exportAct:'exp-act'})+'</div>'
 
   +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="metric gap-pos"><div class="mlabel">Найм</div><div class="mval">'+fmtN(plan.hire)+' <small>чел.</small></div><div class="msub">закрытие дефицита</div></div>'
-    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">Переобучение</div><div class="mval" style="color:var(--amber)">'+fmtN(plan.reskill)+' <small>чел.</small></div><div class="msub">внутренние переходы</div></div>'
-    +'<div class="metric"><div class="mlabel">Полная стоимость плана</div><div class="mval">'+fmtKZT(plan.total)+'</div><div class="msub">'+plan.acts.length+' действий</div></div>'
+    +'<div class="metric gap-pos"><div class="mlabel">'+esc(t('act.hireType'))+'</div><div class="mval">'+fmtN(plan.hire)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('act.hireMetricSub'))+'</div></div>'
+    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">'+esc(t('act.reskillType'))+'</div><div class="mval" style="color:var(--amber)">'+fmtN(plan.reskill)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('act.reskillMetricSub'))+'</div></div>'
+    +'<div class="metric"><div class="mlabel">'+esc(t('act.totalCostLabel'))+'</div><div class="mval">'+fmtKZT(plan.total)+'</div><div class="msub">'+esc(t('act.actsCount',{n:plan.acts.length}))+'</div></div>'
   +'</div>'
 
   +'<div class="card flush">'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-    +'<th>Действие</th><th>Объект</th><th class="c">Кол-во</th><th class="r">Стоимость</th>'
-    +'<th class="c">Срок</th><th class="c">Приоритет</th><th>Обоснование</th></tr></thead><tbody>'
+    +'<th>'+esc(t('act.thAction'))+'</th><th>'+esc(t('act.thTarget'))+'</th><th class="c">'+esc(t('act.thQty'))+'</th><th class="r">'+esc(t('act.thCost'))+'</th>'
+    +'<th class="c">'+esc(t('act.thTerm'))+'</th><th class="c">'+esc(t('act.thPriority'))+'</th><th>'+esc(t('act.thJustification'))+'</th></tr></thead><tbody>'
     +(plan.acts.length? plan.acts.map(a=>'<tr>'
-      +'<td><span class="badge '+a.cls+'">'+a.type+'</span></td>'
-      +'<td style="font-weight:600">'+a.target+'</td>'
+      +'<td><span class="badge '+a.cls+'">'+esc(TYPE_LABEL[a.type]||a.type)+'</span></td>'
+      +'<td style="font-weight:600">'+esc(a.target)+'</td>'
       +'<td class="c mono" style="font-weight:700">'+fmtN(a.qty)+'</td>'
       +'<td class="r mono">'+fmtKZT(a.cost)+'</td>'
-      +'<td class="c mono">'+a.months+' мес.</td>'
+      +'<td class="c mono">'+a.months+' '+esc(t('common.months'))+'</td>'
       +'<td class="c"><span class="badge '+(a.priority===1?'b-red':a.priority===2?'b-amber':'b-gray')+'">P'+a.priority+'</span></td>'
-      +'<td class="small muted">'+a.note+'</td></tr>').join('')
-      : '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;font-style:italic">Действий не требуется — траектория сбалансирована.</td></tr>')
+      +'<td class="small muted">'+esc(a.note)+'</td></tr>').join('')
+      : '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;font-style:italic">'+esc(t('act.noActions'))+'</td></tr>')
     +'</tbody></table></div></div>'
-  +'<div class="fnote" style="margin-top:14px">Стоимость найма — 1.5 оклада (рекрутинг+адаптация), высвобождения — 3 оклада (выходные обязательства), переобучения — по модели CBA. Сроки — из ёмкости найма/высвобождения и объёма разрыва навыков.</div>'
+  +'<div class="fnote" style="margin-top:14px">'+esc(t('act.footnote'))+'</div>'
   +'</div>';
 }
 
@@ -2893,7 +2983,7 @@ function stateSnapshot(full){
       peakDeficitMed:Math.round(M.peakDeficitMed), firstDeficitMonth:M.firstDeficit,
       fteAtRisk:auto.totalAtRisk, riskIndex:risk.portfolioIndex, planCost:Math.round(plan.total) });
     snap.professions=Object.values(profDB).map(p=>({id:p.id,name:p.name,type:p.type,salary:p.salary,headcount:p.headcount,avgAge:p.avgAge,market:p.market,skills:p.skills}));
-    snap.topRisks=risk.rows.slice(0,5).map(r=>({role:r.p.name,index:r.index,dominant:r.dominant,action:r.action}));
+    snap.topRisks=risk.rows.slice(0,5).map(r=>({role:profName(r.p),index:r.index,dominant:r.dominant,action:riskActionText(r.actionKey)}));
   } else {
     snap.professions=Object.values(profDB).map(p=>({id:p.id,name:p.name,type:p.type}));
   }
