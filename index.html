@@ -616,6 +616,30 @@ life:{
   feasible:'Реально', difficult:'сложно',
   coverageNote:'<b>Покрытие переобучением: {share}%</b> предложенных переходов выполнимы (пересечение навыков ≥ 40%). Подробная экономика — на вкладке «Переобучение и CBA».',
   noBridges:'Недостаточно должностей для построения мостов.'
+}, cba:{
+  eyebrow:'Этап 4 · Экономическое обоснование', title:'Переобучение и анализ затрат (CBA)',
+  lead:'Финансовое сравнение: уволить избыточных и нанять новых ПРОТИВ внутреннего переобучения под дефицитные роли. Методология SHRM.',
+  exportLabel:'Отчёт ROI (JSON)',
+  profileTitle:'Профиль переобучения (сопоставление навыков)',
+  profileHint:'Алгоритм сравнивает векторы навыков ролей. Разрыв (недостающие навыки) определяет стоимость курсов ДПО.',
+  sourceLabel:'Исходная (профицит)', targetLabel:'Целевая (дефицит)',
+  matchingLabel:'Совпадающие компетенции', noOverlap:'нет пересечений',
+  gapLabel:'Разрыв навыков (нужно доучить)', gapHint:'Каждый недостающий навык умножается на «цену за навык» из справочника и формирует стоимость обучения.',
+  fullMatch:'полное соответствие',
+  cbaTitle:'Cost-Benefit Analysis', cbaHint:'Сценарий 1 (увольнение+найм): 3 оклада исходной ЗП + 1.5 оклада новой. Сценарий 2 (рескиллинг): база ДПО + навыки × цена + оплата простоя.',
+  scenario1Title:'Сценарий 1 · Увольнение и найм с рынка',
+  severanceRow:'Выходное пособие (3 оклада исх.)', recruitingRow:'Рекрутинг и адаптация (1.5 оклада нов.)', totalCostLabel:'Итого затраты',
+  scenario2Title:'Сценарий 2 · Внутренний рескиллинг',
+  trainingRow:'Курсы ДПО (база + {n} навык. × ставка)', idleRow:'Оплата простоя на учёбу (~1.5 мес.)', totalInvestLabel:'Итого инвестиции',
+  positiveLabel:'Чистая экономия — переобучать выгоднее', negativeLabel:'Убыток — переобучение нецелесообразно'
+}, dir:{
+  eyebrow:'База данных · Оргструктура', title:'Справочник компетенций и затрат',
+  lead:'Должности, оклады, стоимость обучения и векторы навыков. Это основа расчётов CBA и анализа автоматизации.',
+  exportCsv:'Экспорт CSV', importCsv:'Импорт CSV',
+  editModeNote:'Режим редактирования. Изменения нужно сохранить, чтобы применить к расчётам.',
+  saveDbBtn:'Сохранить БД',
+  thSalary:'Оклад ₸', thTrainingBase:'База ДПО ₸', thSkillPrice:'Цена навыка ₸',
+  thHeadcount:'Числ.', thAvgAge:'Ср.возр.', thMarket:'Рынок', thSkills:'Навыки (через ;)'
 }});
 Object.assign(I18N.en, { norm:{
   eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
@@ -702,6 +726,30 @@ life:{
   feasible:'Feasible', difficult:'difficult',
   coverageNote:'<b>Reskilling coverage: {share}%</b> of proposed transitions are feasible (skill overlap >= 40%). Detailed economics are on the Reskilling / CBA tab.',
   noBridges:'Not enough positions to build bridges.'
+}, cba:{
+  eyebrow:'Stage 4 · Economic Justification', title:'Reskilling and Cost-Benefit Analysis (CBA)',
+  lead:'A financial comparison: release surplus staff and hire new people VS internal reskilling into shortage roles. SHRM methodology.',
+  exportLabel:'ROI Report (JSON)',
+  profileTitle:'Reskilling Profile (Skill Matching)',
+  profileHint:'The algorithm compares the skill vectors of two roles. The gap (missing skills) determines the training cost.',
+  sourceLabel:'Source (surplus)', targetLabel:'Target (shortage)',
+  matchingLabel:'Matching Competencies', noOverlap:'no overlap',
+  gapLabel:'Skill Gap (needs training)', gapHint:'Each missing skill is multiplied by the "price per skill" from the directory to build the training cost.',
+  fullMatch:'full match',
+  cbaTitle:'Cost-Benefit Analysis', cbaHint:'Scenario 1 (severance+hiring): 3 salaries of the source role + 1.5 salaries of the new one. Scenario 2 (reskilling): base training cost + skills x price + idle-time pay.',
+  scenario1Title:'Scenario 1 · Severance and Market Hiring',
+  severanceRow:'Severance (3 source salaries)', recruitingRow:'Recruiting & Onboarding (1.5 new salaries)', totalCostLabel:'Total Cost',
+  scenario2Title:'Scenario 2 · Internal Reskilling',
+  trainingRow:'Training Courses (base + {n} skill(s) x rate)', idleRow:'Paid Study Downtime (~1.5 mo)', totalInvestLabel:'Total Investment',
+  positiveLabel:'Net Savings — Reskilling is Cheaper', negativeLabel:'Net Loss — Reskilling is Not Cost-Effective'
+}, dir:{
+  eyebrow:'Database · Org Structure', title:'Competency and Cost Directory',
+  lead:'Positions, salaries, training costs, and skill vectors. This is the foundation for CBA and automation-risk calculations.',
+  exportCsv:'Export CSV', importCsv:'Import CSV',
+  editModeNote:'Edit mode. Changes must be saved to apply to the calculations.',
+  saveDbBtn:'Save Database',
+  thSalary:'Salary ₸', thTrainingBase:'Training Base ₸', thSkillPrice:'Price per Skill ₸',
+  thHeadcount:'Count', thAvgAge:'Avg. Age', thMarket:'Market', thSkills:'Skills (semicolon-separated)'
 }});
 Object.assign(I18N.ru, { toast:{
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
@@ -1843,50 +1891,50 @@ function renderCBA(){
   const dark = c.positive;
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Этап 4 · Экономическое обоснование</div>'
-    +'<h2>Переобучение и анализ затрат (CBA)</h2>'
-    +'<p class="lead">Финансовое сравнение: уволить избыточных и нанять новых ПРОТИВ внутреннего переобучения под дефицитные роли. Методология SHRM.</p></div>'
-    +toolbar({exportLabel:'Отчёт ROI (JSON)',exportAct:'exp-cba'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('cba.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('cba.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('cba.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('cba.exportLabel'),exportAct:'exp-cba'})+'</div>'
 
   +'<div class="grid g2">'
   // ЛЕВО — сопоставление навыков
-  +'<div class="card accent"><div class="ctitle">'+ic('target')+'Профиль переобучения (сопоставление навыков)'
-    +hint('Алгоритм сравнивает векторы навыков ролей. Разрыв (недостающие навыки) определяет стоимость курсов ДПО.')+'</div>'
+  +'<div class="card accent"><div class="ctitle">'+ic('target')+esc(t('cba.profileTitle'))
+    +hint(t('cba.profileHint'))+'</div>'
     +'<div style="display:flex;align-items:center;gap:14px;background:var(--surface2);padding:16px;border-radius:12px;border:1px solid var(--line);margin-bottom:22px">'
-      +'<div style="flex:1"><label class="flabel" style="color:var(--red);font-size:10px;letter-spacing:1px;text-transform:uppercase">Исходная (профицит)</label>'
-        +'<select class="select" id="sourceProf" style="border-color:var(--red-bd)">'+list.map(p=>'<option value="'+p.id+'"'+(source.id===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select></div>'
+      +'<div style="flex:1"><label class="flabel" style="color:var(--red);font-size:10px;letter-spacing:1px;text-transform:uppercase">'+esc(t('cba.sourceLabel'))+'</label>'
+        +'<select class="select" id="sourceProf" style="border-color:var(--red-bd)">'+list.map(p=>'<option value="'+p.id+'"'+(source.id===p.id?' selected':'')+'>'+esc(profName(p))+'</option>').join('')+'</select></div>'
       +'<div class="muted">'+ic('arrow')+'</div>'
-      +'<div style="flex:1"><label class="flabel" style="color:var(--green);font-size:10px;letter-spacing:1px;text-transform:uppercase">Целевая (дефицит)</label>'
-        +'<select class="select" id="targetProf" style="border-color:var(--green-bd)">'+list.map(p=>'<option value="'+p.id+'"'+(target.id===p.id?' selected':'')+'>'+p.name+'</option>').join('')+'</select></div>'
+      +'<div style="flex:1"><label class="flabel" style="color:var(--green);font-size:10px;letter-spacing:1px;text-transform:uppercase">'+esc(t('cba.targetLabel'))+'</label>'
+        +'<select class="select" id="targetProf" style="border-color:var(--green-bd)">'+list.map(p=>'<option value="'+p.id+'"'+(target.id===p.id?' selected':'')+'>'+esc(profName(p))+'</option>').join('')+'</select></div>'
     +'</div>'
     +'<div style="margin-bottom:22px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px">'
-      +'<span style="display:flex;align-items:center;gap:7px;color:var(--green)">'+ic('check')+'Совпадающие компетенции</span>'
+      +'<span style="display:flex;align-items:center;gap:7px;color:var(--green)">'+ic('check')+esc(t('cba.matchingLabel'))+'</span>'
       +'<span class="mono" style="color:var(--green);font-size:16px;font-weight:800">'+c.overlapPct+'%</span></div>'
       +hbar(c.overlapPct,'var(--green)')
-      +'<div class="chips">'+(c.overlap.length?c.overlap.map(s=>'<span class="chip chip-ok">'+s+'</span>').join(''):'<span class="muted small" style="font-style:italic">нет пересечений</span>')+'</div></div>'
+      +'<div class="chips">'+(c.overlap.length?c.overlap.map(s=>'<span class="chip chip-ok">'+esc(skillLabel(s))+'</span>').join(''):'<span class="muted small" style="font-style:italic">'+esc(t('cba.noOverlap'))+'</span>')+'</div></div>'
     +'<div style="border-top:1px solid var(--line2);padding-top:18px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px">'
-      +'<span style="display:flex;align-items:center;gap:7px;color:var(--red)">'+ic('alert')+'Разрыв навыков (нужно доучить)'+hint('Каждый недостающий навык умножается на «цену за навык» из справочника и формирует стоимость обучения.')+'</span>'
+      +'<span style="display:flex;align-items:center;gap:7px;color:var(--red)">'+ic('alert')+esc(t('cba.gapLabel'))+hint(t('cba.gapHint'))+'</span>'
       +'<span class="mono" style="color:var(--red);font-size:16px;font-weight:800">'+c.gapPct+'%</span></div>'
       +hbar(c.gapPct,'var(--red)')
-      +'<div class="chips">'+(c.missing.length?c.missing.map(s=>'<span class="chip chip-gap">'+s+'</span>').join(''):'<span class="small" style="color:var(--green);font-weight:700;font-style:italic">полное соответствие</span>')+'</div></div>'
+      +'<div class="chips">'+(c.missing.length?c.missing.map(s=>'<span class="chip chip-gap">'+esc(skillLabel(s))+'</span>').join(''):'<span class="small" style="color:var(--green);font-weight:700;font-style:italic">'+esc(t('cba.fullMatch'))+'</span>')+'</div></div>'
   +'</div>'
 
   // ПРАВО — экономика
   +'<div class="card '+(dark?'dark':'')+'" '+(dark?'':'style="background:var(--red-l);border-color:var(--red-bd)"')+'>'
-    +'<div class="ctitle" style="'+(dark?'color:#fff;border-color:var(--ink3)':'color:#7a2310;border-color:var(--red-bd)')+'">'+ic('dollar')+'Cost-Benefit Analysis'
-      +hint('Сценарий 1 (увольнение+найм): 3 оклада исходной ЗП + 1.5 оклада новой. Сценарий 2 (рескиллинг): база ДПО + навыки × цена + оплата простоя.')+'</div>'
-    +cbaBlock('Сценарий 1 · Увольнение и найм с рынка',[
-      ['Выходное пособие (3 оклада исх.)',c.severance],
-      ['Рекрутинг и адаптация (1.5 оклада нов.)',c.recruiting]
-    ],'Итого затраты',c.replaceCost,dark,'var(--red)')
-    +cbaBlock('Сценарий 2 · Внутренний рескиллинг',[
-      ['Курсы ДПО (база + '+c.missing.length+' навык. × ставка)',c.trainingCost],
-      ['Оплата простоя на учёбу (~1.5 мес.)',c.lostProd]
-    ],'Итого инвестиции',c.reskillCost,dark,'var(--green)')
+    +'<div class="ctitle" style="'+(dark?'color:#fff;border-color:var(--ink3)':'color:#7a2310;border-color:var(--red-bd)')+'">'+ic('dollar')+esc(t('cba.cbaTitle'))
+      +hint(t('cba.cbaHint'))+'</div>'
+    +cbaBlock(t('cba.scenario1Title'),[
+      [t('cba.severanceRow'),c.severance],
+      [t('cba.recruitingRow'),c.recruiting]
+    ],t('cba.totalCostLabel'),c.replaceCost,dark,'var(--red)')
+    +cbaBlock(t('cba.scenario2Title'),[
+      [t('cba.trainingRow',{n:c.missing.length}),c.trainingCost],
+      [t('cba.idleRow'),c.lostProd]
+    ],t('cba.totalInvestLabel'),c.reskillCost,dark,'var(--green)')
     +'<div style="margin-top:18px;padding:22px;border-radius:14px;text-align:center;'
       +(c.positive?'background:rgba(17,122,91,.18);border:1px solid rgba(17,122,91,.4)':'background:rgba(196,54,27,.14);border:1px solid var(--red-bd)')+'">'
       +'<div class="mono" style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:'+(c.positive?'var(--green)':'var(--red)')+'">'
-        +(c.positive?'Чистая экономия — переобучать выгоднее':'Убыток — переобучение нецелесообразно')+'</div>'
+        +esc(c.positive?t('cba.positiveLabel'):t('cba.negativeLabel'))+'</div>'
       +'<div class="mono" style="font-size:38px;font-weight:800;margin:10px 0;color:'+(dark?'#fff':c.positive?'var(--green)':'var(--red)')+'">'+fmtKZT(c.netSavings)+'</div>'
       +'<div class="badge '+(c.positive?'b-green':'b-red')+'" style="font-size:12px;padding:6px 12px">ROI = '+c.roi+'%</div>'
     +'</div>'
@@ -1898,9 +1946,9 @@ function cbaBlock(title,rows,totalLabel,total,dark,clr){
   const tot=dark?'color:#fff':'color:var(--ink)';
   const bg=dark?'background:var(--ink2);border:1px solid var(--ink3)':'background:rgba(255,255,255,.6);border:1px solid var(--line)';
   return '<div style="padding:16px;border-radius:12px;margin-bottom:14px;'+bg+'">'
-    +'<div class="mono" style="font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:11px;color:'+clr+'">'+title+'</div>'
-    +rows.map(([l,v])=>'<div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:12.5px;'+txt+'"><span>'+l+'</span><span class="mono">'+fmtKZT(v)+'</span></div>').join('')
-    +'<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid '+(dark?'var(--ink3)':'var(--line)')+';font-weight:800;'+tot+'"><span>'+totalLabel+'</span><span class="mono">'+fmtKZT(total)+'</span></div>'
+    +'<div class="mono" style="font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:11px;color:'+clr+'">'+esc(title)+'</div>'
+    +rows.map(([l,v])=>'<div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:12.5px;'+txt+'"><span>'+esc(l)+'</span><span class="mono">'+fmtKZT(v)+'</span></div>').join('')
+    +'<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid '+(dark?'var(--ink3)':'var(--line)')+';font-weight:800;'+tot+'"><span>'+esc(totalLabel)+'</span><span class="mono">'+fmtKZT(total)+'</span></div>'
     +'</div>';
 }
 
@@ -1910,35 +1958,35 @@ function cbaBlock(title,rows,totalLabel,total,dark,clr){
 function renderDictionary(){
   const rows=Object.values(tempDB);
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">База данных · Оргструктура</div>'
-    +'<h2>Справочник компетенций и затрат</h2>'
-    +'<p class="lead">Должности, оклады, стоимость обучения и векторы навыков. Это основа расчётов CBA и анализа автоматизации.</p></div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('dir.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('dir.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('dir.lead'))+'</p></div>'
     +'<div class="actions">'
       +'<button class="tool red" data-act="print">'+ic('file')+'PDF</button>'
-      +'<button class="tool" data-act="exp-csv">'+ic('download')+'Экспорт CSV</button>'
-      +'<button class="tool" data-act="imp-csv">'+ic('upload')+'Импорт CSV</button>'
+      +'<button class="tool" data-act="exp-csv">'+ic('download')+esc(t('dir.exportCsv'))+'</button>'
+      +'<button class="tool" data-act="imp-csv">'+ic('upload')+esc(t('dir.importCsv'))+'</button>'
     +'</div></div>'
 
   +'<div class="card flush">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;background:var(--surface2);border-bottom:1px solid var(--line);flex-wrap:wrap">'
-      +'<div class="small" style="display:flex;align-items:center;gap:8px;color:var(--t2);font-weight:600">'+ic('info','')+'Режим редактирования. Изменения нужно сохранить, чтобы применить к расчётам.</div>'
+      +'<div class="small" style="display:flex;align-items:center;gap:8px;color:var(--t2);font-weight:600">'+ic('info','')+esc(t('dir.editModeNote'))+'</div>'
       +'<div class="actions">'
-        +'<button class="tool" data-act="add-prof">'+ic('plus')+'Добавить</button>'
-        +(isDirty?'<button class="tool red" data-act="discard">'+ic('x')+'Отменить</button>'
-          +'<button class="tool" data-act="save-db" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+'Сохранить БД</button>':'')
+        +'<button class="tool" data-act="add-prof">'+ic('plus')+esc(t('common.add'))+'</button>'
+        +(isDirty?'<button class="tool red" data-act="discard">'+ic('x')+esc(t('common.cancel'))+'</button>'
+          +'<button class="tool" data-act="save-db" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+esc(t('dir.saveDbBtn'))+'</button>':'')
       +'</div>'
     +'</div>'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-      +'<th>Должность</th><th class="c">Группа</th><th class="r">Оклад ₸</th>'
-      +'<th class="r">База ДПО ₸</th><th class="r">Цена навыка ₸</th>'
-      +'<th class="c">Числ.</th><th class="c">Ср.возр.</th><th class="c">Рынок</th>'
-      +'<th>Навыки (через ;)</th><th class="c">×</th></tr></thead><tbody>'
+      +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('work.thGroup'))+'</th><th class="r">'+esc(t('dir.thSalary'))+'</th>'
+      +'<th class="r">'+esc(t('dir.thTrainingBase'))+'</th><th class="r">'+esc(t('dir.thSkillPrice'))+'</th>'
+      +'<th class="c">'+esc(t('dir.thHeadcount'))+'</th><th class="c">'+esc(t('dir.thAvgAge'))+'</th><th class="c">'+esc(t('dir.thMarket'))+'</th>'
+      +'<th>'+esc(t('dir.thSkills'))+'</th><th class="c">×</th></tr></thead><tbody>'
       +rows.map(p=>{
         const changed=isDirty && JSON.stringify(tempDB[p.id])!==JSON.stringify(profDB[p.id]);
         return '<tr'+(changed?' class="dirty"':'')+' data-row="'+p.id+'">'
-          +'<td><input class="cell-edit" data-f="name" value="'+esc(p.name)+'"></td>'
+          +'<td><input class="cell-edit" data-f="name" value="'+esc(profName(p))+'"></td>'
           +'<td class="c"><select class="cell-edit" data-f="type" style="text-align:center">'
-            +['core','aux','mgmt'].map(t=>'<option value="'+t+'"'+(p.type===t?' selected':'')+'>'+({core:'Core',aux:'Aux',mgmt:'Mgmt'})[t]+'</option>').join('')+'</select></td>'
+            +['core','aux','mgmt'].map(ty=>'<option value="'+ty+'"'+(p.type===ty?' selected':'')+'>'+esc(t('common.'+ty+'Short'))+'</option>').join('')+'</select></td>'
           +'<td class="r"><input class="cell-edit mono" data-f="salary" type="number" value="'+p.salary+'" style="text-align:right;color:var(--blue);font-weight:700"></td>'
           +'<td class="r"><input class="cell-edit mono" data-f="trainingBase" type="number" value="'+p.trainingBase+'" style="text-align:right;color:var(--green);font-weight:700"></td>'
           +'<td class="r"><input class="cell-edit mono" data-f="skillRate" type="number" value="'+p.skillRate+'" style="text-align:right;color:var(--amber);font-weight:700"></td>'
