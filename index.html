@@ -687,6 +687,48 @@ life:{
   thTerm:'Срок', thPriority:'Приоритет', thJustification:'Обоснование',
   noActions:'Действий не требуется — траектория сбалансирована.',
   footnote:'Стоимость найма — 1.5 оклада (рекрутинг+адаптация), высвобождения — 3 оклада (выходные обязательства), переобучения — по модели CBA. Сроки — из ёмкости найма/высвобождения и объёма разрыва навыков.'
+}, scen:{
+  eyebrow:'Сценарное моделирование · §7', title:'Сценарии «что если» — сравнение траекторий',
+  lead:'Сохраняйте полный снимок параметров и справочника как сценарий, сравнивайте кадровые траектории бок о бок, назначайте базовую линию. Песочница отделена от текущих данных.',
+  saveBtn:'Сохранить текущее как сценарий',
+  metricRequired:'Потребность (FTE)', metricGapNow:'Разрыв «сейчас»', metricHorizon:'Горизонт (мес.)',
+  metricProbDeficit:'Вер. дефицита', metricPeakDeficit:'Пиковый дефицит', metricFteAtRisk:'FTE под автоматизацией',
+  metricRiskIndex:'Индекс риска', metricPlanCost:'Стоимость плана',
+  metricHeader:'Показатель',
+  currentState:'Текущее состояние', control:'Управление', active:'— активно —',
+  loadBtn:'Загрузить',
+  onlyCurrentNote:'Пока сохранён только текущий срез. Измените параметры на других вкладках (объём, сценарий, темп автоматизации, фазы) и нажмите «Сохранить текущее как сценарий», чтобы сравнить варианты.',
+  footnote:'Каждый сценарий — независимый снимок состояния и справочника. Метрики пересчитываются полными моделями (нормирование, Монте-Карло, риски, план действий) под состоянием сценария. «★» — базовая линия.'
+}, meth:{
+  eyebrow:'Прозрачность · Источники и формулы', title:'Методология и допущения',
+  lead:'Здесь раскрыто, откуда берётся каждое число: формулы нормирования, прогнозные модели и редактируемые методологические коэффициенты. Никаких «скрытых» значений — всё считается из этих параметров.',
+  exportLabel:'Допущения (JSON)',
+  formulasTitle:'Формулы расчёта и прогноза',
+  block1Title:'Нормирование численности (детерминированное ядро)',
+  block1Text:'Явочная Чяв считается по методике вида работ: <b>по выработке</b> Чяв=Объём÷Норма; <b>по норме времени</b> Чяв=(Объём×Нвр)÷(Фсм×kвн); <b>по обслуживанию</b> Чяв=Агрегаты÷Нобсл; <b>по рабочим местам</b> Чяв=Места×kзагр. Списочная FTE=Чяв×Сменность×k_сп. Итог по объекту = сумма по работам × множитель фазы жизненного цикла.',
+  block2Title:'Прогноз оттока (Attrition)',
+  block2Text:'Из годовой текучести p выводится месячная вероятность увольнения: 1−(1−p)^(1/12). Численность убывает экспоненциально. Источник ставки — параметр «Годовая текучесть» (по умолчанию бенчмарк 12–18%).',
+  block3Title:'Реализуемость найма',
+  block3Text:'hireEff = clamp(1−(Срок_вакансии−30)÷200; 0.30…1.0). Чем дольше закрывается вакансия, тем меньшая доля заявленной ёмкости найма реализуется.',
+  block4Title:'Монте-Карло прогноз',
+  block4Text:'N симуляций со случайными колебаниями: отток ±40%, спрос ±5%, успешность найма переменная. Сид детерминирован от состояния (воспроизводимость). На выходе — перцентили P10/P50/P90, вероятность дефицита, пиковый дефицит.',
+  block5Title:'Анализ дожития профессий (риск автоматизации)',
+  block5Text:'S(t)=exp(−λt), λ = средний_риск_навыков × Темп_автоматизации × hazardLambda. Средний риск навыков берётся из лексикона ниже; неизвестный навык → hazardDefault.',
+  block6Title:'Кадровый риск (6 факторов)',
+  block6Text:'Индекс 0–100 = взвешенная сумма факторов: демография (от среднего возраста к пенсии {age}), bus-factor (от числа носителей × критичности роли), навыки (автоматизируемость), текучесть, рынок (дефицитность × срок закрытия), избыточность (из дожития). Веса — на вкладке «Кадровые риски».',
+  block7Title:'CBA переобучения (методология SHRM)',
+  block7Text:'Замена = Высвобождение (cbaSever окладов) + Найм (cbaHire окладов). Рескиллинг = База_ДПО + Недостающие_навыки×Цена_навыка + Простой (cbaIdleMonths окладов). ROI=(Замена−Рескиллинг)÷Рескиллинг.',
+  assumptionsTitle:'Редактируемые допущения',
+  assumptionsHint:'Эти коэффициенты раньше были «зашиты» в коде. Теперь они явные и влияют на CBA, план действий и анализ автоматизации.',
+  cbaHireLabel:'Стоимость найма', cbaHireSuf:'окладов', cbaHireNote:'Рекрутинг + адаптация. Бенчмарк SHRM ≈ 1.5 оклада.',
+  cbaSeverLabel:'Стоимость высвобождения', cbaSeverSuf:'окладов', cbaSeverNote:'Выходные обязательства. ТК РК/РФ: ориентир до 3 средних заработков.',
+  cbaIdleLabel:'Простой на переобучение', cbaIdleSuf:'мес.', cbaIdleNote:'Оплачиваемое время вне производства во время обучения.',
+  hazardDefLabel:'Риск навыка по умолчанию', hazardDefSuf:'0…1', hazardDefNote:'Применяется к навыкам вне лексикона автоматизации.',
+  hazardLambdaLabel:'Масштаб дожития (λ)', hazardLambdaSuf:'—', hazardLambdaNote:'Калибровка скорости вытеснения ролей технологиями.',
+  confirmNote:'Под конкретную юрисдикцию и отрасль эти значения следует подтвердить у заказчика. ИИ-ассистент может подобрать их по источникам (set_methodology).',
+  lexiconTitle:'Лексикон автоматизируемости навыков',
+  lexiconHint:'Вероятность того, что задача навыка автоматизируема. Питает анализ дожития и компетентностный риск.',
+  thSkill:'Навык', thLevel:'Уровень', thRisk:'Риск'
 }});
 Object.assign(I18N.en, { norm:{
   eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
@@ -844,6 +886,48 @@ life:{
   thTerm:'Timeline', thPriority:'Priority', thJustification:'Justification',
   noActions:'No actions needed — the trajectory is balanced.',
   footnote:'Hiring cost is 1.5 salaries (recruiting+onboarding), release is 3 salaries (severance obligations), reskilling follows the CBA model. Timelines come from hiring/release capacity and the size of the skill gap.'
+}, scen:{
+  eyebrow:'Scenario Modeling · §7', title:'What-If Scenarios — Trajectory Comparison',
+  lead:'Save a full snapshot of parameters and the directory as a scenario, compare workforce trajectories side by side, and assign a baseline. The sandbox is separate from current data.',
+  saveBtn:'Save Current as Scenario',
+  metricRequired:'Demand (FTE)', metricGapNow:'Gap "now"', metricHorizon:'Horizon (mo.)',
+  metricProbDeficit:'Shortage Prob.', metricPeakDeficit:'Peak Shortage', metricFteAtRisk:'FTE at Automation Risk',
+  metricRiskIndex:'Risk Index', metricPlanCost:'Plan Cost',
+  metricHeader:'Metric',
+  currentState:'Current State', control:'Control', active:'— active —',
+  loadBtn:'Load',
+  onlyCurrentNote:'So far only the current snapshot is saved. Change parameters on other tabs (volume, scenario, automation pace, phases) and click "Save Current as Scenario" to compare options.',
+  footnote:'Each scenario is an independent snapshot of state and the directory. Metrics are recalculated with the full models (norming, Monte Carlo, risks, action plan) under the scenario\'s state. "★" marks the baseline.'
+}, meth:{
+  eyebrow:'Transparency · Sources and Formulas', title:'Methodology and Assumptions',
+  lead:'Here you can see where every number comes from: norming formulas, forecast models, and editable methodological coefficients. No "hidden" values — everything is calculated from these parameters.',
+  exportLabel:'Assumptions (JSON)',
+  formulasTitle:'Calculation and Forecast Formulas',
+  block1Title:'Headcount Norming (Deterministic Core)',
+  block1Text:'Attendance headcount is calculated per the work type\'s method: <b>output-based</b> Attendance=Volume÷Rate; <b>time-norm</b> Attendance=(Volume×TimeNorm)÷(ShiftFund×ComplianceFactor); <b>service-based</b> Attendance=Units÷ServiceRate; <b>workplace-based</b> Attendance=Workplaces×LoadFactor. Payroll FTE=Attendance×Shifts×k_sp. Facility total = sum across work types × lifecycle stage multiplier.',
+  block2Title:'Attrition Forecast',
+  block2Text:'From annual turnover p, a monthly separation probability is derived: 1-(1-p)^(1/12). Headcount decays exponentially. The rate comes from the "Annual Turnover" parameter (default benchmark 12-18%).',
+  block3Title:'Hiring Realizability',
+  block3Text:'hireEff = clamp(1-(TimeToFill-30)/200; 0.30...1.0). The longer a vacancy stays open, the smaller the share of stated hiring capacity that is realized.',
+  block4Title:'Monte Carlo Forecast',
+  block4Text:'N simulations with random fluctuations: attrition ±40%, demand ±5%, variable hiring success. The seed is deterministic based on state (reproducibility). Output: P10/P50/P90 percentiles, probability of shortage, peak shortage.',
+  block5Title:'Profession Survival Analysis (Automation Risk)',
+  block5Text:'S(t)=exp(-λt), λ = average_skill_risk × automation_pace × hazardLambda. The average skill risk comes from the lexicon below; an unknown skill maps to hazardDefault.',
+  block6Title:'Workforce Risk (6 Factors)',
+  block6Text:'Index 0-100 = weighted sum of factors: demographics (from average age toward retirement at {age}), bus-factor (from number of holders × role criticality), skills (automatability), turnover, market (scarcity × time-to-fill), redundancy (from survival analysis). Weights are on the Workforce Risks tab.',
+  block7Title:'Reskilling CBA (SHRM Methodology)',
+  block7Text:'Replacement = Release (cbaSever salaries) + Hiring (cbaHire salaries). Reskilling = BaseTraining + MissingSkills×PricePerSkill + Downtime (cbaIdleMonths salaries). ROI=(Replacement-Reskilling)/Reskilling.',
+  assumptionsTitle:'Editable Assumptions',
+  assumptionsHint:'These coefficients used to be hardcoded. Now they are explicit and affect CBA, the action plan, and the automation analysis.',
+  cbaHireLabel:'Hiring Cost', cbaHireSuf:'salaries', cbaHireNote:'Recruiting + onboarding. SHRM benchmark ≈ 1.5 salaries.',
+  cbaSeverLabel:'Release Cost', cbaSeverSuf:'salaries', cbaSeverNote:'Severance obligations. KZ/RU labor code benchmark up to 3 average salaries.',
+  cbaIdleLabel:'Reskilling Downtime', cbaIdleSuf:'mo.', cbaIdleNote:'Paid time off production during training.',
+  hazardDefLabel:'Default Skill Risk', hazardDefSuf:'0...1', hazardDefNote:'Applied to skills outside the automation lexicon.',
+  hazardLambdaLabel:'Survival Scale (λ)', hazardLambdaSuf:'—', hazardLambdaNote:'Calibrates the speed at which technology displaces roles.',
+  confirmNote:'For a specific jurisdiction and industry, these values should be confirmed with the client. The AI assistant can tune them from sources (set_methodology).',
+  lexiconTitle:'Skill Automatability Lexicon',
+  lexiconHint:'The probability that a skill\'s task is automatable. Feeds the survival analysis and the competency risk factor.',
+  thSkill:'Skill', thLevel:'Level', thRisk:'Risk'
 }});
 Object.assign(I18N.ru, { toast:{
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
@@ -2268,40 +2352,41 @@ function renderActions(){
 function renderScenarios(){
   const cur=scenarioMetrics(S,profDB);
   const rowsMetrics=[
-    ['Потребность (FTE)', s=>fmtN(s.required), false],
-    ['Разрыв «сейчас»', s=>fmtN(s.gapNow), true],
-    ['Горизонт (мес.)', s=>s.horizon, false],
-    ['Вер. дефицита', s=>pct(s.probDeficit)+'%', true],
-    ['Пиковый дефицит', s=>fmtN(s.peakDeficit), true],
-    ['FTE под автоматизацией', s=>fmtN(s.fteAtRisk), true],
-    ['Индекс риска', s=>s.riskIndex, true],
-    ['Стоимость плана', s=>fmtKZT(s.planCost), true]
+    [t('scen.metricRequired'), s=>fmtN(s.required), false],
+    [t('scen.metricGapNow'), s=>fmtN(s.gapNow), true],
+    [t('scen.metricHorizon'), s=>s.horizon, false],
+    [t('scen.metricProbDeficit'), s=>pct(s.probDeficit)+'%', true],
+    [t('scen.metricPeakDeficit'), s=>fmtN(s.peakDeficit), true],
+    [t('scen.metricFteAtRisk'), s=>fmtN(s.fteAtRisk), true],
+    [t('scen.metricRiskIndex'), s=>s.riskIndex, true],
+    [t('scen.metricPlanCost'), s=>fmtKZT(s.planCost), true]
   ];
-  const cols=[{id:'__cur',name:'Текущее состояние',m:cur,cur:true}]
+  const cols=[{id:'__cur',name:t('scen.currentState'),m:cur,cur:true}]
     .concat(scenarios.map(s=>({id:s.id,name:s.name,m:scenarioMetrics(s.state,s.professions),baseline:s.baseline})));
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Сценарное моделирование · §7</div>'
-    +'<h2>Сценарии «что если» — сравнение траекторий</h2>'
-    +'<p class="lead">Сохраняйте полный снимок параметров и справочника как сценарий, сравнивайте кадровые траектории бок о бок, назначайте базовую линию. Песочница отделена от текущих данных.</p></div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('scen.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('scen.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('scen.lead'))+'</p></div>'
     +'<div class="actions"><button class="tool red" data-act="print">'+ic('file')+'PDF</button>'
-      +'<button class="tool" data-act="save-scenario" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+'Сохранить текущее как сценарий</button></div></div>'
+      +'<button class="tool" data-act="save-scenario" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+esc(t('scen.saveBtn'))+'</button></div></div>'
 
   +'<div class="card flush">'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-    +'<th>Показатель</th>'+cols.map(c=>'<th class="c">'+(c.cur?'● ':'')+esc(c.name)+(c.baseline?' ★':'')+'</th>').join('')+'</tr></thead><tbody>'
-    +rowsMetrics.map(([label,fn])=>'<tr><td style="font-weight:700">'+label+'</td>'
+    +'<th>'+esc(t('scen.metricHeader'))+'</th>'
+    +cols.map(c=>'<th class="c">'+(c.cur?'● ':'')+esc(c.name)+(c.baseline?' ★':'')+'</th>').join('')+'</tr></thead><tbody>'
+    +rowsMetrics.map(([label,fn])=>'<tr><td style="font-weight:700">'+esc(label)+'</td>'
       +cols.map(c=>'<td class="c mono'+(c.cur?'" style="background:var(--primary-l)':'')+'">'+fn(c.m)+'</td>').join('')+'</tr>').join('')
-    +'<tr class="grouprow"><td>Управление</td>'
+    +'<tr class="grouprow"><td>'+esc(t('scen.control'))+'</td>'
       +cols.map(c=>'<td class="c">'+(c.cur
-        ? '<span class="muted small">— активно —</span>'
+        ? '<span class="muted small">'+esc(t('scen.active'))+'</span>'
         : '<div style="display:flex;gap:5px;justify-content:center">'
-          +'<button class="tool" data-load-sc="'+c.id+'" style="padding:5px 8px;font-size:11px">Загрузить</button>'
+          +'<button class="tool" data-load-sc="'+c.id+'" style="padding:5px 8px;font-size:11px">'+esc(t('scen.loadBtn'))+'</button>'
           +'<button class="tool" data-base-sc="'+c.id+'" style="padding:5px 8px;font-size:11px'+(c.baseline?';background:var(--gold-l);border-color:var(--gold)':'')+'">★</button>'
           +'<button class="xbtn" data-del-sc="'+c.id+'" style="width:28px;height:28px">'+ic('trash')+'</button></div>')+'</td>').join('')
     +'</tr></tbody></table></div></div>'
-  +(scenarios.length? '' : '<div class="note note-blue" style="margin-top:16px">'+ic('info')+'<div>Пока сохранён только текущий срез. Измените параметры на других вкладках (объём, сценарий, темп автоматизации, фазы) и нажмите «Сохранить текущее как сценарий», чтобы сравнить варианты.</div></div>')
-  +'<div class="fnote" style="margin-top:14px">Каждый сценарий — независимый снимок состояния и справочника. Метрики пересчитываются полными моделями (нормирование, Монте-Карло, риски, план действий) под состоянием сценария. «★» — базовая линия.</div>'
+  +(scenarios.length? '' : '<div class="note note-blue" style="margin-top:16px">'+ic('info')+'<div>'+esc(t('scen.onlyCurrentNote'))+'</div></div>')
+  +'<div class="fnote" style="margin-top:14px">'+esc(t('scen.footnote'))+'</div>'
   +'</div>';
 }
 
@@ -2310,50 +2395,43 @@ function renderScenarios(){
    ============================================================ */
 function renderMethodology(){
   const hazardRows=Object.entries(SKILL_HAZARD).sort((a,b)=>b[1]-a[1]).map(([s,v])=>
-    '<tr><td>'+s+'</td><td class="c">'+hbar(v*100, v>0.6?'var(--red)':v>0.4?'var(--amber)':'var(--green)')+'</td>'
+    '<tr><td>'+esc(skillLabel(s))+'</td><td class="c">'+hbar(v*100, v>0.6?'var(--red)':v>0.4?'var(--amber)':'var(--green)')+'</td>'
     +'<td class="c mono" style="font-weight:700">'+pct(v)+'%</td></tr>').join('');
-  const f=(id,label,val,step,suf,note)=>'<div class="field"><label class="flabel">'+label+'</label>'
+  const f=(id,label,val,step,suf,note)=>'<div class="field"><label class="flabel">'+esc(label)+'</label>'
     +'<div class="rowflex" style="align-items:center"><input class="input num" type="number" step="'+step+'" id="'+id+'" value="'+val+'" style="max-width:120px">'
-    +(suf?'<span class="muted small">'+suf+'</span>':'')+'</div>'
-    +'<div class="fnote" style="margin-top:6px">'+note+'</div></div>';
-  const block=(t,d)=>'<div style="margin-bottom:14px"><div style="font-weight:700;color:var(--ink);font-size:13px;margin-bottom:3px">'+t+'</div><div class="small muted" style="line-height:1.55">'+d+'</div></div>';
+    +(suf?'<span class="muted small">'+esc(suf)+'</span>':'')+'</div>'
+    +'<div class="fnote" style="margin-top:6px">'+esc(note)+'</div></div>';
+  const block=(ti,d)=>'<div style="margin-bottom:14px"><div style="font-weight:700;color:var(--ink);font-size:13px;margin-bottom:3px">'+esc(ti)+'</div><div class="small muted" style="line-height:1.55">'+d+'</div></div>';
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Прозрачность · Источники и формулы</div>'
-    +'<h2>Методология и допущения</h2>'
-    +'<p class="lead">Здесь раскрыто, откуда берётся каждое число: формулы нормирования, прогнозные модели и редактируемые методологические коэффициенты. Никаких «скрытых» значений — всё считается из этих параметров.</p></div>'
-    +toolbar({exportLabel:'Допущения (JSON)',exportAct:'exp-meth'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('meth.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('meth.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('meth.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('meth.exportLabel'),exportAct:'exp-meth'})+'</div>'
 
   +'<div class="grid g12">'
-  +'<div class="col-span-7"><div class="card"><div class="ctitle">'+ic('activity')+'Формулы расчёта и прогноза</div>'
-    +block('Нормирование численности (детерминированное ядро)',
-      'Явочная Чяв считается по методике вида работ: <b>по выработке</b> Чяв=Объём÷Норма; <b>по норме времени</b> Чяв=(Объём×Нвр)÷(Фсм×kвн); <b>по обслуживанию</b> Чяв=Агрегаты÷Нобсл; <b>по рабочим местам</b> Чяв=Места×kзагр. Списочная FTE=Чяв×Сменность×k_сп. Итог по объекту = сумма по работам × множитель фазы жизненного цикла.')
-    +block('Прогноз оттока (Attrition)',
-      'Из годовой текучести p выводится месячная вероятность увольнения: 1−(1−p)^(1/12). Численность убывает экспоненциально. Источник ставки — параметр «Годовая текучесть» (по умолчанию бенчмарк 12–18%).')
-    +block('Реализуемость найма',
-      'hireEff = clamp(1−(Срок_вакансии−30)÷200; 0.30…1.0). Чем дольше закрывается вакансия, тем меньшая доля заявленной ёмкости найма реализуется.')
-    +block('Монте-Карло прогноз',
-      'N симуляций со случайными колебаниями: отток ±40%, спрос ±5%, успешность найма переменная. Сид детерминирован от состояния (воспроизводимость). На выходе — перцентили P10/P50/P90, вероятность дефицита, пиковый дефицит.')
-    +block('Анализ дожития профессий (риск автоматизации)',
-      'S(t)=exp(−λt), λ = средний_риск_навыков × Темп_автоматизации × hazardLambda. Средний риск навыков берётся из лексикона ниже; неизвестный навык → hazardDefault.')
-    +block('Кадровый риск (6 факторов)',
-      'Индекс 0–100 = взвешенная сумма факторов: демография (от среднего возраста к пенсии '+PENSION_AGE+'), bus-factor (от числа носителей × критичности роли), навыки (автоматизируемость), текучесть, рынок (дефицитность × срок закрытия), избыточность (из дожития). Веса — на вкладке «Кадровые риски».')
-    +block('CBA переобучения (методология SHRM)',
-      'Замена = Высвобождение (cbaSever окладов) + Найм (cbaHire окладов). Рескиллинг = База_ДПО + Недостающие_навыки×Цена_навыка + Простой (cbaIdleMonths окладов). ROI=(Замена−Рескиллинг)÷Рескиллинг.')
+  +'<div class="col-span-7"><div class="card"><div class="ctitle">'+ic('activity')+esc(t('meth.formulasTitle'))+'</div>'
+    +block(t('meth.block1Title'), t('meth.block1Text'))
+    +block(t('meth.block2Title'), t('meth.block2Text'))
+    +block(t('meth.block3Title'), t('meth.block3Text'))
+    +block(t('meth.block4Title'), t('meth.block4Text'))
+    +block(t('meth.block5Title'), t('meth.block5Text'))
+    +block(t('meth.block6Title'), t('meth.block6Text',{age:PENSION_AGE}))
+    +block(t('meth.block7Title'), t('meth.block7Text'))
   +'</div></div>'
 
-  +'<div class="col-span-5"><div class="card accent-g"><div class="ctitle">'+ic('sliders')+'Редактируемые допущения'
-    +hint('Эти коэффициенты раньше были «зашиты» в коде. Теперь они явные и влияют на CBA, план действий и анализ автоматизации.')+'</div>'
-    +f('cbaHire','Стоимость найма',S.cbaHire,'0.1','окладов','Рекрутинг + адаптация. Бенчмарк SHRM ≈ 1.5 оклада.')
-    +f('cbaSever','Стоимость высвобождения',S.cbaSever,'0.1','окладов','Выходные обязательства. ТК РК/РФ: ориентир до 3 средних заработков.')
-    +f('cbaIdleMonths','Простой на переобучение',S.cbaIdleMonths,'0.5','мес.','Оплачиваемое время вне производства во время обучения.')
-    +f('hazardDefault','Риск навыка по умолчанию',S.hazardDefault,'0.05','0…1','Применяется к навыкам вне лексикона автоматизации.')
-    +f('hazardLambda','Масштаб дожития (λ)',S.hazardLambda,'0.05','—','Калибровка скорости вытеснения ролей технологиями.')
-    +'<div class="note note-amber" style="margin-top:6px">'+ic('info')+'<div>Под конкретную юрисдикцию и отрасль эти значения следует подтвердить у заказчика. ИИ-ассистент может подобрать их по источникам (set_methodology).</div></div>'
+  +'<div class="col-span-5"><div class="card accent-g"><div class="ctitle">'+ic('sliders')+esc(t('meth.assumptionsTitle'))
+    +hint(t('meth.assumptionsHint'))+'</div>'
+    +f('cbaHire',t('meth.cbaHireLabel'),S.cbaHire,'0.1',t('meth.cbaHireSuf'),t('meth.cbaHireNote'))
+    +f('cbaSever',t('meth.cbaSeverLabel'),S.cbaSever,'0.1',t('meth.cbaSeverSuf'),t('meth.cbaSeverNote'))
+    +f('cbaIdleMonths',t('meth.cbaIdleLabel'),S.cbaIdleMonths,'0.5',t('meth.cbaIdleSuf'),t('meth.cbaIdleNote'))
+    +f('hazardDefault',t('meth.hazardDefLabel'),S.hazardDefault,'0.05',t('meth.hazardDefSuf'),t('meth.hazardDefNote'))
+    +f('hazardLambda',t('meth.hazardLambdaLabel'),S.hazardLambda,'0.05',t('meth.hazardLambdaSuf'),t('meth.hazardLambdaNote'))
+    +'<div class="note note-amber" style="margin-top:6px">'+ic('info')+'<div>'+esc(t('meth.confirmNote'))+'</div></div>'
   +'</div>'
-  +'<div class="card" style="margin-top:18px"><div class="ctitle">'+ic('zap')+'Лексикон автоматизируемости навыков'
-    +hint('Вероятность того, что задача навыка автоматизируема. Питает анализ дожития и компетентностный риск.')+'</div>'
-    +'<div class="tbl-wrap" style="max-height:280px;overflow-y:auto"><table><thead><tr><th>Навык</th><th class="c">Уровень</th><th class="c">Риск</th></tr></thead><tbody>'+hazardRows+'</tbody></table></div>'
+  +'<div class="card" style="margin-top:18px"><div class="ctitle">'+ic('zap')+esc(t('meth.lexiconTitle'))
+    +hint(t('meth.lexiconHint'))+'</div>'
+    +'<div class="tbl-wrap" style="max-height:280px;overflow-y:auto"><table><thead><tr><th>'+esc(t('meth.thSkill'))+'</th><th class="c">'+esc(t('meth.thLevel'))+'</th><th class="c">'+esc(t('meth.thRisk'))+'</th></tr></thead><tbody>'+hazardRows+'</tbody></table></div>'
   +'</div>'
   +'</div>'
   +'</div></div>';
