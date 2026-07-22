@@ -565,6 +565,57 @@ Object.assign(I18N.ru, { norm:{
   totalRow:'Итого по всем работам (эксплуатация, до множителя этапа)',
   footnote:'Методики (раздел 5 ТЗ): «{output}», «{time}», «{service}», «{workplace}». Списочная = Явочная × Сменность × k_сп ({absCoeff}).',
   fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ'
+}, chart:{ monthAxis:'месяц проекта', deficitAxis:'дефицит', surplusAxis:'профицит' },
+life:{
+  eyebrow:'Этап 2 · Моделирование во времени', title:'Траектория жизненного цикла',
+  lead:'Потребность в персонале меняется по фазам актива: проектирование → СМР → ПНР → эксплуатация → вывод. Задайте длительности и сценарий.',
+  exportLabel:'Сценарий (JSON)',
+  matrixTitle:'Матрица управления', matrixHint:'Параметры меняют форму кривой потребности и реакцию прогнозных моделей.',
+  durationsLabel:'Длительности фаз (мес.)', durationsHint:'Горизонт = сумма всех фаз. Фазы с длительностью 0 исключаются.',
+  phaseDesign:'Проект', phaseConstruction:'СМР', phaseCommissioning:'ПНР', phaseOperation:'Эксплуат.', phaseDecline:'Вывод',
+  currentStageLabel:'Текущий этап (для среза «сейчас»)', currentStageHint:'Используется во вкладке «Нормативный расчёт» для снимка потребности.',
+  macroLabel:'Макро-сценарий', macroHint:'«Индустрия 4.0» срезает ~35% потребности в рабочих на эксплуатации и сдвигает структуру к ИТР.',
+  scenarioBase:'Базовый [×1.0]', scenarioOptimistic:'Агрессивный рост [×1.25]', scenarioAutomation:'Индустрия 4.0 / роботизация [×0.65]',
+  structureHorizon:'Структура на горизонте', structCore:'Основной', structAux:'ТОиР', structMgmt:'ИТР',
+  curveTitle:'Кривая потребности и комплектования',
+  curveHint:'Красная линия — расчётная потребность (FTE) по фазам. Зелёная — прогноз доступной численности с учётом найма и оттока (медиана Монте-Карло), коридор — P10–P90.',
+  legendDemandPlan:'Потребность (план)', legendAvailForecast:'Доступно — прогноз (медиана)', legendBand:'Коридор P10–P90',
+  horizonNote:'Горизонт планирования: <b>{h} мес.</b> ({years} г.). Пиковая потребность приходится на фазу с максимумом кривой. Модель найма: до {hireCap} чел/мес при реализуемости {hireEff}% (срок закрытия вакансии {fillDays} дн.).',
+  balanceTitle:'Баланс по месяцам (профицит ↔ дефицит)',
+  balanceHint:'Разрыв = Потребность − Доступно по каждому месяцу (медианный сценарий). Красное — дефицит (нужен найм), зелёное — профицит (переобучение / высвобождение).'
+}, pred:{
+  eyebrow:'Этап 3 · Прогноз рисков', title:'Предиктивная аналитика и кадровые риски',
+  lead:'Реальные модели: экспоненциальный отток, вероятностный прогноз Монте-Карло ({runs} сценариев) и анализ дожития профессий. Все числа реагируют на параметры — это не статика.',
+  exportLabel:'Прогноз (JSON)',
+  kpiProbTitle:'Вероятность дефицита к концу горизонта', kpiProbSub:'Доля из {runs} симуляций, где на {month}-й месяц потребность превысила доступный штат.',
+  kpiPeakTitle:'Пиковый дефицит (медиана)', kpiPeakSub:'До {p90} чел. в худших 10% сценариев (P90). Пик ожидается на {month}-м месяце.',
+  kpiAutoTitle:'FTE под риском автоматизации', kpiAutoSub:'Ожидаемое число позиций к высвобождению за {years} г. (анализ дожития по навыкам).',
+  driversTitle:'Драйверы прогноза', driversHint:'Эти параметры управляют моделями оттока, найма и автоматизации.',
+  turnoverLabel:'Годовая текучесть', turnoverHint:'Доля персонала, увольняющегося за год. Переводится в месячную вероятность: 1−(1−p)^(1/12).',
+  benchmarkNote:'Оценка: <b>{level}</b> (бенчмарк ~12–18%).',
+  benchAbove:'выше нормы', benchMarket:'на уровне рынка', benchBelow:'ниже рынка',
+  hireCapLabel:'Ёмкость найма', hireCapHint:'Сколько человек реально можно нанять за месяц при текущих рекрутинговых ресурсах.',
+  fillDaysLabel:'Срок закрытия вакансии', fillDaysHint:'Чем дольше закрывается вакансия, тем ниже реализуемость найма в модели.',
+  sepCapLabel:'Ёмкость высвобождения', sepCapHint:'Сколько профицитных позиций можно управляемо сократить/перевести за месяц.',
+  autoPaceLabel:'Темп автоматизации', autoPaceHint:'Скорость внедрения технологий. Множитель к риску вытеснения профессий.',
+  mcRunsLabel:'Симуляций Монте-Карло', mcRunsHint:'Больше прогонов — стабильнее перцентили, но дольше расчёт.',
+  modelNote:'Модель учитывает случайные колебания оттока (±40%), спроса (±5%) и успешности найма. Результат — коридор вероятных исходов, а не одна цифра.',
+  fanTitle:'Вероятностный прогноз численности (веер Монте-Карло)',
+  fanHint:'P50 — срединный прогноз доступной численности. Коридор P10–P90 показывает диапазон, в который попадает 80% исходов. Расхождение с красной линией потребности = зона риска.',
+  legendDemand:'Потребность', legendAvailP50:'Доступно P50', legendBand:'P10–P90',
+  deficitBold:'Кадровый разрыв прогнозируется с {month}-го месяца.', deficitText:'Без усиления найма ({hireCap} чел/мес) пик дефицита достигнет ~{peak} чел. Рекомендуется опережающий рекрутинг и план переобучения.',
+  noDeficitBold:'Устойчивого дефицита не прогнозируется.', noDeficitText:'Текущая ёмкость найма покрывает потребность по медианному сценарию на всём горизонте.',
+  survivalTitle:'Анализ дожития профессий (риск автоматизации)',
+  survivalHint:'Survival Analysis: S(t)=exp(−λt). Риск λ выводится из вектора навыков должности (рутинные операции = высокий риск; аналитика, ML, сети = низкий), масштабируется темпом автоматизации.',
+  thProfession:'Профессия', thSkillRisk:'Риск навыков', thDispProb:'Вероятность вытеснения', thFteRisk:'FTE под риском', thRecommendation:'Рекомендация',
+  survivalFoot:'Расчёт за горизонт {years} г. при темпе автоматизации ×{pace}. «FTE под риском» = численность роли × вероятность вытеснения.',
+  statusReskill:'Рескиллинг', statusCrosstrain:'Кросс-тренинг', statusRetain:'Удержание',
+  bridgesTitle:'Рекомендуемые мосты переобучения',
+  bridgesHint:'Система сопоставляет роли с высоким риском вытеснения (источники) с дефицитными ролями (цели) по пересечению навыков и экономике (ROI переобучения).',
+  thSource:'Источник (профицит/риск)', thTarget:'Цель (дефицит)', thOverlap:'Совпадение', thRoi:'ROI', thStatus:'Статус',
+  feasible:'Реально', difficult:'сложно',
+  coverageNote:'<b>Покрытие переобучением: {share}%</b> предложенных переходов выполнимы (пересечение навыков ≥ 40%). Подробная экономика — на вкладке «Переобучение и CBA».',
+  noBridges:'Недостаточно должностей для построения мостов.'
 }});
 Object.assign(I18N.en, { norm:{
   eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
@@ -600,6 +651,57 @@ Object.assign(I18N.en, { norm:{
   totalRow:'Total across all work types (operation, before stage multiplier)',
   footnote:'Methods (spec section 5): "{output}", "{time}", "{service}", "{workplace}". Payroll = Attendance x Shifts x k_sp ({absCoeff}).',
   fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type'
+}, chart:{ monthAxis:'project month', deficitAxis:'shortage', surplusAxis:'surplus' },
+life:{
+  eyebrow:'Stage 2 · Modeling over Time', title:'Lifecycle Trajectory',
+  lead:'Workforce demand changes across the asset\'s phases: design → construction → commissioning → operation → decommissioning. Set the durations and scenario.',
+  exportLabel:'Scenario (JSON)',
+  matrixTitle:'Control Matrix', matrixHint:'These parameters change the shape of the demand curve and how the forecast models respond.',
+  durationsLabel:'Phase Durations (months)', durationsHint:'The horizon = the sum of all phases. Phases with a duration of 0 are excluded.',
+  phaseDesign:'Design', phaseConstruction:'Constr.', phaseCommissioning:'Comm.', phaseOperation:'Operation', phaseDecline:'Decline',
+  currentStageLabel:'Current Stage (for the "now" snapshot)', currentStageHint:'Used on the Normative Calculation tab for the demand snapshot.',
+  macroLabel:'Macro Scenario', macroHint:'"Industry 4.0" cuts ~35% of worker demand during operation and shifts the structure toward engineering.',
+  scenarioBase:'Base [x1.0]', scenarioOptimistic:'Aggressive Growth [x1.25]', scenarioAutomation:'Industry 4.0 / Automation [x0.65]',
+  structureHorizon:'Structure over the Horizon', structCore:'Core', structAux:'Maintenance', structMgmt:'Engineering',
+  curveTitle:'Demand and Staffing Curve',
+  curveHint:'The red line is the calculated demand (FTE) across phases. Green is the forecast of available headcount accounting for hiring and attrition (Monte Carlo median), with a P10-P90 band.',
+  legendDemandPlan:'Demand (plan)', legendAvailForecast:'Available — forecast (median)', legendBand:'P10-P90 band',
+  horizonNote:'Planning horizon: <b>{h} mo.</b> ({years} yr). Peak demand occurs at the phase with the curve\'s maximum. Hiring model: up to {hireCap} people/mo at {hireEff}% realizability (time-to-fill {fillDays} days).',
+  balanceTitle:'Monthly Balance (surplus <-> shortage)',
+  balanceHint:'Gap = Demand - Available for each month (median scenario). Red is a shortage (hiring needed), green is a surplus (reskilling / release).'
+}, pred:{
+  eyebrow:'Stage 3 · Risk Forecast', title:'Predictive Analytics and Workforce Risks',
+  lead:'Real models: exponential attrition, a probabilistic Monte Carlo forecast ({runs} scenarios), and profession survival analysis. Every number reacts to the parameters — nothing here is static.',
+  exportLabel:'Forecast (JSON)',
+  kpiProbTitle:'Probability of Shortage by End of Horizon', kpiProbSub:'Share of {runs} simulations where, in month {month}, demand exceeded available headcount.',
+  kpiPeakTitle:'Peak Shortage (median)', kpiPeakSub:'Up to {p90} people in the worst 10% of scenarios (P90). The peak is expected in month {month}.',
+  kpiAutoTitle:'FTE at Automation Risk', kpiAutoSub:'Expected number of positions to be released within {years} yr (skill-based survival analysis).',
+  driversTitle:'Forecast Drivers', driversHint:'These parameters control the attrition, hiring and automation models.',
+  turnoverLabel:'Annual Turnover', turnoverHint:'The share of staff leaving per year. Converted into a monthly probability: 1-(1-p)^(1/12).',
+  benchmarkNote:'Assessment: <b>{level}</b> (benchmark ~12-18%).',
+  benchAbove:'above the norm', benchMarket:'at market level', benchBelow:'below the norm',
+  hireCapLabel:'Hiring Capacity', hireCapHint:'How many people can realistically be hired per month with current recruiting resources.',
+  fillDaysLabel:'Time-to-Fill', fillDaysHint:'The longer a vacancy stays open, the lower the realized hiring in the model.',
+  sepCapLabel:'Release Capacity', sepCapHint:'How many surplus positions can be managedly reduced/transferred per month.',
+  autoPaceLabel:'Automation Pace', autoPaceHint:'The speed of technology adoption. A multiplier on the risk of profession displacement.',
+  mcRunsLabel:'Monte Carlo Simulations', mcRunsHint:'More runs give more stable percentiles, but take longer to calculate.',
+  modelNote:'The model accounts for random fluctuations in attrition (+/-40%), demand (+/-5%), and hiring success. The result is a band of likely outcomes, not a single number.',
+  fanTitle:'Probabilistic Headcount Forecast (Monte Carlo Fan)',
+  fanHint:'P50 is the median forecast of available headcount. The P10-P90 band shows the range containing 80% of outcomes. Divergence from the red demand line is the risk zone.',
+  legendDemand:'Demand', legendAvailP50:'Available P50', legendBand:'P10-P90',
+  deficitBold:'A workforce gap is projected starting month {month}.', deficitText:'Without additional hiring ({hireCap} people/mo) the peak shortage will reach ~{peak} people. Proactive recruiting and a reskilling plan are recommended.',
+  noDeficitBold:'No sustained shortage is projected.', noDeficitText:'Current hiring capacity covers demand under the median scenario across the entire horizon.',
+  survivalTitle:'Profession Survival Analysis (Automation Risk)',
+  survivalHint:'Survival Analysis: S(t)=exp(-λt). Risk λ is derived from the role\'s skill vector (routine operations = high risk; analytics, ML, networks = low), scaled by the automation pace.',
+  thProfession:'Profession', thSkillRisk:'Skill Risk', thDispProb:'Displacement Probability', thFteRisk:'FTE at Risk', thRecommendation:'Recommendation',
+  survivalFoot:'Calculated over a {years}-yr horizon at an automation pace of x{pace}. "FTE at risk" = role headcount x displacement probability.',
+  statusReskill:'Reskill', statusCrosstrain:'Cross-train', statusRetain:'Retain',
+  bridgesTitle:'Recommended Reskilling Bridges',
+  bridgesHint:'The system matches roles with a high displacement risk (sources) to shortage roles (targets) by skill overlap and economics (reskilling ROI).',
+  thSource:'Source (surplus/risk)', thTarget:'Target (shortage)', thOverlap:'Overlap', thRoi:'ROI', thStatus:'Status',
+  feasible:'Feasible', difficult:'difficult',
+  coverageNote:'<b>Reskilling coverage: {share}%</b> of proposed transitions are feasible (skill overlap >= 40%). Detailed economics are on the Reskilling / CBA tab.',
+  noBridges:'Not enough positions to build bridges.'
 }});
 Object.assign(I18N.ru, { toast:{
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
@@ -1132,9 +1234,9 @@ function automationAnalysis(horizonMonths){
     const dispFTE = fteRole*dispProb;
     totalAtRisk += dispFTE;
     let status,bcls;
-    if(dispProb>=0.6){status='Рескиллинг';bcls='b-red';}
-    else if(dispProb>=0.3){status='Кросс-тренинг';bcls='b-amber';}
-    else {status='Удержание';bcls='b-green';}
+    if(dispProb>=0.6){status='reskill';bcls='b-red';}
+    else if(dispProb>=0.3){status='crosstrain';bcls='b-amber';}
+    else {status='retain';bcls='b-green';}
     rows.push({p,hz,dispProb,fteRole,dispFTE,status,bcls});
   });
   rows.sort((x,y)=>y.dispProb-x.dispProb);
@@ -1359,7 +1461,7 @@ function svgForecast(M){
   // ось X (метки месяцев)
   let xlbl=''; const stepX=Math.max(1,Math.ceil(n/8));
   for(let i=0;i<n;i+=stepX){ xlbl+='<text x="'+X(i).toFixed(1)+'" y="'+(H-pb+18)+'" text-anchor="middle" class="vlbl">'+i+'</text>'; }
-  xlbl+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-6)+'" text-anchor="middle" class="vlbl" style="font-weight:700">месяц проекта</text>';
+  xlbl+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-6)+'" text-anchor="middle" class="vlbl" style="font-weight:700">'+esc(t('chart.monthAxis'))+'</text>';
   return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'
     +bands+grid
     +'<path d="'+band+'" fill="#0f766e" opacity="0.12"/>'
@@ -1385,8 +1487,8 @@ function svgGap(gap){
   });
   return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'
     +'<line x1="'+pl+'" y1="'+zeroY+'" x2="'+(W-pr)+'" y2="'+zeroY+'" stroke="#c9c2b3" stroke-width="1.2"/>'
-    +'<text x="'+(pl-8)+'" y="'+(pt+10)+'" text-anchor="end" class="axislbl" style="fill:#c4361b">дефицит</text>'
-    +'<text x="'+(pl-8)+'" y="'+(H-pb+2)+'" text-anchor="end" class="axislbl" style="fill:#117a5b">профицит</text>'
+    +'<text x="'+(pl-8)+'" y="'+(pt+10)+'" text-anchor="end" class="axislbl" style="fill:#c4361b">'+esc(t('chart.deficitAxis'))+'</text>'
+    +'<text x="'+(pl-8)+'" y="'+(H-pb+2)+'" text-anchor="end" class="axislbl" style="fill:#117a5b">'+esc(t('chart.surplusAxis'))+'</text>'
     +bars+'</svg>';
 }
 
@@ -1570,61 +1672,61 @@ function slider(id,label,valPct,clr){
 function renderLifecycle(){
   const M=projectGap();
   const b=computeBase();
-  const phaseInput=(id,label)=>'<div><label class="flabel" style="font-size:11px;justify-content:center;text-align:center">'+label+'</label>'
+  const phaseInput=(id,label)=>'<div><label class="flabel" style="font-size:11px;justify-content:center;text-align:center">'+esc(label)+'</label>'
     +'<input class="input num" type="number" min="0" id="'+id+'" value="'+S[id]+'" style="text-align:center;padding:8px"></div>';
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Этап 2 · Моделирование во времени</div>'
-    +'<h2>Траектория жизненного цикла</h2>'
-    +'<p class="lead">Потребность в персонале меняется по фазам актива: проектирование → СМР → ПНР → эксплуатация → вывод. Задайте длительности и сценарий.</p></div>'
-    +toolbar({exportLabel:'Сценарий (JSON)',exportAct:'exp-life',importAct:'imp-life'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('life.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('life.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('life.lead'))+'</p></div>'
+    +toolbar({exportLabel:t('life.exportLabel'),exportAct:'exp-life',importAct:'imp-life'})+'</div>'
 
   +'<div class="grid g12">'
   +'<div class="col-span-4"><div class="card accent-p">'
-    +'<div class="ctitle">'+ic('activity')+'Матрица управления'+hint('Параметры меняют форму кривой потребности и реакцию прогнозных моделей.')+'</div>'
+    +'<div class="ctitle">'+ic('activity')+esc(t('life.matrixTitle'))+hint(t('life.matrixHint'))+'</div>'
 
-    +'<div class="section-label">Длительности фаз (мес.)'+hint('Горизонт = сумма всех фаз. Фазы с длительностью 0 исключаются.')+'</div>'
+    +'<div class="section-label">'+esc(t('life.durationsLabel'))+hint(t('life.durationsHint'))+'</div>'
     +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:18px">'
-      +phaseInput('durDesign','Проект')+phaseInput('durConstruction','СМР')+phaseInput('durCommissioning','ПНР')
-      +phaseInput('durOperation','Эксплуат.')+phaseInput('durDecline','Вывод')
+      +phaseInput('durDesign',t('life.phaseDesign'))+phaseInput('durConstruction',t('life.phaseConstruction'))+phaseInput('durCommissioning',t('life.phaseCommissioning'))
+      +phaseInput('durOperation',t('life.phaseOperation'))+phaseInput('durDecline',t('life.phaseDecline'))
     +'</div>'
 
-    +'<div class="field"><label class="flabel">Текущий этап (для среза «сейчас»)'+hint('Используется во вкладке «Нормативный расчёт» для снимка потребности.')+'</label>'
-      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>'<option value="'+id+'"'+(S.stage===id?' selected':'')+'>'+STAGES[id].name+' (K='+STAGES[id].mult+')</option>').join('')+'</select></div>'
+    +'<div class="field"><label class="flabel">'+esc(t('life.currentStageLabel'))+hint(t('life.currentStageHint'))+'</label>'
+      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>'<option value="'+id+'"'+(S.stage===id?' selected':'')+'>'+esc(stageName(id))+' (K='+STAGES[id].mult+')</option>').join('')+'</select></div>'
 
-    +'<div class="field"><label class="flabel">Макро-сценарий'+hint('«Индустрия 4.0» срезает ~35% потребности в рабочих на эксплуатации и сдвигает структуру к ИТР.')+'</label>'
+    +'<div class="field"><label class="flabel">'+esc(t('life.macroLabel'))+hint(t('life.macroHint'))+'</label>'
       +'<select class="select" id="scenario">'
-        +'<option value="base"'+(S.scenario==='base'?' selected':'')+'>Базовый [×1.0]</option>'
-        +'<option value="optimistic"'+(S.scenario==='optimistic'?' selected':'')+'>Агрессивный рост [×1.25]</option>'
-        +'<option value="automation"'+(S.scenario==='automation'?' selected':'')+'>Индустрия 4.0 / роботизация [×0.65]</option>'
+        +'<option value="base"'+(S.scenario==='base'?' selected':'')+'>'+esc(t('life.scenarioBase'))+'</option>'
+        +'<option value="optimistic"'+(S.scenario==='optimistic'?' selected':'')+'>'+esc(t('life.scenarioOptimistic'))+'</option>'
+        +'<option value="automation"'+(S.scenario==='automation'?' selected':'')+'>'+esc(t('life.scenarioAutomation'))+'</option>'
       +'</select></div>'
 
     +'<div class="divider"></div>'
-    +'<div class="section-label">Структура на горизонте</div>'
+    +'<div class="section-label">'+esc(t('life.structureHorizon'))+'</div>'
     +'<div style="display:flex;gap:18px;align-items:center">'
       +svgDonut([{v:b.staff.core,color:'var(--primary)'},{v:b.staff.aux,color:'var(--green)'},{v:b.staff.mgmt,color:'var(--purple)'}])
       +'<div style="flex:1;font-size:12px">'
-        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="swatch" style="background:var(--primary)"></span>Основной — <b class="mono">'+fmtN(b.staff.core)+'</b></div>'
-        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="swatch" style="background:var(--green)"></span>ТОиР — <b class="mono">'+fmtN(b.staff.aux)+'</b></div>'
-        +'<div style="display:flex;align-items:center;gap:8px"><span class="swatch" style="background:var(--purple)"></span>ИТР — <b class="mono">'+fmtN(b.staff.mgmt)+'</b></div>'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="swatch" style="background:var(--primary)"></span>'+esc(t('life.structCore'))+' — <b class="mono">'+fmtN(b.staff.core)+'</b></div>'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="swatch" style="background:var(--green)"></span>'+esc(t('life.structAux'))+' — <b class="mono">'+fmtN(b.staff.aux)+'</b></div>'
+        +'<div style="display:flex;align-items:center;gap:8px"><span class="swatch" style="background:var(--purple)"></span>'+esc(t('life.structMgmt'))+' — <b class="mono">'+fmtN(b.staff.mgmt)+'</b></div>'
       +'</div>'
     +'</div>'
   +'</div></div>'
 
   +'<div class="col-span-8"><div class="grid" style="gap:18px">'
-    +'<div class="card"><div class="ctitle">'+ic('trend')+'Кривая потребности и комплектования'
-      +hint('Красная линия — расчётная потребность (FTE) по фазам. Зелёная — прогноз доступной численности с учётом найма и оттока (медиана Монте-Карло), коридор — P10–P90.')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('trend')+esc(t('life.curveTitle'))
+      +hint(t('life.curveHint'))+'</div>'
       +svgForecast(M)
       +'<div class="legend">'
-        +'<span><span class="swatch line" style="background:#c4361b"></span>Потребность (план)</span>'
-        +'<span><span class="swatch line" style="background:#0f766e"></span>Доступно — прогноз (медиана)</span>'
-        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>Коридор P10–P90</span>'
+        +'<span><span class="swatch line" style="background:#c4361b"></span>'+esc(t('life.legendDemandPlan'))+'</span>'
+        +'<span><span class="swatch line" style="background:#0f766e"></span>'+esc(t('life.legendAvailForecast'))+'</span>'
+        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>'+esc(t('life.legendBand'))+'</span>'
       +'</div>'
-      +'<div class="fnote">Горизонт планирования: <b>'+M.H+' мес.</b> ('+(M.H/12).toFixed(1)+' г.). Пиковая потребность приходится на фазу с максимумом кривой. Модель найма: до '+S.hireCap+' чел/мес при реализуемости '+pct(M.hireEff)+'% (срок закрытия вакансии '+S.fillDays+' дн.).</div>'
+      +'<div class="fnote">'+t('life.horizonNote',{h:M.H,years:(M.H/12).toFixed(1),hireCap:S.hireCap,hireEff:pct(M.hireEff),fillDays:S.fillDays})+'</div>'
     +'</div>'
 
-    +'<div class="card"><div class="ctitle">'+ic('gauge')+'Баланс по месяцам (профицит ↔ дефицит)'
-      +hint('Разрыв = Потребность − Доступно по каждому месяцу (медианный сценарий). Красное — дефицит (нужен найм), зелёное — профицит (переобучение / высвобождение).')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('gauge')+esc(t('life.balanceTitle'))
+      +hint(t('life.balanceHint'))+'</div>'
       +svgGap(M.gapP50)
     +'</div>'
   +'</div></div>'
@@ -1640,90 +1742,91 @@ function renderPredictive(){
   const bridges=reskillBridges();
   // покрытие дефицита переобучением: доля выполнимых мостов
   const feasibleShare = bridges.length? Math.round(bridges.filter(x=>x.feasible).length/bridges.length*100):0;
-  const turnBenchmark = S.turnover>20?'выше нормы':S.turnover>14?'на уровне рынка':'ниже рынка';
+  const turnBenchmark = S.turnover>20?t('pred.benchAbove'):S.turnover>14?t('pred.benchMarket'):t('pred.benchBelow');
   const probColor = M.probDeficitEnd>0.6?'var(--red)':M.probDeficitEnd>0.3?'var(--amber)':'var(--green)';
+  const STATUS_LABEL={reskill:t('pred.statusReskill'),crosstrain:t('pred.statusCrosstrain'),retain:t('pred.statusRetain')};
 
   const ctrl=(id,label,val,min,max,step,suf,h)=>'<div class="field"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px">'
-    +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+label+hint(h)+'</span>'
+    +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+esc(label)+hint(h)+'</span>'
     +'<span class="mono" style="font-weight:800;color:var(--primary)">'+val+suf+'</span></div>'
     +'<input type="range" min="'+min+'" max="'+max+'" step="'+step+'" id="'+id+'" value="'+val+'"></div>';
 
   return '<div class="fadein">'
-  +'<div class="pagehead"><div><div class="eyebrow">Этап 3 · Прогноз рисков</div>'
-    +'<h2>Предиктивная аналитика и кадровые риски</h2>'
-    +'<p class="lead">Реальные модели: экспоненциальный отток, вероятностный прогноз Монте-Карло ('+M.runs.toLocaleString('ru-RU')+' сценариев) и анализ дожития профессий. Все числа реагируют на параметры — это не статика.</p></div>'
-    +toolbar({exportLabel:'Прогноз (JSON)',exportAct:'exp-pred'})+'</div>'
+  +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('pred.eyebrow'))+'</div>'
+    +'<h2>'+esc(t('pred.title'))+'</h2>'
+    +'<p class="lead">'+esc(t('pred.lead',{runs:M.runs.toLocaleString(curLocale())}))+'</p></div>'
+    +toolbar({exportLabel:t('pred.exportLabel'),exportAct:'exp-pred'})+'</div>'
 
   // KPI лента
   +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+'Вероятность дефицита к концу горизонта</div>'
+    +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+esc(t('pred.kpiProbTitle'))+'</div>'
       +'<div class="kv" style="color:'+probColor+'">'+pct(M.probDeficitEnd)+'%</div>'
-      +'<div class="kd">Доля из '+M.runs.toLocaleString('ru-RU')+' симуляций, где на '+(M.H-1)+'-й месяц потребность превысила доступный штат.</div></div>'
-    +'<div class="kpi" style="border-top:3px solid var(--red)"><div class="kt">'+ic('alert')+'Пиковый дефицит (медиана)</div>'
+      +'<div class="kd">'+esc(t('pred.kpiProbSub',{runs:M.runs.toLocaleString(curLocale()),month:M.H-1}))+'</div></div>'
+    +'<div class="kpi" style="border-top:3px solid var(--red)"><div class="kt">'+ic('alert')+esc(t('pred.kpiPeakTitle'))+'</div>'
       +'<div class="kv" style="color:var(--red)">'+fmtN(M.peakDeficitMed)+'</div>'
-      +'<div class="kd">До '+fmtN(M.peakDeficitP90)+' чел. в худших 10% сценариев (P90). Пик ожидается на '+M.peakMonth+'-м месяце.</div></div>'
-    +'<div class="kpi" style="border-top:3px solid var(--amber)"><div class="kt">'+ic('zap')+'FTE под риском автоматизации</div>'
+      +'<div class="kd">'+esc(t('pred.kpiPeakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}))+'</div></div>'
+    +'<div class="kpi" style="border-top:3px solid var(--amber)"><div class="kt">'+ic('zap')+esc(t('pred.kpiAutoTitle'))+'</div>'
       +'<div class="kv" style="color:var(--amber)">'+fmtN(auto.totalAtRisk)+'</div>'
-      +'<div class="kd">Ожидаемое число позиций к высвобождению за '+auto.years.toFixed(1)+' г. (анализ дожития по навыкам).</div></div>'
+      +'<div class="kd">'+esc(t('pred.kpiAutoSub',{years:auto.years.toFixed(1)}))+'</div></div>'
   +'</div>'
 
   +'<div class="grid g12">'
   // ЛЕВО — параметры прогноза
   +'<div class="col-span-4"><div class="card accent-g">'
-    +'<div class="ctitle">'+ic('sliders')+'Драйверы прогноза'+hint('Эти параметры управляют моделями оттока, найма и автоматизации.')+'</div>'
-    +ctrl('turnover','Годовая текучесть',S.turnover,2,45,1,'%','Доля персонала, увольняющегося за год. Переводится в месячную вероятность: 1−(1−p)^(1/12).')
-    +'<div class="fnote" style="margin-top:-6px;margin-bottom:12px">Оценка: <b>'+turnBenchmark+'</b> (бенчмарк ~12–18%).</div>'
-    +ctrl('hireCap','Ёмкость найма',S.hireCap,1,120,1,' чел/мес','Сколько человек реально можно нанять за месяц при текущих рекрутинговых ресурсах.')
-    +ctrl('fillDays','Срок закрытия вакансии',S.fillDays,15,180,5,' дн','Чем дольше закрывается вакансия, тем ниже реализуемость найма в модели.')
-    +ctrl('sepCap','Ёмкость высвобождения',S.sepCap,0,80,1,' чел/мес','Сколько профицитных позиций можно управляемо сократить/перевести за месяц.')
-    +ctrl('autoPace','Темп автоматизации',S.autoPace,0.3,1.6,0.1,'×','Скорость внедрения технологий. Множитель к риску вытеснения профессий.')
-    +ctrl('mcRuns','Симуляций Монте-Карло',S.mcRuns,100,1200,50,'','Больше прогонов — стабильнее перцентили, но дольше расчёт.')
-    +'<div class="note note-blue" style="margin-top:6px">'+ic('info')+'<div>Модель учитывает случайные колебания оттока (±40%), спроса (±5%) и успешности найма. Результат — коридор вероятных исходов, а не одна цифра.</div></div>'
+    +'<div class="ctitle">'+ic('sliders')+esc(t('pred.driversTitle'))+hint(t('pred.driversHint'))+'</div>'
+    +ctrl('turnover',t('pred.turnoverLabel'),S.turnover,2,45,1,'%',t('pred.turnoverHint'))
+    +'<div class="fnote" style="margin-top:-6px;margin-bottom:12px">'+t('pred.benchmarkNote',{level:turnBenchmark})+'</div>'
+    +ctrl('hireCap',t('pred.hireCapLabel'),S.hireCap,1,120,1,' '+t('common.person')+'/'+t('work.periodMonth'),t('pred.hireCapHint'))
+    +ctrl('fillDays',t('pred.fillDaysLabel'),S.fillDays,15,180,5,' '+t('common.days'),t('pred.fillDaysHint'))
+    +ctrl('sepCap',t('pred.sepCapLabel'),S.sepCap,0,80,1,' '+t('common.person')+'/'+t('work.periodMonth'),t('pred.sepCapHint'))
+    +ctrl('autoPace',t('pred.autoPaceLabel'),S.autoPace,0.3,1.6,0.1,'×',t('pred.autoPaceHint'))
+    +ctrl('mcRuns',t('pred.mcRunsLabel'),S.mcRuns,100,1200,50,'',t('pred.mcRunsHint'))
+    +'<div class="note note-blue" style="margin-top:6px">'+ic('info')+'<div>'+esc(t('pred.modelNote'))+'</div></div>'
   +'</div></div>'
 
   // ПРАВО — графики + риски
   +'<div class="col-span-8"><div class="grid" style="gap:18px">'
-    +'<div class="card"><div class="ctitle">'+ic('trend')+'Вероятностный прогноз численности (веер Монте-Карло)'
-      +hint('P50 — срединный прогноз доступной численности. Коридор P10–P90 показывает диапазон, в который попадает 80% исходов. Расхождение с красной линией потребности = зона риска.')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('trend')+esc(t('pred.fanTitle'))
+      +hint(t('pred.fanHint'))+'</div>'
       +svgForecast(M)
       +'<div class="legend">'
-        +'<span><span class="swatch line" style="background:#c4361b"></span>Потребность</span>'
-        +'<span><span class="swatch line" style="background:#0f766e"></span>Доступно P50</span>'
-        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>P10–P90</span>'
+        +'<span><span class="swatch line" style="background:#c4361b"></span>'+esc(t('pred.legendDemand'))+'</span>'
+        +'<span><span class="swatch line" style="background:#0f766e"></span>'+esc(t('pred.legendAvailP50'))+'</span>'
+        +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>'+esc(t('pred.legendBand'))+'</span>'
       +'</div>'
       +(M.firstDeficit>=0
-        ? '<div class="note note-red" style="margin-top:14px">'+ic('alert')+'<div><b>Кадровый разрыв прогнозируется с '+M.firstDeficit+'-го месяца.</b> Без усиления найма ('+S.hireCap+' чел/мес) пик дефицита достигнет ~'+fmtN(M.peakVal)+' чел. Рекомендуется опережающий рекрутинг и план переобучения.</div></div>'
-        : '<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>Устойчивого дефицита не прогнозируется.</b> Текущая ёмкость найма покрывает потребность по медианному сценарию на всём горизонте.</div></div>')
+        ? '<div class="note note-red" style="margin-top:14px">'+ic('alert')+'<div><b>'+esc(t('pred.deficitBold',{month:M.firstDeficit}))+'</b> '+esc(t('pred.deficitText',{hireCap:S.hireCap,peak:fmtN(M.peakVal)}))+'</div></div>'
+        : '<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>'+esc(t('pred.noDeficitBold'))+'</b> '+esc(t('pred.noDeficitText'))+'</div></div>')
     +'</div>'
 
-    +'<div class="card"><div class="ctitle">'+ic('zap')+'Анализ дожития профессий (риск автоматизации)'
-      +hint('Survival Analysis: S(t)=exp(−λt). Риск λ выводится из вектора навыков должности (рутинные операции = высокий риск; аналитика, ML, сети = низкий), масштабируется темпом автоматизации.')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('zap')+esc(t('pred.survivalTitle'))
+      +hint(t('pred.survivalHint'))+'</div>'
       +'<div class="tbl-wrap"><table><thead><tr>'
-        +'<th>Профессия</th><th class="c">Риск навыков</th><th class="c">Вероятность вытеснения</th>'
-        +'<th class="c">FTE под риском</th><th class="c">Рекомендация</th></tr></thead><tbody>'
-        +auto.rows.map(r=>'<tr><td style="font-weight:700">'+r.p.name+'</td>'
+        +'<th>'+esc(t('pred.thProfession'))+'</th><th class="c">'+esc(t('pred.thSkillRisk'))+'</th><th class="c">'+esc(t('pred.thDispProb'))+'</th>'
+        +'<th class="c">'+esc(t('pred.thFteRisk'))+'</th><th class="c">'+esc(t('pred.thRecommendation'))+'</th></tr></thead><tbody>'
+        +auto.rows.map(r=>'<tr><td style="font-weight:700">'+esc(profName(r.p))+'</td>'
           +'<td class="c">'+hbar(r.hz*100, r.hz>0.6?'var(--red)':r.hz>0.4?'var(--amber)':'var(--green)')+'<span class="mono small muted">'+pct(r.hz)+'%</span></td>'
           +'<td class="c mono" style="font-weight:800;color:'+(r.dispProb>0.6?'var(--red)':r.dispProb>0.3?'var(--amber)':'var(--green)')+'">'+pct(r.dispProb)+'%</td>'
           +'<td class="c mono" style="font-weight:700">'+r.dispFTE.toFixed(1)+'</td>'
-          +'<td class="c"><span class="badge '+r.bcls+'">'+r.status+'</span></td></tr>').join('')
+          +'<td class="c"><span class="badge '+r.bcls+'">'+esc(STATUS_LABEL[r.status]||r.status)+'</span></td></tr>').join('')
       +'</tbody></table></div>'
-      +'<div class="fnote">Расчёт за горизонт '+auto.years.toFixed(1)+' г. при темпе автоматизации ×'+S.autoPace+'. «FTE под риском» = численность роли × вероятность вытеснения.</div>'
+      +'<div class="fnote">'+esc(t('pred.survivalFoot',{years:auto.years.toFixed(1),pace:S.autoPace}))+'</div>'
     +'</div>'
 
-    +'<div class="card"><div class="ctitle">'+ic('route')+'Рекомендуемые мосты переобучения'
-      +hint('Система сопоставляет роли с высоким риском вытеснения (источники) с дефицитными ролями (цели) по пересечению навыков и экономике (ROI переобучения).')+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('route')+esc(t('pred.bridgesTitle'))
+      +hint(t('pred.bridgesHint'))+'</div>'
       +(bridges.length? '<div class="tbl-wrap"><table><thead><tr>'
-        +'<th>Источник (профицит/риск)</th><th class="c"></th><th>Цель (дефицит)</th>'
-        +'<th class="c">Совпадение</th><th class="c">ROI</th><th class="c">Статус</th></tr></thead><tbody>'
-        +bridges.map(br=>'<tr><td style="font-weight:600">'+br.src.name+'</td>'
+        +'<th>'+esc(t('pred.thSource'))+'</th><th class="c"></th><th>'+esc(t('pred.thTarget'))+'</th>'
+        +'<th class="c">'+esc(t('pred.thOverlap'))+'</th><th class="c">'+esc(t('pred.thRoi'))+'</th><th class="c">'+esc(t('pred.thStatus'))+'</th></tr></thead><tbody>'
+        +bridges.map(br=>'<tr><td style="font-weight:600">'+esc(profName(br.src))+'</td>'
           +'<td class="c muted">'+ic('arrow')+'</td>'
-          +'<td style="font-weight:600">'+br.tgt.name+'</td>'
+          +'<td style="font-weight:600">'+esc(profName(br.tgt))+'</td>'
           +'<td class="c mono" style="font-weight:700">'+br.overlap+'%</td>'
           +'<td class="c mono" style="font-weight:800;color:'+(br.roi>=0?'var(--green)':'var(--red)')+'">'+br.roi+'%</td>'
-          +'<td class="c">'+(br.feasible?'<span class="tag tag-ok">'+ic('check')+'Реально</span>':'<span class="badge b-gray">сложно</span>')+'</td></tr>').join('')
+          +'<td class="c">'+(br.feasible?'<span class="tag tag-ok">'+ic('check')+esc(t('pred.feasible'))+'</span>':'<span class="badge b-gray">'+esc(t('pred.difficult'))+'</span>')+'</td></tr>').join('')
         +'</tbody></table></div>'
-        +'<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div><b>Покрытие переобучением: '+feasibleShare+'%</b> предложенных переходов выполнимы (пересечение навыков ≥ 40%). Подробная экономика — на вкладке «Переобучение и CBA».</div></div>'
-        : '<div class="muted small" style="font-style:italic">Недостаточно должностей для построения мостов.</div>')
+        +'<div class="note note-green" style="margin-top:14px">'+ic('check')+'<div>'+t('pred.coverageNote',{share:feasibleShare})+'</div></div>'
+        : '<div class="muted small" style="font-style:italic">'+esc(t('pred.noBridges'))+'</div>')
     +'</div>'
   +'</div></div>'
   +'</div></div>';
