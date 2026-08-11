@@ -307,7 +307,7 @@ svg.chart{width:100%;height:auto;display:block}
 .ai-att button{color:var(--primary-d);display:flex} .ai-att svg{width:12px;height:12px;stroke:currentColor}
 .ai-input-row{display:flex;align-items:flex-end;gap:8px}
 #aiInput{flex:1;border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:13px;resize:none;
-  max-height:140px;background:var(--surface);color:var(--t1);font-family:var(--sans);line-height:1.4}
+  min-height:66px;max-height:240px;background:var(--surface);color:var(--t1);font-family:var(--sans);line-height:1.4}
 #aiInput:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-l)}
 .ai-iconbtn{width:40px;height:40px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;
   background:var(--surface2);border:1px solid var(--line);color:var(--t2)}
@@ -372,7 +372,7 @@ svg.chart{width:100%;height:auto;display:block}
 </div></div>
 
 <input type="file" id="fileImport" accept=".json,.csv" style="display:none">
-<input type="file" id="aiFile" accept=".pdf,.txt,.csv,.md,.json" multiple style="display:none">
+<input type="file" id="aiFile" accept=".pdf,.txt,.csv,.md,.json,.xlsx,.xlsm,.docx,.pptx" multiple style="display:none">
 
 <!-- ИИ-АССИСТЕНТ (выезжающая панель) -->
 <div id="aiScrim"></div>
@@ -392,8 +392,8 @@ svg.chart{width:100%;height:auto;display:block}
   <div id="aiComposer">
     <div id="aiAttachBar"></div>
     <div class="ai-input-row">
-      <button class="ai-iconbtn" id="aiAttach" title="Прикрепить файл (ТЭО, PDF, CSV)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
-      <textarea id="aiInput" rows="1" placeholder="Опишите задачу: «спроектируй расчёт по ТЭО», «снизи текучесть до 12%», «исследуй дефицит буровиков в РК»…"></textarea>
+      <button class="ai-iconbtn" id="aiAttach" title="Прикрепить файл (ТЭО, PDF, Excel, Word, PowerPoint, CSV)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+      <textarea id="aiInput" rows="3" placeholder="Опишите задачу: «спроектируй расчёт по ТЭО», «снизи текучесть до 12%», «исследуй дефицит буровиков в РК»…"></textarea>
       <button class="ai-send" id="aiSend" title="Отправить (Enter)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
     </div>
     <label class="ai-research"><input type="checkbox" id="aiResearch" checked> <span id="aiResearchLabel">Реальное исследование (веб-поиск источников)</span></label>
@@ -482,13 +482,14 @@ Object.assign(I18N.ru, {
   glossary:{ title:'Глоссарий терминов и методик' },
   guide:{ title:'Руководство пользователя', why:'Зачем', how:'Как считается' },
   ai:{ panelTitle:'ИИ-ассистент SWP', panelSub:'сопровождение проекта', settingsTitle:'Настройки',
-    attachTitle:'Прикрепить файл (ТЭО, PDF, CSV)', sendTitle:'Отправить (Enter)',
+    attachTitle:'Прикрепить файл (ТЭО, PDF, Excel, Word, PowerPoint, CSV)', sendTitle:'Отправить (Enter)',
     inputPlaceholder:'Опишите задачу: «спроектируй расчёт по ТЭО», «снизи текучесть до 12%», «исследуй дефицит буровиков в РК»…',
     researchLabel:'Реальное исследование (веб-поиск источников)',
     connectTitle:'Подключение ИИ', providerLabel:'Провайдер',
     keyNote:' Ключ хранится только в этом браузере (localStorage), отдельный сервер не нужен. Получить ключ:',
     modelLabel:'Модель', helloTitle:'Здравствуйте! Я сопровождаю ваш кадровый расчёт.',
-    helloText:'Могу изучить ТЭО и спроектировать виды работ, подобрать параметры под цель, исследовать рынок труда (с источниками) и менять данные за вас — вручную ничего вводить не нужно.' }
+    helloText:'Могу изучить ТЭО и спроектировать виды работ, подобрать параметры под цель, исследовать рынок труда (с источниками) и менять данные за вас — вручную ничего вводить не нужно.',
+    slideLabel:'Слайд {n}' }
 });
 Object.assign(I18N.en, {
   app:{ title:'SWP · Strategic Workforce Planning', brandSub:'Workforce Forecast' },
@@ -504,13 +505,14 @@ Object.assign(I18N.en, {
   glossary:{ title:'Glossary of Terms and Methods' },
   guide:{ title:'User Guide', why:'Why', how:'How it\'s calculated' },
   ai:{ panelTitle:'SWP AI Assistant', panelSub:'project support', settingsTitle:'Settings',
-    attachTitle:'Attach a file (feasibility study, PDF, CSV)', sendTitle:'Send (Enter)',
+    attachTitle:'Attach a file (feasibility study, PDF, Excel, Word, PowerPoint, CSV)', sendTitle:'Send (Enter)',
     inputPlaceholder:'Describe the task: "design the calculation from my feasibility study", "reduce turnover to 12%", "research driller shortages in Kazakhstan"…',
     researchLabel:'Real research (web search for sources)',
     connectTitle:'AI Connection', providerLabel:'Provider',
     keyNote:' The key is stored only in this browser (localStorage); no separate server is needed. Get a key:',
     modelLabel:'Model', helloTitle:'Hello! I support your workforce calculation.',
-    helloText:'I can study a feasibility study and design work types, tune parameters toward a goal, research the labor market (with sources), and change data for you — no manual entry needed.' }
+    helloText:'I can study a feasibility study and design work types, tune parameters toward a goal, research the labor market (with sources), and change data for you — no manual entry needed.',
+    slideLabel:'Slide {n}' }
 });
 Object.assign(I18N.ru, { dash:{
   eyebrow:'Обзор · Стратегический контур', title:'Сводный дашборд кадровой траектории',
@@ -760,7 +762,11 @@ life:{
   invalidKeyGemini:'Неверный ключ Gemini. Получите его на aistudio.google.com и вставьте в настройках.',
   searchNote:'Веб-поиск: {q}',
   searchUnavailable:'Веб-поиск недоступен с этой моделью — отвечаю без него.',
-  requestRejected:'Запрос отклонён', attachFileError:'Файл «{name}»: {msg}'
+  requestRejected:'Запрос отклонён', attachFileError:'Файл «{name}»: {msg}',
+  officeUnsupported:'Браузер не поддерживает распаковку файлов Office (нужен свежий Chrome/Edge/Firefox/Safari)',
+  officeParseError:'Не удалось разобрать структуру файла',
+  officeParseFailed:'Не удалось прочитать «{name}»: {msg}',
+  officeLegacyFormat:'Старый формат файла (.doc/.xls/.ppt) не поддерживается. Пересохраните файл в современном формате (.docx/.xlsx/.pptx) и загрузите снова.'
 }});
 Object.assign(I18N.en, { norm:{
   eyebrow:'Stage 1 · Deterministic Calculation', title:'Normative Demand Calculation',
@@ -991,7 +997,11 @@ life:{
   invalidKeyGemini:'Invalid Gemini key. Get one at aistudio.google.com and paste it in settings.',
   searchNote:'Web search: {q}',
   searchUnavailable:'Web search is unavailable with this model — answering without it.',
-  requestRejected:'Request rejected', attachFileError:'File "{name}": {msg}'
+  requestRejected:'Request rejected', attachFileError:'File "{name}": {msg}',
+  officeUnsupported:'Your browser does not support unpacking Office files (needs a recent Chrome/Edge/Firefox/Safari)',
+  officeParseError:'Could not parse the file structure',
+  officeParseFailed:'Could not read "{name}": {msg}',
+  officeLegacyFormat:'The old file format (.doc/.xls/.ppt) is not supported. Please re-save the file in a modern format (.docx/.xlsx/.pptx) and upload it again.'
 }});
 Object.assign(I18N.ru, { toast:{
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
@@ -2793,7 +2803,7 @@ const GUIDE_I18N = { ru: [
     {t:'hazardDefault / hazardLambda', why:'Калибровка анализа автоматизации.', how:'hazardDefault — риск навыка вне лексикона; hazardLambda — масштаб скорости вытеснения (λ).'}
   ]},
   {section:'11. ИИ-ассистент', items:[
-    {t:'Что умеет', why:'Сопровождает проект и сам меняет данные — вручную вводить не нужно.', how:'Изучает ТЭО/PDF, исследует рынок (веб-поиск со ссылками), вызывает функции: параметры, виды работ, должности, веса рисков, методология, сценарии.'},
+    {t:'Что умеет', why:'Сопровождает проект и сам меняет данные — вручную вводить не нужно.', how:'Изучает ТЭО и документы (PDF, Excel, Word, PowerPoint), исследует рынок (веб-поиск со ссылками), вызывает функции: параметры, виды работ, должности, веса рисков, методология, сценарии.'},
     {t:'Прозрачность', why:'Доверие к цифрам.', how:'Все числа выводятся из формул этого руководства; ассистент объясняет «откуда цифра» и помечает допущения.'}
   ]}
 ], en: [
@@ -2868,7 +2878,7 @@ const GUIDE_I18N = { ru: [
     {t:'hazardDefault / hazardLambda', why:'Calibration of the automation analysis.', how:'hazardDefault - the risk of a skill outside the lexicon; hazardLambda - the scale of displacement speed (λ).'}
   ]},
   {section:'11. AI assistant', items:[
-    {t:'What it can do', why:'Supports the project and changes data itself - no manual entry needed.', how:'Studies feasibility studies/PDFs, researches the market (web search with sources), calls functions: parameters, work types, positions, risk weights, methodology, scenarios.'},
+    {t:'What it can do', why:'Supports the project and changes data itself - no manual entry needed.', how:'Studies feasibility studies and documents (PDF, Excel, Word, PowerPoint), researches the market (web search with sources), calls functions: parameters, work types, positions, risk weights, methodology, scenarios.'},
     {t:'Transparency', why:'Trust in the numbers.', how:'All numbers are derived from the formulas in this guide; the assistant explains "where a number comes from" and flags assumptions.'}
   ]}
 ] };
@@ -3491,9 +3501,155 @@ function renderAttachBar(){
   bar.innerHTML=aiAttachments.map((a,i)=>'<span class="ai-att">'+ic('file')+aiEsc(a.name)
     +'<button data-rmatt="'+i+'">'+ic('x')+'</button></span>').join('');
 }
+/* ---------- ЧТЕНИЕ ФАЙЛОВ OFFICE (XLSX/DOCX/PPTX) — минимальный ZIP + OOXML парсер ----------
+   Без внешних библиотек: структура ZIP разбирается вручную (стандартные сигнатуры
+   PK), распаковка DEFLATE — через нативный DecompressionStream браузера. */
+async function inflateRawRO(bytes){
+  if(typeof DecompressionStream==='undefined') throw new Error(t('aiErr.officeUnsupported'));
+  const ds=new DecompressionStream('deflate-raw');
+  const stream=new Blob([bytes]).stream().pipeThrough(ds);
+  const buf=await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
+}
+function parseZipRO(buf){
+  const view=new DataView(buf), bytes=new Uint8Array(buf);
+  let eocd=-1;
+  const minOff=Math.max(0, buf.byteLength-22-65557);
+  for(let i=buf.byteLength-22;i>=minOff;i--){
+    if(view.getUint32(i,true)===0x06054b50){ eocd=i; break; }
+  }
+  if(eocd===-1) throw new Error(t('aiErr.officeParseError'));
+  const cdOffset=view.getUint32(eocd+16,true);
+  const cdEntries=view.getUint16(eocd+10,true);
+  const entries=[]; let off=cdOffset;
+  for(let i=0;i<cdEntries;i++){
+    if(view.getUint32(off,true)!==0x02014b50) break;
+    const compMethod=view.getUint16(off+10,true);
+    const compSize=view.getUint32(off+20,true);
+    const nameLen=view.getUint16(off+28,true);
+    const extraLen=view.getUint16(off+30,true);
+    const commentLen=view.getUint16(off+32,true);
+    const localHeaderOffset=view.getUint32(off+42,true);
+    const name=new TextDecoder('utf-8').decode(bytes.slice(off+46,off+46+nameLen));
+    entries.push({name,compMethod,compSize,localHeaderOffset});
+    off+=46+nameLen+extraLen+commentLen;
+  }
+  return {view,bytes,entries};
+}
+async function readZipEntryTextRO(zip,path){
+  const entry=zip.entries.find(e=>e.name===path); if(!entry) return null;
+  const {view,bytes}=zip, off=entry.localHeaderOffset;
+  if(view.getUint32(off,true)!==0x04034b50) throw new Error(t('aiErr.officeParseError'));
+  const nameLen=view.getUint16(off+26,true), extraLen=view.getUint16(off+28,true);
+  const dataStart=off+30+nameLen+extraLen;
+  const raw=bytes.slice(dataStart,dataStart+entry.compSize);
+  let data;
+  if(entry.compMethod===0) data=raw;
+  else if(entry.compMethod===8) data=await inflateRawRO(raw);
+  else throw new Error(t('aiErr.officeParseError'));
+  return new TextDecoder('utf-8').decode(data);
+}
+function xmlTextOf(node){ return node?node.textContent:''; }
+async function extractDocxTextRO(zip){
+  const xml=await readZipEntryTextRO(zip,'word/document.xml');
+  if(!xml) throw new Error(t('aiErr.officeParseError'));
+  const doc=new DOMParser().parseFromString(xml,'application/xml');
+  const paras=doc.getElementsByTagName('w:p'); const lines=[];
+  for(let i=0;i<paras.length;i++){
+    const ts=paras[i].getElementsByTagName('w:t'); let line='';
+    for(let j=0;j<ts.length;j++) line+=xmlTextOf(ts[j]);
+    if(line.trim()) lines.push(line);
+  }
+  return lines.join('\n');
+}
+async function extractPptxTextRO(zip){
+  const slides=zip.entries.filter(e=>/^ppt\/slides\/slide\d+\.xml$/.test(e.name))
+    .sort((a,b)=>parseInt(a.name.match(/\d+/)[0],10)-parseInt(b.name.match(/\d+/)[0],10));
+  const out=[];
+  for(const entry of slides){
+    const xml=await readZipEntryTextRO(zip,entry.name);
+    const doc=new DOMParser().parseFromString(xml,'application/xml');
+    const ts=doc.getElementsByTagName('a:t'); let text='';
+    for(let i=0;i<ts.length;i++) text+=xmlTextOf(ts[i])+' ';
+    if(text.trim()) out.push('['+t('ai.slideLabel',{n:out.length+1})+']\n'+text.trim());
+  }
+  return out.join('\n\n');
+}
+async function getXlsxSheetNamesRO(zip){
+  try{
+    const wbXml=await readZipEntryTextRO(zip,'xl/workbook.xml');
+    const relsXml=await readZipEntryTextRO(zip,'xl/_rels/workbook.xml.rels');
+    if(!wbXml||!relsXml) return {};
+    const relsDoc=new DOMParser().parseFromString(relsXml,'application/xml');
+    const relMap={}; const rels=relsDoc.getElementsByTagName('Relationship');
+    for(let i=0;i<rels.length;i++) relMap[rels[i].getAttribute('Id')]=rels[i].getAttribute('Target').replace(/^\.?\//,'');
+    const wbDoc=new DOMParser().parseFromString(wbXml,'application/xml');
+    const sheets=wbDoc.getElementsByTagName('sheet'); const map={};
+    for(let i=0;i<sheets.length;i++){
+      const name=sheets[i].getAttribute('name');
+      const rid=sheets[i].getAttribute('r:id')||sheets[i].getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
+      const target=relMap[rid];
+      if(target) map['xl/'+target]=name;
+    }
+    return map;
+  }catch(e){ return {}; }
+}
+async function extractXlsxTextRO(zip){
+  const sharedStrings=[];
+  const ssXml=await readZipEntryTextRO(zip,'xl/sharedStrings.xml');
+  if(ssXml){
+    const doc=new DOMParser().parseFromString(ssXml,'application/xml');
+    const sis=doc.getElementsByTagName('si');
+    for(let i=0;i<sis.length;i++){
+      const ts=sis[i].getElementsByTagName('t'); let s='';
+      for(let j=0;j<ts.length;j++) s+=xmlTextOf(ts[j]);
+      sharedStrings.push(s);
+    }
+  }
+  const sheetNames=await getXlsxSheetNamesRO(zip);
+  const sheets=zip.entries.filter(e=>/^xl\/worksheets\/sheet\d+\.xml$/.test(e.name))
+    .sort((a,b)=>parseInt(a.name.match(/\d+/)[0],10)-parseInt(b.name.match(/\d+/)[0],10));
+  const out=[];
+  for(const entry of sheets){
+    const xml=await readZipEntryTextRO(zip,entry.name);
+    const doc=new DOMParser().parseFromString(xml,'application/xml');
+    const rows=doc.getElementsByTagName('row'); const lines=[];
+    for(let r=0;r<rows.length;r++){
+      const cells=rows[r].getElementsByTagName('c'); const vals=[];
+      for(let c=0;c<cells.length;c++){
+        const cell=cells[c], type=cell.getAttribute('t'); let val='';
+        if(type==='s'){ const vN=cell.getElementsByTagName('v')[0]; const idx=vN?parseInt(xmlTextOf(vN),10):-1; val=sharedStrings[idx]||''; }
+        else if(type==='inlineStr'){ const tN=cell.getElementsByTagName('t')[0]; val=xmlTextOf(tN); }
+        else { const vN=cell.getElementsByTagName('v')[0]; val=xmlTextOf(vN); }
+        vals.push(val);
+      }
+      if(vals.some(v=>v!=='')) lines.push(vals.join('\t'));
+    }
+    if(lines.length) out.push('['+(sheetNames[entry.name]||entry.name)+']\n'+lines.join('\n'));
+  }
+  return out.join('\n\n');
+}
+async function extractOfficeTextRO(file,kind){
+  const buf=await file.arrayBuffer();
+  const zip=parseZipRO(buf);
+  if(kind==='docx') return extractDocxTextRO(zip);
+  if(kind==='pptx') return extractPptxTextRO(zip);
+  if(kind==='xlsx') return extractXlsxTextRO(zip);
+  throw new Error(t('aiErr.officeParseError'));
+}
 function readAiFile(file){
+  const ext=(file.name.match(/\.([a-z0-9]+)$/i)||[,''])[1].toLowerCase();
+  const isPdf=ext==='pdf'||file.type==='application/pdf';
+  const officeKind=ext==='docx'?'docx':ext==='pptx'?'pptx':(ext==='xlsx'||ext==='xlsm')?'xlsx':null;
+  if(officeKind){
+    return extractOfficeTextRO(file,officeKind)
+      .then(text=>({name:file.name,kind:'text',text:text.slice(0,200000)}))
+      .catch(e=>{ throw new Error(t('aiErr.officeParseFailed',{name:file.name,msg:e.message||''})); });
+  }
+  if(ext==='doc'||ext==='xls'||ext==='ppt'){
+    return Promise.reject(new Error(t('aiErr.officeLegacyFormat')));
+  }
   return new Promise((res,rej)=>{
-    const isPdf=/\.pdf$/i.test(file.name)||file.type==='application/pdf';
     const r=new FileReader();
     r.onload=()=>{ if(isPdf){ const d=String(r.result).split(',')[1]||''; res({name:file.name,kind:'pdf',data:d}); }
                    else res({name:file.name,kind:'text',text:String(r.result).slice(0,200000)}); };
@@ -3528,7 +3684,7 @@ function initAssistant(){
   document.getElementById('aiSend').addEventListener('click',aiSubmit);
   const inp=document.getElementById('aiInput');
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); aiSubmit(); } });
-  inp.addEventListener('input',()=>{ inp.style.height='auto'; inp.style.height=Math.min(140,inp.scrollHeight)+'px'; });
+  inp.addEventListener('input',()=>{ inp.style.height='auto'; inp.style.height=Math.min(240,inp.scrollHeight)+'px'; });
   document.getElementById('aiResearch').checked=AI.research;
   document.getElementById('aiResearch').addEventListener('change',e=>{ AI.research=e.target.checked; saveAiCfg(); });
   document.getElementById('aiAttach').addEventListener('click',()=>document.getElementById('aiFile').click());
@@ -3653,6 +3809,43 @@ UNIT_I18N["story points"].zh = "故事点";
 PERIOD_I18N["месяц"].zh = "月";
 PERIOD_I18N["год"].zh = "年";
 PERIOD_I18N["спринт"].zh = "冲刺";
+
+/* ---------- Догрузка ключей, добавленных после первичного перевода (поддержка Office-вложений) ---------- */
+Object.assign(I18N.kk.aiErr, {
+  officeUnsupported:'Браузер Office файлдарын ашуды (декомпрессиялауды) қолдамайды — жаңа нұсқалы Chrome/Edge/Firefox/Safari қажет',
+  officeParseError:'Файл құрылымын талдау мүмкін болмады',
+  officeParseFailed:'«{name}» файлын оқу мүмкін болмады: {msg}',
+  officeLegacyFormat:'Ескі файл форматы (.doc/.xls/.ppt) қолданылмайды. Файлды заманауи форматта (.docx/.xlsx/.pptx) қайта сақтап, қайта жүктеңіз.'
+});
+Object.assign(I18N.kk.ai, { slideLabel:'Слайд {n}' });
+Object.assign(I18N.es.aiErr, {
+  officeUnsupported:'Su navegador no admite la descompresión de archivos de Office (se requiere una versión reciente de Chrome/Edge/Firefox/Safari)',
+  officeParseError:'No se pudo analizar la estructura del archivo',
+  officeParseFailed:'No se pudo leer «{name}»: {msg}',
+  officeLegacyFormat:'El formato de archivo antiguo (.doc/.xls/.ppt) no es compatible. Vuelva a guardar el archivo en un formato moderno (.docx/.xlsx/.pptx) y cárguelo de nuevo.'
+});
+Object.assign(I18N.es.ai, { slideLabel:'Diapositiva {n}' });
+Object.assign(I18N.ar.aiErr, {
+  officeUnsupported:'متصفحك لا يدعم فك ضغط ملفات Office (يلزم إصدار حديث من Chrome/Edge/Firefox/Safari)',
+  officeParseError:'تعذّر تحليل بنية الملف',
+  officeParseFailed:'تعذّرت قراءة «{name}»: {msg}',
+  officeLegacyFormat:'تنسيق الملف القديم (.doc/.xls/.ppt) غير مدعوم. يرجى إعادة حفظ الملف بتنسيق حديث (.docx/.xlsx/.pptx) ثم رفعه مرة أخرى.'
+});
+Object.assign(I18N.ar.ai, { slideLabel:'الشريحة {n}' });
+Object.assign(I18N.fr.aiErr, {
+  officeUnsupported:"Votre navigateur ne prend pas en charge la décompression des fichiers Office (une version récente de Chrome/Edge/Firefox/Safari est nécessaire)",
+  officeParseError:"Impossible d'analyser la structure du fichier",
+  officeParseFailed:'Impossible de lire « {name} » : {msg}',
+  officeLegacyFormat:"L'ancien format de fichier (.doc/.xls/.ppt) n'est pas pris en charge. Réenregistrez le fichier dans un format moderne (.docx/.xlsx/.pptx) puis importez-le à nouveau."
+});
+Object.assign(I18N.fr.ai, { slideLabel:'Diapositive {n}' });
+Object.assign(I18N.zh.aiErr, {
+  officeUnsupported:'您的浏览器不支持解压 Office 文件（需要较新版本的 Chrome/Edge/Firefox/Safari）',
+  officeParseError:'无法解析文件结构',
+  officeParseFailed:'无法读取「{name}」：{msg}',
+  officeLegacyFormat:'不支持旧版文件格式（.doc/.xls/.ppt）。请将文件另存为现代格式（.docx/.xlsx/.pptx）后重新上传。'
+});
+Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
 
 /* ---------- СТАРТ ---------- */
 function init(){
