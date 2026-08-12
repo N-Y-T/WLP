@@ -3324,11 +3324,11 @@ const ADAPTERS = {
       return {role:'user',content};
     },
     toolResultMsg(outs){ return {role:'user',content:outs.map(o=>({type:'tool_result',tool_use_id:o.id,content:o.result,is_error:!o.ok}))}; },
-    async step(history){
+    async step(history,allowSearch){
       const key=getAiKey(); if(!key) throw new Error(t('aiErr.noApiKey'));
       const model=AI.model||'claude-opus-4-8';
       const tools=AI_TOOLS.slice();
-      if(aiResearchOn() && !/haiku/.test(model)) tools.push({type:'web_search_20260209',name:'web_search',max_uses:5});
+      if(allowSearch && aiResearchOn() && !/haiku/.test(model)) tools.push({type:'web_search_20260209',name:'web_search',max_uses:5});
       const body=JSON.stringify({model,max_tokens:8000,system:systemPrompt(),messages:history,tools});
       let data;
       for(let attempt=0;;attempt++){
@@ -3363,16 +3363,15 @@ const ADAPTERS = {
       return {role:'user',parts};
     },
     toolResultMsg(outs){ return {role:'user',parts:outs.map(o=>({functionResponse:{name:o.name,response:{result:o.result}}}))}; },
-    async step(history){
+    async step(history,allowSearch){
       const key=getAiKey(); if(!key) throw new Error(t('aiErr.noApiKey'));
       const model=AI.model||'gemini-2.5-flash';
       const url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(key);
       const decls=GEMINI_TOOLS.slice();
-      const useSearch=aiResearchOn();
-      const mkBody=ground=>{ const tl=[{functionDeclarations:decls}]; if(ground) tl.push({googleSearch:{}});
-        return {system_instruction:{parts:[{text:systemPrompt()}]},contents:history,tools:tl,generationConfig:{maxOutputTokens:6000,temperature:0.4}}; };
-      const doFetch=async ground=>{
-        const payload=JSON.stringify(mkBody(ground));
+      const useSearch=allowSearch&&aiResearchOn();
+      const mkBody=tools=>({system_instruction:{parts:[{text:systemPrompt()}]},contents:history,tools,generationConfig:{maxOutputTokens:6000,temperature:0.4}});
+      const doFetch=async tools=>{
+        const payload=JSON.stringify(mkBody(tools));
         for(let attempt=0;;attempt++){
           const r=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:payload});
           const d=await r.json().catch(()=>({}));
@@ -3387,18 +3386,30 @@ const ADAPTERS = {
           throw new Error(msg);
         }
       };
-      let data, degraded=false;
-      try{ data=await doFetch(useSearch); }
-      catch(e){ if(useSearch && /search|grounding|function|tool|combine|unsupported|not supported/i.test(e.message)){ degraded=true; data=await doFetch(false); } else throw e; }
+      // Gemini API не позволяет использовать googleSearch и functionDeclarations в одном запросе —
+      // при включённом исследовании сначала отдельный раунд только с поиском, затем обычный
+      // раунд с функциями (без поиска); результаты объединяются в один ход ассистента.
+      let searchParts=[], searches=[], degraded=false;
+      if(useSearch){
+        try{
+          const sData=await doFetch([{googleSearch:{}}]);
+          const sCand=sData.candidates&&sData.candidates[0];
+          if(sCand){
+            ((sCand.content&&sCand.content.parts)||[]).forEach(p=>{ if(p.text&&p.text.trim()) searchParts.push(p); });
+            const gm=sCand.groundingMetadata; if(gm&&gm.webSearchQueries) gm.webSearchQueries.forEach(q=>searches.push(q));
+          }
+        }catch(e){ degraded=true; }
+      }
+      const data=await doFetch([{functionDeclarations:decls}]);
       const cand=data.candidates&&data.candidates[0];
-      if(!cand){ const br=data.promptFeedback&&data.promptFeedback.blockReason; return {assistant:null,texts:[],tools:[],searches:[],stop:'refusal',blocked:br,degraded}; }
-      const parts=(cand.content&&cand.content.parts)||[]; const texts=[],tools2=[],searches=[];
+      if(!cand){ const br=data.promptFeedback&&data.promptFeedback.blockReason; return {assistant:null,texts:[],tools:[],searches,stop:'refusal',blocked:br,degraded}; }
+      const parts=(cand.content&&cand.content.parts)||[]; const texts=[],tools2=[];
+      searchParts.forEach(p=>texts.push(p.text));
       parts.forEach(p=>{ if(p.text&&p.text.trim())texts.push(p.text);
         else if(p.functionCall)tools2.push({id:p.functionCall.name,name:p.functionCall.name,input:geminiNormArgs(p.functionCall.name,p.functionCall.args)}); });
-      const gm=cand.groundingMetadata; if(gm&&gm.webSearchQueries) gm.webSearchQueries.forEach(q=>searches.push(q));
       let stop=tools2.length?'tool':'end';
       if(cand.finishReason==='SAFETY'||cand.finishReason==='PROHIBITED_CONTENT'||cand.finishReason==='BLOCKLIST') stop='refusal';
-      return {assistant:{role:'model',parts},texts,tools:tools2,searches,stop,degraded};
+      return {assistant:{role:'model',parts:[...searchParts,...parts]},texts,tools:tools2,searches,stop,degraded};
     }
   }
 };
@@ -3414,7 +3425,7 @@ async function runAssistant(userText){
   aiBusy=true; updateSendState(); const typing=showTyping();
   try{
     for(let i=0;i<8;i++){
-      const r=await ad.step(aiMessages);
+      const r=await ad.step(aiMessages,i===0);
       if(r.assistant) aiMessages.push(r.assistant);
       (r.searches||[]).forEach(q=>aiAddTool('search',t('aiErr.searchNote',{q})));
       if(r.degraded) aiAddTool('err',t('aiErr.searchUnavailable'));
