@@ -580,7 +580,8 @@ Object.assign(I18N.ru, { norm:{
   qHint:'Фаза «{stage}» неравномерна: в начале людей нужно меньше, чем в конце (или наоборот). Q1–Q4 — четыре контрольные точки этой кривой: {q1} / {q2} / {q3} / {q4} от базового уровня. «FTE цель» — среднее по фазе, поэтому Q-значения закономерно расходятся с ним в обе стороны.',
   thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель (среднее по фазе)',
   groupCore:'Основной персонал', groupAux:'Службы ТОиР', groupMgmt:'ИТР и менеджмент',
-  noPositions:'Нет должностей в справочнике', periodWorks:'{n} видов работ'
+  noPositions:'Нет должностей в справочнике', periodWorks:'{n} видов работ',
+  demoDirWarn:'<b>Виды работ вы задали свои, а справочник должностей — ещё демонстрационный.</b> Поэтому ниже показаны роли из примера (оператор установки, обходчик и т.д.), а не ваши. Замените их на вкладке «Справочник» или попросите ИИ-ассистента: «замени справочник должностей под мой проект».'
 }, work:{
   volume:'Объём', volumePh:'Объём за период', tNorm:'Нвр', tNormPh:'Норма времени на ед., мин',
   fsm:'Фсм', fsmPh:'Фонд смены, мин', kvn:'kвн', kvnPh:'Коэфф. выполнения норм',
@@ -781,6 +782,8 @@ life:{
   invalidWork:'Некорректная работа', errorResult:'Ошибка',
   workAddedNote:'Добавлена работа: {name}', workAddedResult:'FTE работы={fte}',
   profSavedNote:'Должность сохранена: {name}', profSavedResult:'Сохранено (id={id})',
+  emptyProfessions:'Пустой список должностей',
+  professionsSetNote:'Справочник заменён: {n} должн.', professionsSetResult:'Справочник должностей заменён, всего {n} должностей',
   profNotFound:'Должность не найдена', notFoundResult:'Не найдено',
   profDeletedNote:'Удалена должность {id}', deletedResult:'Удалено',
   riskWeightsNote:'Веса рисков: {list}', riskWeightsResult:'OK. Индекс риска={idx}',
@@ -829,7 +832,8 @@ Object.assign(I18N.en, { norm:{
   qHint:'The "{stage}" phase is not flat: fewer people are needed at its start than at its end (or vice versa). Q1-Q4 are the four control points of that curve: {q1} / {q2} / {q3} / {q4} of the base level. "Target FTE" is the phase average, so the Q values naturally sit above and below it.',
   thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE (phase average)',
   groupCore:'Core Personnel', groupAux:'Maintenance Services', groupMgmt:'Engineering & Management',
-  noPositions:'No positions in the directory', periodWorks:'{n} work types'
+  noPositions:'No positions in the directory', periodWorks:'{n} work types',
+  demoDirWarn:'<b>You have defined your own work types, but the positions directory is still the demo one.</b> That is why the roles below are from the sample data (process operator, patrol operator, etc.) rather than yours. Replace them on the Directory tab, or ask the AI assistant: "replace the positions directory to match my project".'
 }, work:{
   volume:'Volume', volumePh:'Volume per period', tNorm:'T-norm', tNormPh:'Time norm per unit, min',
   fsm:'Shift fund', fsmPh:'Shift fund, min', kvn:'k-comp', kvnPh:'Norm compliance factor',
@@ -1029,6 +1033,8 @@ life:{
   invalidWork:'Invalid work type', errorResult:'Error',
   workAddedNote:'Added work type: {name}', workAddedResult:'Work type FTE={fte}',
   profSavedNote:'Position saved: {name}', profSavedResult:'Saved (id={id})',
+  emptyProfessions:'Empty list of positions',
+  professionsSetNote:'Directory replaced: {n} positions', professionsSetResult:'Positions directory replaced, {n} positions total',
   profNotFound:'Position not found', notFoundResult:'Not found',
   profDeletedNote:'Deleted position {id}', deletedResult:'Deleted',
   riskWeightsNote:'Risk weights: {list}', riskWeightsResult:'OK. Risk index={idx}',
@@ -2060,6 +2066,18 @@ function periodLabel(){
 /* ============================================================
    ВКЛАДКА 1 — НОРМАТИВНЫЙ РАСЧЁТ
    ============================================================ */
+// Справочник должностей ещё нетронутый демо-набор, хотя виды работ уже свои?
+// Тогда «Детализация по должностям» покажет чужие роли — предупреждаем явно.
+function isDemoDirectory(){
+  const ids=Object.keys(profDB), seed=Object.keys(INITIAL_PROFESSIONS);
+  if(ids.length!==seed.length) return false;
+  return ids.every(id=>{ const a=profDB[id], b=INITIAL_PROFESSIONS[id];
+    return b && a.name===b.name && +a.salary===+b.salary && +a.headcount===+b.headcount && a.skills===b.skills; });
+}
+function worksAreCustom(){
+  const w=S.works||[];
+  return w.length>1 || (w.length===1 && w[0].id!=='w_main');
+}
 function renderNormative(){
   const b=computeBase();
   const allT={...DEFAULT_TEMPLATES,...customTemplates};
@@ -2133,6 +2151,8 @@ function renderNormative(){
 
     +'<div class="card"><div class="ctitle">'+ic('layers')+esc(t('norm.detailTitle'))
       +hint(t('norm.detailHint'))+'</div>'
+      +(worksAreCustom()&&isDemoDirectory()
+        ? '<div class="note note-amber" style="margin-bottom:14px">'+ic('alert')+'<div>'+t('norm.demoDirWarn')+'</div></div>' : '')
       +'<div class="tbl-wrap"><table><thead><tr>'
         +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th><th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
         +'<th class="c">Q1'+hint(t('norm.qHint',{stage:stageName(S.stage),
@@ -3434,7 +3454,9 @@ function systemPrompt(){
 '',
 'РЕАЛЬНОЕ ИССЛЕДОВАНИЕ: если доступен web_search и вопрос требует внешних данных (нормы труда, профстандарты/ЕТКС РК и РФ, дефицитность профессий и сроки закрытия вакансий, зарплаты по региону, темпы автоматизации, демография) — используй веб-поиск и ССЫЛАЙСЯ на источники. Чётко разделяй: что взято из источника, что — экспертная оценка, что — посчитано системой. Нормативы не выдумывай; при отсутствии данных помечай допущение явно.',
 'ПРОЗРАЧНОСТЬ: все числа в системе выводятся из формул и заданных параметров (см. вкладку «Методология»). Если спрашивают «откуда цифра» — объясни формулу и входные значения.',
-'При загрузке ТЭО/проектных документов: извлеки производственную программу, мощность, режим, фазы и уровень автоматизации; затем спроектируй виды работ (set_works) и параметры (update_params), при необходимости добавь должности. Кратко перечисли допущения, требующие подтверждения.',
+'При загрузке ТЭО/проектных документов: извлеки производственную программу, мощность, режим, фазы и уровень автоматизации; затем спроектируй виды работ (set_works) и параметры (update_params).',
+'ВАЖНО — СПРАВОЧНИК ДОЛЖНОСТЕЙ. В приложении по умолчанию лежат ДЕМО-должности (оператор установки, обходчик, буровик и т.п.). Это образец, а не данные клиента. Если ты проектируешь расчёт по документу, ты ОБЯЗАН одним вызовом set_professions заменить справочник на должности, которые реально нужны этому объекту и соответствуют заданным видам работ. Иначе вкладки «Детализация по должностям», «Кадровые риски» и CBA покажут чужие роли, и весь расчёт будет бессмысленным. Для каждой должности задай оклад, численность (headcount), средний возраст и рыночную дефицитность — если в документе их нет, поставь разумную оценку и явно пометь её как допущение.',
+'Кратко перечисли допущения, требующие подтверждения.',
 '',
 (AI.provider==='gemini'?'ФОРМАТ ИНСТРУМЕНТОВ: аргументы-объекты передавай как JSON-строку в поле *_json, напр. update_params(params_json="{\\"turnover\\":12}"), set_works(works_json="[ {…} ]").\n':'')+
 'ТЕКУЩЕЕ СОСТОЯНИЕ ПРОЕКТА (JSON):',
@@ -3448,7 +3470,8 @@ const AI_TOOLS = [
   {name:'update_params',description:'Изменить вводные/прогнозные параметры расчёта.',input_schema:{type:'object',properties:{params:{type:'object',description:'Объект {ключ:значение}, например {"turnover":12,"stage":"operation","autoPace":1.3}'}},required:['params']}},
   {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). Используй для проектирования расчёта по ТЭО.',input_schema:{type:'object',properties:{works:{type:'array',items:{type:'object'},description:'Массив объектов work (см. системную подсказку)'}},required:['works']}},
   {name:'add_work',description:'Добавить один вид работ.',input_schema:{type:'object',properties:{work:{type:'object'}},required:['work']}},
-  {name:'upsert_profession',description:'Добавить или обновить должность в справочнике.',input_schema:{type:'object',properties:{profession:{type:'object'}},required:['profession']}},
+  {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). Используй это при проектировании расчёта по документу заказчика: одним вызовом задай тот набор должностей, который реально нужен объекту.',input_schema:{type:'object',properties:{professions:{type:'array',items:{type:'object'},description:'Массив должностей: {name, type:core|aux|mgmt, salary, trainingBase, skillRate, skills, headcount, avgAge, market}'}},required:['professions']}},
+  {name:'upsert_profession',description:'Добавить или обновить ОДНУ должность в справочнике.',input_schema:{type:'object',properties:{profession:{type:'object'}},required:['profession']}},
   {name:'delete_profession',description:'Удалить должность по id.',input_schema:{type:'object',properties:{id:{type:'string'}},required:['id']}},
   {name:'set_risk_weights',description:'Задать веса факторов кадрового риска.',input_schema:{type:'object',properties:{weights:{type:'object'}},required:['weights']}},
   {name:'set_methodology',description:'Изменить методологические допущения (множители CBA, параметры дожития/автоматизации).',input_schema:{type:'object',properties:{params:{type:'object'}},required:['params']}},
@@ -3466,7 +3489,8 @@ const GEMINI_TOOLS = [
   {name:'update_params',description:'Изменить вводные/прогнозные параметры. params_json — JSON-строка объекта {ключ:значение}, напр. {"turnover":12,"stage":"operation","autoPace":1.3}.',parameters:{type:'object',properties:{params_json:{type:'string'}},required:['params_json']}},
   {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). works_json — JSON-строка массива объектов work.',parameters:{type:'object',properties:{works_json:{type:'string'}},required:['works_json']}},
   {name:'add_work',description:'Добавить один вид работ. work_json — JSON-строка объекта work.',parameters:{type:'object',properties:{work_json:{type:'string'}},required:['work_json']}},
-  {name:'upsert_profession',description:'Добавить/обновить должность. profession_json — JSON-строка объекта должности.',parameters:{type:'object',properties:{profession_json:{type:'string'}},required:['profession_json']}},
+  {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). professions_json — JSON-строка массива должностей.',parameters:{type:'object',properties:{professions_json:{type:'string'}},required:['professions_json']}},
+  {name:'upsert_profession',description:'Добавить/обновить ОДНУ должность. profession_json — JSON-строка объекта должности.',parameters:{type:'object',properties:{profession_json:{type:'string'}},required:['profession_json']}},
   {name:'delete_profession',description:'Удалить должность по id.',parameters:{type:'object',properties:{id:{type:'string'}},required:['id']}},
   {name:'set_risk_weights',description:'Задать веса факторов риска. weights_json — JSON-строка {wDemo,wBus,wSkill,wTurn,wMarket,wRedund}.',parameters:{type:'object',properties:{weights_json:{type:'string'}},required:['weights_json']}},
   {name:'set_methodology',description:'Изменить методологические допущения. params_json — JSON-строка {cbaHire,cbaSever,cbaIdleMonths,hazardDefault,hazardLambda}.',parameters:{type:'object',properties:{params_json:{type:'string'}},required:['params_json']}},
@@ -3481,6 +3505,7 @@ function geminiNormArgs(name,args){
     case 'set_methodology': return {params:J(args.params_json,{})};
     case 'set_works': return {works:J(args.works_json,[])};
     case 'add_work': return {work:J(args.work_json,{})};
+    case 'set_professions': return {professions:J(args.professions_json,[])};
     case 'upsert_profession': return {profession:J(args.profession_json,{})};
     case 'set_risk_weights': return {weights:J(args.weights_json,{})};
     case 'delete_profession': return {id:args.id};
@@ -3498,6 +3523,15 @@ function aiNormalizeWork(w){
     tNorm:num(w.tNorm,0),Fsm:num(w.Fsm,480),kvn:num(w.kvn,1),
     nObjects:num(w.nObjects,0),serviceNorm:num(w.serviceNorm,1),
     workplaces:num(w.workplaces,0),loadCoeff:num(w.loadCoeff,1), shifts:num(w.shifts,1)};
+}
+function aiNormalizeProfession(pr){
+  if(!pr||typeof pr!=='object') return null;
+  const name=String(pr.name||'').trim(); if(!name) return null;
+  return {id:pr.id||('p_'+Math.random().toString(36).slice(2,8)), name,
+    type:['core','aux','mgmt'].includes(pr.type)?pr.type:'core',
+    salary:num(pr.salary,300000), trainingBase:num(pr.trainingBase,80000), skillRate:num(pr.skillRate,12000),
+    skills:String(pr.skills||''), headcount:num(pr.headcount,20), avgAge:num(pr.avgAge,42),
+    market:clamp(num(pr.market,0.4),0,1)};
 }
 function aiApplyAfterMutation(){ const ids=Object.keys(profDB); if(!profDB[S.sourceProf])S.sourceProf=ids[0]; if(!profDB[S.targetProf])S.targetProf=ids[ids.length>1?1:0]; render(); }
 function executeAiTool(name,input){
@@ -3521,6 +3555,14 @@ function executeAiTool(name,input){
         const w=aiNormalizeWork(input.work); if(!w) return {ok:false,note:t('aiTool.invalidWork'),result:t('aiTool.errorResult')};
         S.works=S.works||[]; S.works.push(w); aiApplyAfterMutation();
         return {ok:true,note:t('aiTool.workAddedNote',{name:w.name}),result:t('aiTool.workAddedResult',{fte:fmtN(workFTE(w))})};
+      }
+      case 'set_professions':{
+        const arr=(input.professions||[]).map(aiNormalizeProfession).filter(Boolean);
+        if(!arr.length) return {ok:false,note:t('aiTool.emptyProfessions'),result:t('aiTool.errorResult')};
+        const next={}; arr.forEach(pr=>{ next[pr.id]=pr; });
+        profDB=next; tempDB=JSON.parse(JSON.stringify(next)); isDirty=false;
+        aiApplyAfterMutation();
+        return {ok:true,note:t('aiTool.professionsSetNote',{n:arr.length}),result:t('aiTool.professionsSetResult',{n:arr.length})};
       }
       case 'upsert_profession':{
         const pr=input.profession||{}; const id=pr.id||('p_'+Math.random().toString(36).slice(2,8));
@@ -4132,6 +4174,16 @@ Object.assign(I18N.zh.risk, {
   cellRedund:'<b>被替代风险 — {val}%</b><br>该角色在 {years} 年内被自动化替代的概率。这与预测分析标签页中的生存分析完全相同：在那里它是独立表格，在这里则作为指数六项因素之一参与计算。',
   cellIndex:'<b>指数 — {val}／100</b><br>左侧六项因素的加权总和：<br>{list}',
   skillColHint:'该岗位各项技能的平均值。每项技能的百分比取自「方法论」标签页的「技能可自动化程度词典」，可在那里查看并调整。将鼠标悬停在行内数值上可查看按技能的明细。' });
+Object.assign(I18N.kk.norm, { demoDirWarn:'<b>Жұмыс түрлерін өзіңіз бердіңіз, ал лауазымдар анықтамалығы әлі демонстрациялық күйінде.</b> Сондықтан төменде сіздің емес, мысал рөлдері көрсетілген. Оларды «Анықтамалық» қосымшасында ауыстырыңыз немесе AI көмекшіден сұраңыз: «лауазымдар анықтамалығын жобама сай ауыстыр».' });
+Object.assign(I18N.kk.aiTool, { emptyProfessions:'Лауазымдар тізімі бос', professionsSetNote:'Анықтамалық ауыстырылды: {n} лауазым', professionsSetResult:'Лауазымдар анықтамалығы ауыстырылды, барлығы {n} лауазым' });
+Object.assign(I18N.es.norm, { demoDirWarn:'<b>Ha definido sus propios tipos de trabajo, pero el directorio de puestos sigue siendo el de demostración.</b> Por eso los roles que aparecen abajo son los del ejemplo y no los suyos. Sustitúyalos en la pestaña Directorio o pida al asistente de IA: «reemplaza el directorio de puestos según mi proyecto».' });
+Object.assign(I18N.es.aiTool, { emptyProfessions:'Lista de puestos vacía', professionsSetNote:'Directorio reemplazado: {n} puestos', professionsSetResult:'Directorio de puestos reemplazado, {n} puestos en total' });
+Object.assign(I18N.fr.norm, { demoDirWarn:"<b>Vous avez défini vos propres types de travail, mais le référentiel des postes est encore celui de démonstration.</b> Les rôles ci-dessous proviennent donc de l'exemple et non de votre projet. Remplacez-les dans l'onglet Référentiel ou demandez à l'assistant IA : « remplace le référentiel des postes selon mon projet »." });
+Object.assign(I18N.fr.aiTool, { emptyProfessions:'Liste de postes vide', professionsSetNote:'Référentiel remplacé : {n} postes', professionsSetResult:'Référentiel des postes remplacé, {n} postes au total' });
+Object.assign(I18N.ar.norm, { demoDirWarn:'<b>لقد حدّدت أنواع العمل الخاصة بك، لكن دليل الوظائف ما زال هو الدليل التجريبي.</b> لذلك تظهر أدناه أدوار من البيانات التجريبية وليست أدوارك. استبدلها من تبويب الدليل أو اطلب من مساعد الذكاء الاصطناعي: «استبدل دليل الوظائف بما يناسب مشروعي».' });
+Object.assign(I18N.ar.aiTool, { emptyProfessions:'قائمة الوظائف فارغة', professionsSetNote:'تم استبدال الدليل: {n} وظيفة', professionsSetResult:'تم استبدال دليل الوظائف، بإجمالي {n} وظيفة' });
+Object.assign(I18N.zh.norm, { demoDirWarn:'<b>作业类型已按您的项目设置，但岗位目录仍是演示数据。</b>因此下方显示的是示例角色，而非您的岗位。请在「目录」标签页中替换，或让 AI 助手代劳：「把岗位目录替换成符合我项目的岗位」。' });
+Object.assign(I18N.zh.aiTool, { emptyProfessions:'岗位列表为空', professionsSetNote:'目录已替换：{n} 个岗位', professionsSetResult:'岗位目录已替换，共 {n} 个岗位' });
 Object.assign(I18N.kk.cba, { severanceBase:'Жұмыстан босату жәрдемақысы', recruitingBase:'Рекрутинг және бейімдеу', idleBase:'Оқу кезіндегі ақылы бос тұру',
   liveCoefs:'Коэффициенттер «Әдістеме» қосымшасынан алынады және мұнда автоматты түрде қолданылады: жалдау {hire} {hireSuf}, босату {sever} {severSuf}, оқуға бос тұру {idle} {idleSuf}.' });
 Object.assign(I18N.kk.act, { footnoteBase:'Жалдау мен босату құны жалақымен есептеледі, қайта даярлау — CBA моделі бойынша. Мерзімдер жалдау/босату сыйымдылығы мен дағдылар алшақтығының көлемінен шығады.' });
