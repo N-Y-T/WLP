@@ -207,6 +207,12 @@ td.c{text-align:center} td.r{text-align:right}
 .cell-edit:hover{border-bottom-color:var(--line)}
 .cell-edit:focus{border-bottom-color:var(--primary)}
 .dirty td{background:var(--gold-l)!important}
+/* таблица видов работ: параметры переносятся, имя не обрезается */
+.wtbl td,.wtbl th{padding-left:10px;padding-right:10px}
+.wtbl .wname{min-width:190px;width:24%}
+.wtbl .wcell{font-size:11px;white-space:normal;min-width:215px}
+.wtbl select.cell-edit{padding-left:4px;padding-right:2px}
+.wtbl .wp{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;margin:2px 10px 2px 0}
 
 /* ---------- PROGRESS BARS ---------- */
 .bartrack{height:9px;border-radius:9px;background:var(--line2);overflow:hidden}
@@ -586,7 +592,7 @@ Object.assign(I18N.ru, { norm:{
   thParams:'Параметры нормирования', thShifts:'Смен', thFte:'FTE (списочн.)',
   noWorks:'Нет видов работ — добавьте первый',
   totalRow:'Итого по всем работам (эксплуатация, до множителя этапа)',
-  footnote:'Методики (раздел 5 ТЗ): «{output}», «{time}», «{service}», «{workplace}». Списочная = Явочная × Сменность × k_сп ({absCoeff}).',
+  footnotePlain:'Каждая строка — отдельный вид работ со своей методикой расчёта. «Явочная» численность — сколько человек нужно одновременно в смену; итоговая FTE дополнительно учитывает сменность и резерв на отпуска, больничные и обучение (коэффициент {absCoeff}). Итог внизу — суммарная потребность до поправки на фазу проекта.',
   fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ', mainWorkName:'Основная технологическая работа'
 }, chart:{ monthAxis:'месяц проекта', deficitAxis:'дефицит', surplusAxis:'профицит',
   tipMonth:'Месяц {n}', tipDemand:'Потребность', tipAvail:'Доступно (P50)',
@@ -827,7 +833,7 @@ Object.assign(I18N.en, { norm:{
   thParams:'Norming Parameters', thShifts:'Shifts', thFte:'FTE (payroll)',
   noWorks:'No work types — add the first one',
   totalRow:'Total across all work types (operation, before stage multiplier)',
-  footnote:'Methods (spec section 5): "{output}", "{time}", "{service}", "{workplace}". Payroll = Attendance x Shifts x k_sp ({absCoeff}).',
+  footnotePlain:'Each row is a separate work type with its own calculation method. The "attendance" figure is how many people are needed on shift at once; the final FTE additionally accounts for shift coverage and a reserve for vacations, sick leave and training (factor {absCoeff}). The total at the bottom is the combined demand before the project-phase adjustment.',
   fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type', mainWorkName:'Main Production Work'
 }, chart:{ monthAxis:'project month', deficitAxis:'shortage', surplusAxis:'surplus',
   tipMonth:'Month {n}', tipDemand:'Demand', tipAvail:'Available (P50)',
@@ -2112,31 +2118,32 @@ function workParamCells(w){
   const txt=(f,ph,wd)=>{ const raw=w[f]||''; const disp=f==='unit'?unitLabel(raw):f==='period'?periodWordLabel(raw):raw;
     return '<input class="cell-edit" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(disp)+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:'+(wd||58)+'px">'; };
   const lbl=s=>'<span class="muted" style="font-size:10px">'+esc(s)+'</span> ';
+  const u=parts=>'<span class="wp">'+parts+'</span>';   // неразрывная группа «подпись + поле»
   switch(w.method){
-    case 'time':      return lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)
-                      +' · '+lbl(t('work.tNorm'))+inp('tNorm',t('work.tNormPh'),0.01)
-                      +' · '+lbl(t('work.fsm'))+inp('Fsm',t('work.fsmPh'))
-                      +' · '+lbl(t('work.kvn'))+inp('kvn',t('work.kvnPh'),0.01);
-    case 'service':   return lbl(t('work.nObjects'))+inp('nObjects',t('work.nObjectsPh'))
-                      +' · '+lbl(t('work.serviceNorm'))+inp('serviceNorm',t('work.serviceNormPh'),0.1);
-    case 'workplace': return lbl(t('work.workplaces'))+inp('workplaces',t('work.workplacesPh'))
-                      +' · '+lbl(t('work.loadCoeff'))+inp('loadCoeff',t('work.loadCoeffPh'),0.05);
-    default:          return lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)+'/'+txt('period',t('work.periodDefault'),64)
-                      +' · '+lbl(t('work.norm'))+inp('norm',t('work.normPh'));
+    case 'time':      return u(lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46))
+                      +u(lbl(t('work.tNorm'))+inp('tNorm',t('work.tNormPh'),0.01))
+                      +u(lbl(t('work.fsm'))+inp('Fsm',t('work.fsmPh')))
+                      +u(lbl(t('work.kvn'))+inp('kvn',t('work.kvnPh'),0.01));
+    case 'service':   return u(lbl(t('work.nObjects'))+inp('nObjects',t('work.nObjectsPh')))
+                      +u(lbl(t('work.serviceNorm'))+inp('serviceNorm',t('work.serviceNormPh'),0.1));
+    case 'workplace': return u(lbl(t('work.workplaces'))+inp('workplaces',t('work.workplacesPh')))
+                      +u(lbl(t('work.loadCoeff'))+inp('loadCoeff',t('work.loadCoeffPh'),0.05));
+    default:          return u(lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)+'/'+txt('period',t('work.periodDefault'),64))
+                      +u(lbl(t('work.norm'))+inp('norm',t('work.normPh')));
   }
 }
 function worksEditor(){
   const rows=(S.works||[]).map(w=>{
-    const gsel='<select class="cell-edit" data-work="'+w.id+'" data-wf="group" style="text-align:center;width:88px">'
+    const gsel='<select class="cell-edit" data-work="'+w.id+'" data-wf="group" style="text-align:center;width:100%;min-width:76px">'
       +[['core',t('common.core')],['aux',t('common.aux')],['mgmt',t('common.mgmt')]].map(([v,lb])=>'<option value="'+v+'"'+(w.group===v?' selected':'')+'>'+esc(lb)+'</option>').join('')+'</select>';
-    const msel='<select class="cell-edit" data-work="'+w.id+'" data-wf="method" style="width:150px">'
+    const msel='<select class="cell-edit" data-work="'+w.id+'" data-wf="method" style="width:100%;min-width:116px">'
       +Object.keys(WORK_METHODS).map(k=>'<option value="'+k+'"'+(w.method===k?' selected':'')+'>'+esc(methodName(k))+'</option>').join('')+'</select>';
     const shs='<input class="cell-edit mono" data-work="'+w.id+'" data-wf="shifts" type="number" min="1" max="4" value="'+num(w.shifts,1)+'" style="width:44px;text-align:center">';
     return '<tr data-workrow="'+w.id+'">'
-      +'<td><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(workDisplayName(w))+'" style="font-weight:700;min-width:130px"></td>'
+      +'<td class="wname"><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(workDisplayName(w))+'" title="'+esc(workDisplayName(w))+'" style="font-weight:700;width:100%"></td>'
       +'<td class="c">'+gsel+'</td>'
       +'<td>'+msel+'</td>'
-      +'<td style="font-size:11px;white-space:nowrap">'+workParamCells(w)+'</td>'
+      +'<td class="wcell">'+workParamCells(w)+'</td>'
       +'<td class="c">'+shs+'</td>'
       +'<td class="r mono" style="font-weight:800;color:var(--primary)" title="'+esc(t('work.fteTitle',{yav:fmtN(workYav(w))}))+'">'+fmtN(workFTE(w))+'</td>'
       +'<td class="c"><button class="xbtn" data-delwork="'+w.id+'" style="width:28px;height:28px">'+ic('trash')+'</button></td></tr>';
@@ -2145,12 +2152,12 @@ function worksEditor(){
   return '<div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('layers')+esc(t('work.title'))
     +hint(t('work.hint'))
     +'<span class="sp"></span><button class="tool" data-act="add-work" style="padding:6px 11px">'+ic('plus')+esc(t('work.addBtn'))+'</button></div>'
-    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
+    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table class="wtbl"><thead><tr>'
     +'<th>'+esc(t('work.thName'))+'</th><th class="c">'+esc(t('work.thGroup'))+'</th><th>'+esc(t('work.thMethod'))+'</th><th>'+esc(t('work.thParams'))+'</th><th class="c">'+esc(t('work.thShifts'))+'</th><th class="r">'+esc(t('work.thFte'))+'</th><th class="c">×</th>'
     +'</tr></thead><tbody>'+(rows||'<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic;padding:18px">'+esc(t('work.noWorks'))+'</td></tr>')
     +'</tbody>'+(S.works&&S.works.length?'<tfoot><tr style="background:var(--ink);color:#fff"><td colspan="5" style="font-weight:700;padding:11px 14px">'+esc(t('work.totalRow'))+'</td><td class="r mono" style="font-weight:800;font-size:15px;color:#fff;padding:11px 14px">'+fmtN(total)+'</td><td></td></tr></tfoot>':'')
     +'</table></div>'
-    +'<div class="fnote" style="padding:0 22px 16px">'+esc(t('work.footnote',{output:methodHint('output'),time:methodHint('time'),service:methodHint('service'),workplace:methodHint('workplace'),absCoeff:S.absCoeff}))+'</div>'
+    +'<div class="fnote" style="padding:0 22px 16px">'+esc(t('work.footnotePlain',{absCoeff:S.absCoeff}))+'</div>'
   +'</div>';
 }
 function slider(id,label,valPct,clr){
@@ -4025,6 +4032,11 @@ PERIOD_I18N["год"].zh = "年";
 PERIOD_I18N["спринт"].zh = "冲刺";
 
 /* ---------- Догрузка ключей, добавленных после первичного перевода (поддержка Office-вложений) ---------- */
+Object.assign(I18N.kk.work, { footnotePlain:'Әр жол — өз есептеу әдістемесі бар жеке жұмыс түрі. «Явкалық» сан — бір ауысымда бір мезгілде қанша адам қажет; қорытынды FTE қосымша ауысымдылықты және демалыс, ауру парағы мен оқуға арналған резервті ескереді ({absCoeff} коэффициенті). Төмендегі қорытынды — жоба фазасына түзетуге дейінгі жиынтық қажеттілік.' });
+Object.assign(I18N.es.work, { footnotePlain:'Cada fila es un tipo de trabajo independiente con su propio método de cálculo. La dotación «de presencia» indica cuántas personas se necesitan simultáneamente por turno; el FTE final incorpora además la cobertura de turnos y una reserva para vacaciones, bajas y formación (factor {absCoeff}). El total inferior es la demanda combinada antes del ajuste por fase del proyecto.' });
+Object.assign(I18N.fr.work, { footnotePlain:"Chaque ligne est un type de travail distinct avec sa propre méthode de calcul. L'effectif « de présence » indique combien de personnes sont nécessaires simultanément par poste ; le FTE final tient compte en plus de la couverture des postes et d'une réserve pour congés, arrêts maladie et formation (facteur {absCoeff}). Le total en bas correspond au besoin cumulé avant ajustement selon la phase du projet." });
+Object.assign(I18N.ar.work, { footnotePlain:'كل صف هو نوع عمل مستقل له طريقة حساب خاصة به. يوضّح عدد «الحضور» كم شخصًا يلزم في الوردية الواحدة في آنٍ معًا؛ أما قيمة FTE النهائية فتأخذ في الحسبان أيضًا تغطية الورديات واحتياطيًا للإجازات والإجازات المرضية والتدريب (المعامل {absCoeff}). والإجمالي في الأسفل هو الاحتياج الكلي قبل التعديل حسب مرحلة المشروع.' });
+Object.assign(I18N.zh.work, { footnotePlain:'每一行都是一个独立的作业类型，各有其计算方法。「出勤」人数指同一班次内同时需要的人数；最终 FTE 还会计入班次覆盖以及休假、病假和培训的储备（系数 {absCoeff}）。底部的合计为按项目阶段调整前的总需求。' });
 Object.assign(I18N.kk.cba, { severanceBase:'Жұмыстан босату жәрдемақысы', recruitingBase:'Рекрутинг және бейімдеу', idleBase:'Оқу кезіндегі ақылы бос тұру',
   liveCoefs:'Коэффициенттер «Әдістеме» қосымшасынан алынады және мұнда автоматты түрде қолданылады: жалдау {hire} {hireSuf}, босату {sever} {severSuf}, оқуға бос тұру {idle} {idleSuf}.' });
 Object.assign(I18N.kk.act, { footnoteBase:'Жалдау мен босату құны жалақымен есептеледі, қайта даярлау — CBA моделі бойынша. Мерзімдер жалдау/босату сыйымдылығы мен дағдылар алшақтығының көлемінен шығады.' });
