@@ -651,6 +651,9 @@ life:{
   gapLabel:'Разрыв навыков (нужно доучить)', gapHint:'Каждый недостающий навык умножается на «цену за навык» из справочника и формирует стоимость обучения.',
   fullMatch:'полное соответствие',
   cbaTitle:'Cost-Benefit Analysis', cbaHint:'Сценарий 1 (увольнение+найм): 3 оклада исходной ЗП + 1.5 оклада новой. Сценарий 2 (рескиллинг): база ДПО + навыки × цена + оплата простоя.',
+  severanceBase:'Выходное пособие', recruitingBase:'Рекрутинг и адаптация', idleBase:'Оплата простоя на учёбу',
+  salaryForms:'оклад|оклада|окладов',
+  liveCoefs:'Коэффициенты берутся с вкладки «Методология» и применяются здесь автоматически: найм {hire} {hireSuf}, высвобождение {sever} {severSuf}, простой на учёбу {idle} {idleSuf}.',
   scenario1Title:'Сценарий 1 · Увольнение и найм с рынка',
   severanceRow:'Выходное пособие (3 оклада исх.)', recruitingRow:'Рекрутинг и адаптация (1.5 оклада нов.)', totalCostLabel:'Итого затраты',
   scenario2Title:'Сценарий 2 · Внутренний рескиллинг',
@@ -710,7 +713,7 @@ life:{
   thAction:'Действие', thTarget:'Объект', thQty:'Кол-во', thCost:'Стоимость',
   thTerm:'Срок', thPriority:'Приоритет', thJustification:'Обоснование',
   noActions:'Действий не требуется — траектория сбалансирована.',
-  footnote:'Стоимость найма — 1.5 оклада (рекрутинг+адаптация), высвобождения — 3 оклада (выходные обязательства), переобучения — по модели CBA. Сроки — из ёмкости найма/высвобождения и объёма разрыва навыков.'
+  footnoteBase:'Стоимость найма и высвобождения считается в окладах, переобучения — по модели CBA. Сроки — из ёмкости найма/высвобождения и объёма разрыва навыков.'
 }, scen:{
   eyebrow:'Сценарное моделирование · §7', title:'Сценарии «что если» — сравнение траекторий',
   lead:'Сохраняйте полный снимок параметров и справочника как сценарий, сравнивайте кадровые траектории бок о бок, назначайте базовую линию. Песочница отделена от текущих данных.',
@@ -888,6 +891,8 @@ life:{
   gapLabel:'Skill Gap (needs training)', gapHint:'Each missing skill is multiplied by the "price per skill" from the directory to build the training cost.',
   fullMatch:'full match',
   cbaTitle:'Cost-Benefit Analysis', cbaHint:'Scenario 1 (severance+hiring): 3 salaries of the source role + 1.5 salaries of the new one. Scenario 2 (reskilling): base training cost + skills x price + idle-time pay.',
+  severanceBase:'Severance', recruitingBase:'Recruiting & onboarding', idleBase:'Paid study downtime',
+  liveCoefs:'The coefficients come from the Methodology tab and apply here automatically: hiring {hire} {hireSuf}, release {sever} {severSuf}, study downtime {idle} {idleSuf}.',
   scenario1Title:'Scenario 1 · Severance and Market Hiring',
   severanceRow:'Severance (3 source salaries)', recruitingRow:'Recruiting & Onboarding (1.5 new salaries)', totalCostLabel:'Total Cost',
   scenario2Title:'Scenario 2 · Internal Reskilling',
@@ -947,7 +952,7 @@ life:{
   thAction:'Action', thTarget:'Target', thQty:'Qty', thCost:'Cost',
   thTerm:'Timeline', thPriority:'Priority', thJustification:'Justification',
   noActions:'No actions needed — the trajectory is balanced.',
-  footnote:'Hiring cost is 1.5 salaries (recruiting+onboarding), release is 3 salaries (severance obligations), reskilling follows the CBA model. Timelines come from hiring/release capacity and the size of the skill gap.'
+  footnoteBase:'Hiring and release costs are counted in salaries, reskilling follows the CBA model. Timelines come from hiring/release capacity and the size of the skill gap.'
 }, scen:{
   eyebrow:'Scenario Modeling · §7', title:'What-If Scenarios — Trajectory Comparison',
   lead:'Save a full snapshot of parameters and the directory as a scenario, compare workforce trajectories side by side, and assign a baseline. The sandbox is separate from current data.',
@@ -1096,6 +1101,19 @@ function tRaw(key){
     for(const p of path){ cur = cur ? cur[p] : undefined; }
   }
   return cur;
+}
+// склонение существительного после числа (нужно для ru/kk-подобных языков).
+// forms='один|два-четыре|пять+'; для дробных чисел берётся форма 2 («1,5 оклада»).
+function plural(n,formsKey,fallback){
+  const raw=tRaw(formsKey);
+  if(!raw||typeof raw!=='string') return fallback;
+  const f=raw.split('|'); if(f.length<3) return fallback;
+  if(Math.floor(n)!==n) return f[1];
+  const a=Math.abs(n)%100, b=a%10;
+  if(a>10&&a<20) return f[2];
+  if(b>1&&b<5) return f[1];
+  if(b===1) return f[0];
+  return f[2];
 }
 function t(key,vars){
   let s=tRaw(key);
@@ -1866,6 +1884,7 @@ function hbar(val,color){ // val 0..100
 
 /* ---------------- ОБЩИЕ ЭЛЕМЕНТЫ ---------------- */
 // подсказка «?»: текст живёт в data-tip, показывается общим плавающим боксом (см. initTips)
+function tidy(str){ return String(str).replace(/\.\s*\./g,'.').replace(/\.\)/g,')'); }
 function hint(txt){return '<span class="hint" tabindex="0" data-tip="'+esc(txt)+'">'+ic('help')+'</span>';}
 /* ---------- ПЛАВАЮЩИЕ ПОДСКАЗКИ ---------- */
 let tipEl=null, tipAnchor=null;
@@ -2308,6 +2327,14 @@ function renderCBA(){
   const target = profDB[S.targetProf] || list[1] || list[0];
   const c = cbaPair(source,target);
   const dark = c.positive;
+  // коэффициенты живут на вкладке «Методология» — подставляем их актуальные значения,
+  // чтобы подписи строк не расходились с фактическим расчётом
+  const coef=v=>String(+(+v).toFixed(2));
+  const cSever=num(S.cbaSever,3), cHire=num(S.cbaHire,1.5), cIdle=num(S.cbaIdleMonths,1.5);
+  const salUnit=n=>plural(n,'cba.salaryForms',t('meth.cbaHireSuf'));
+  const rowLbl=(base,n,suf)=>base+' ('+coef(n)+' '+suf+')';
+  const liveCoefs=tidy(t('cba.liveCoefs',{hire:coef(cHire),hireSuf:salUnit(cHire),
+    sever:coef(cSever),severSuf:salUnit(cSever),idle:coef(cIdle),idleSuf:t('meth.cbaIdleSuf')}));
 
   return '<div class="fadein">'
   +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('cba.eyebrow'))+'</div>'
@@ -2341,14 +2368,14 @@ function renderCBA(){
   // ПРАВО — экономика
   +'<div class="card '+(dark?'dark':'')+'" '+(dark?'':'style="background:var(--red-l);border-color:var(--red-bd)"')+'>'
     +'<div class="ctitle" style="'+(dark?'color:#fff;border-color:var(--ink3)':'color:#7a2310;border-color:var(--red-bd)')+'">'+ic('dollar')+esc(t('cba.cbaTitle'))
-      +hint(t('cba.cbaHint'))+'</div>'
+      +hint(t('cba.cbaHint')+' '+liveCoefs)+'</div>'
     +cbaBlock(t('cba.scenario1Title'),[
-      [t('cba.severanceRow'),c.severance],
-      [t('cba.recruitingRow'),c.recruiting]
+      [rowLbl(t('cba.severanceBase'),cSever,salUnit(cSever)),c.severance],
+      [rowLbl(t('cba.recruitingBase'),cHire,salUnit(cHire)),c.recruiting]
     ],t('cba.totalCostLabel'),c.replaceCost,dark,'var(--red)')
     +cbaBlock(t('cba.scenario2Title'),[
       [t('cba.trainingRow',{n:c.missing.length}),c.trainingCost],
-      [t('cba.idleRow'),c.lostProd]
+      [tidy(rowLbl(t('cba.idleBase'),cIdle,t('meth.cbaIdleSuf'))),c.lostProd]
     ],t('cba.totalInvestLabel'),c.reskillCost,dark,'var(--green)')
     +'<div style="margin-top:18px;padding:22px;border-radius:14px;text-align:center;'
       +(c.positive?'background:rgba(17,122,91,.18);border:1px solid rgba(17,122,91,.4)':'background:rgba(196,54,27,.14);border:1px solid var(--red-bd)')+'">'
@@ -2589,7 +2616,10 @@ function renderActions(){
       +'<td class="small muted">'+esc(a.note)+'</td></tr>').join('')
       : '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;font-style:italic">'+esc(t('act.noActions'))+'</td></tr>')
     +'</tbody></table></div></div>'
-  +'<div class="fnote" style="margin-top:14px">'+esc(t('act.footnote'))+'</div>'
+  +'<div class="fnote" style="margin-top:14px">'+esc(tidy(t('act.footnoteBase')+' '+t('cba.liveCoefs',{
+      hire:String(+num(S.cbaHire,1.5).toFixed(2)),hireSuf:plural(num(S.cbaHire,1.5),'cba.salaryForms',t('meth.cbaHireSuf')),
+      sever:String(+num(S.cbaSever,3).toFixed(2)),severSuf:plural(num(S.cbaSever,3),'cba.salaryForms',t('meth.cbaSeverSuf')),
+      idle:String(+num(S.cbaIdleMonths,1.5).toFixed(2)),idleSuf:t('meth.cbaIdleSuf')})))+'</div>'
   +'</div>';
 }
 
@@ -3988,6 +4018,21 @@ PERIOD_I18N["год"].zh = "年";
 PERIOD_I18N["спринт"].zh = "冲刺";
 
 /* ---------- Догрузка ключей, добавленных после первичного перевода (поддержка Office-вложений) ---------- */
+Object.assign(I18N.kk.cba, { severanceBase:'Жұмыстан босату жәрдемақысы', recruitingBase:'Рекрутинг және бейімдеу', idleBase:'Оқу кезіндегі ақылы бос тұру',
+  liveCoefs:'Коэффициенттер «Әдістеме» қосымшасынан алынады және мұнда автоматты түрде қолданылады: жалдау {hire} {hireSuf}, босату {sever} {severSuf}, оқуға бос тұру {idle} {idleSuf}.' });
+Object.assign(I18N.kk.act, { footnoteBase:'Жалдау мен босату құны жалақымен есептеледі, қайта даярлау — CBA моделі бойынша. Мерзімдер жалдау/босату сыйымдылығы мен дағдылар алшақтығының көлемінен шығады.' });
+Object.assign(I18N.es.cba, { severanceBase:'Indemnización', recruitingBase:'Reclutamiento e incorporación', idleBase:'Tiempo de estudio pagado',
+  liveCoefs:'Los coeficientes provienen de la pestaña Metodología y se aplican aquí automáticamente: contratación {hire} {hireSuf}, desvinculación {sever} {severSuf}, tiempo de estudio {idle} {idleSuf}.' });
+Object.assign(I18N.es.act, { footnoteBase:'Los costos de contratación y desvinculación se cuentan en salarios; la recapacitación sigue el modelo CBA. Los plazos provienen de la capacidad de contratación/desvinculación y del tamaño de la brecha de competencias.' });
+Object.assign(I18N.fr.cba, { severanceBase:'Indemnités de départ', recruitingBase:'Recrutement et intégration', idleBase:'Temps de formation rémunéré',
+  liveCoefs:"Les coefficients proviennent de l'onglet Méthodologie et s'appliquent ici automatiquement : recrutement {hire} {hireSuf}, réduction {sever} {severSuf}, temps de formation {idle} {idleSuf}." });
+Object.assign(I18N.fr.act, { footnoteBase:"Les coûts de recrutement et de réduction sont comptés en salaires ; la reconversion suit le modèle CBA. Les délais découlent de la capacité de recrutement/réduction et de l'ampleur de l'écart de compétences." });
+Object.assign(I18N.ar.cba, { severanceBase:'مكافأة نهاية الخدمة', recruitingBase:'التوظيف والتهيئة', idleBase:'فترة التعطل المدفوعة للتدريب',
+  liveCoefs:'تُؤخذ المعاملات من تبويب المنهجية وتُطبَّق هنا تلقائيًا: التوظيف {hire} {hireSuf}، إنهاء الخدمة {sever} {severSuf}، فترة التدريب {idle} {idleSuf}.' });
+Object.assign(I18N.ar.act, { footnoteBase:'تُحتسب تكاليف التوظيف وإنهاء الخدمة بالرواتب، وتتبع إعادة التأهيل نموذج CBA. وتنبع المدد من الطاقة الاستيعابية للتوظيف/إنهاء الخدمة وحجم فجوة المهارات.' });
+Object.assign(I18N.zh.cba, { severanceBase:'遣散费', recruitingBase:'招聘与入职', idleBase:'带薪培训停工期',
+  liveCoefs:'系数取自「方法论」标签页并在此自动生效：招聘 {hire} {hireSuf}，裁减 {sever} {severSuf}，培训停工 {idle} {idleSuf}。' });
+Object.assign(I18N.zh.act, { footnoteBase:'招聘与裁减成本以工资月数计算，转岗培训按CBA模型计算。时限取决于招聘/裁减能力及技能差距的大小。' });
 Object.assign(I18N.kk.aiErr, {
   officeUnsupported:'Браузер Office файлдарын ашуды (декомпрессиялауды) қолдамайды — жаңа нұсқалы Chrome/Edge/Firefox/Safari қажет',
   officeParseError:'Файл құрылымын талдау мүмкін болмады',
