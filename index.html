@@ -128,19 +128,36 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;
 input[type=range].rp::-webkit-slider-thumb{background:var(--purple)}
 input[type=range].rp::-moz-range-thumb{background:var(--purple)}
 
-/* hint tooltip */
+/* hint tooltip — единый плавающий бокс (position:fixed), чтобы не обрезался
+   родителями с overflow:hidden/auto (карточки, таблицы) */
 .hint{position:relative;display:inline-grid;place-items:center;width:16px;height:16px;
   border-radius:50%;background:var(--line2);color:var(--t3);cursor:help;flex-shrink:0}
-.hint svg{width:11px;height:11px;stroke:currentColor}
-.hint:hover{background:var(--primary);color:#fff}
-.hint .tip{position:absolute;bottom:135%;left:50%;transform:translateX(-50%);
-  width:260px;padding:11px 13px;background:var(--ink);color:#eef1f5;font-size:11.5px;
-  font-weight:500;line-height:1.5;border-radius:10px;box-shadow:0 10px 30px -8px rgba(0,0,0,.5);
-  opacity:0;visibility:hidden;transition:.16s;z-index:60;text-align:left;pointer-events:none;
-  letter-spacing:0}
-.hint:hover .tip{opacity:1;visibility:visible;bottom:150%}
-.hint .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);
-  border:6px solid transparent;border-top-color:var(--ink)}
+.hint svg{width:11px;height:11px;stroke:currentColor;pointer-events:none}
+.hint:hover,.hint.on{background:var(--primary);color:#fff}
+#tipbox{position:fixed;top:0;left:0;max-width:300px;padding:11px 13px;background:var(--ink);
+  color:#eef1f5;font-family:var(--sans);font-size:11.5px;font-weight:500;line-height:1.5;
+  border-radius:10px;box-shadow:0 10px 30px -8px rgba(0,0,0,.5);text-align:left;letter-spacing:0;
+  opacity:0;visibility:hidden;transition:opacity .16s;z-index:200;pointer-events:none;white-space:normal}
+#tipbox.show{opacity:1;visibility:visible}
+#tipbox::after{content:"";position:absolute;left:var(--ax,50%);transform:translateX(-50%);
+  border:6px solid transparent}
+#tipbox.above::after{top:100%;border-top-color:var(--ink)}
+#tipbox.below::after{bottom:100%;border-bottom-color:var(--ink)}
+[dir="rtl"] #tipbox{text-align:right}
+/* всплывающая подсказка графика */
+#charttip{position:fixed;top:0;left:0;min-width:190px;padding:10px 12px;background:var(--ink);
+  color:#eef1f5;font-family:var(--sans);font-size:11.5px;line-height:1.5;border-radius:10px;
+  box-shadow:0 10px 30px -8px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:opacity .12s;
+  z-index:200;pointer-events:none;letter-spacing:0}
+#charttip.show{opacity:1;visibility:visible}
+#charttip .ct-h{font-weight:800;font-size:11px;letter-spacing:.4px;text-transform:uppercase;
+  color:var(--primary-l);padding-bottom:6px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.14)}
+#charttip .ct-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:3px}
+#charttip .ct-k{display:flex;align-items:center;gap:6px;color:#aab2bd}
+#charttip .ct-k i{width:9px;height:3px;border-radius:2px;display:inline-block}
+#charttip .ct-row b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+#charttip .ct-gap{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.14)}
+[dir="rtl"] #charttip{direction:rtl}
 
 /* ---------- BADGES / TAGS ---------- */
 .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-family:var(--mono);
@@ -519,9 +536,12 @@ Object.assign(I18N.ru, { dash:{
   lead:'Единый «светофор» состояния: разрыв сейчас, вероятность дефицита на горизонте, портфель кадровых рисков и стоимость плана действий. Все показатели агрегируются из расчётных моделей.',
   exportLabel:'Сводка (JSON)',
   gapNow:'Разрыв «сейчас»', gapDeficit:'дефицит против факта', gapSurplus:'профицит против расчёта', gapBalance:'баланс',
-  probDeficit:'Вероятность дефицита', probSub:'к {month}-му мес. ({runs} симуляций)',
+  probDeficit:'Вероятность дефицита', probSub:'хотя бы в одном месяце горизонта ({runs} симуляций)',
+  probHint:'Доля симуляций Монте-Карло, где потребность превысила доступный штат <b>хотя бы в одном месяце</b> горизонта — а не только в последнем. Дефицитом считается разрыв больше {thr} чел. (2% от текущего штата). Смотрите на этот показатель вместе с «Пиковым дефицитом»: он отвечает «случится ли», а пиковый — «насколько глубоко».',
   riskIndex:'Индекс риска (портфель)', riskSub:'{critical} критич. · {elevated} повыш. ролей',
+  riskHint:'Средний индекс кадрового риска по всем должностям, взвешенный по их численности (0–100). Каждая должность оценивается по 6 факторам: демография, зависимость от ключевого специалиста, устаревание навыков, текучесть, дефицитность на рынке, риск автоматизации. Разбор по ролям и настройка весов — на вкладке «Кадровые риски».',
   peakDeficit:'Пиковый дефицит', peakSub:'медиана; до {p90} (P90) на {month}-м мес.',
+  peakHint:'Самый глубокий разрыв «потребность − доступный штат» за весь горизонт. В каждой из {runs} симуляций берётся её максимальный разрыв, затем по этим значениям считается медиана (P50) и худшие 10% (P90). Пик приходится на {month}-й месяц — обычно это фаза СМР, где потребность максимальна.',
   fteAuto:'FTE под автоматизацией', fteAutoSub:'к высвобождению за {years} г.',
   planCost:'Стоимость плана', planCostSub:'{hire} найм · {reskill} переоб. · {release} высвоб.',
   trajTitle:'Кадровая траектория объекта',
@@ -567,7 +587,9 @@ Object.assign(I18N.ru, { norm:{
   totalRow:'Итого по всем работам (эксплуатация, до множителя этапа)',
   footnote:'Методики (раздел 5 ТЗ): «{output}», «{time}», «{service}», «{workplace}». Списочная = Явочная × Сменность × k_сп ({absCoeff}).',
   fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ', mainWorkName:'Основная технологическая работа'
-}, chart:{ monthAxis:'месяц проекта', deficitAxis:'дефицит', surplusAxis:'профицит' },
+}, chart:{ monthAxis:'месяц проекта', deficitAxis:'дефицит', surplusAxis:'профицит',
+  tipMonth:'Месяц {n}', tipDemand:'Потребность', tipAvail:'Доступно (P50)',
+  tipBand:'Коридор P10–P90', tipGap:'Разрыв' },
 life:{
   eyebrow:'Этап 2 · Моделирование во времени', title:'Траектория жизненного цикла',
   lead:'Потребность в персонале меняется по фазам актива: проектирование → СМР → ПНР → эксплуатация → вывод. Задайте длительности и сценарий.',
@@ -589,7 +611,7 @@ life:{
   eyebrow:'Этап 3 · Прогноз рисков', title:'Предиктивная аналитика и кадровые риски',
   lead:'Реальные модели: экспоненциальный отток, вероятностный прогноз Монте-Карло ({runs} сценариев) и анализ дожития профессий. Все числа реагируют на параметры — это не статика.',
   exportLabel:'Прогноз (JSON)',
-  kpiProbTitle:'Вероятность дефицита к концу горизонта', kpiProbSub:'Доля из {runs} симуляций, где на {month}-й месяц потребность превысила доступный штат.',
+  kpiProbTitle:'Вероятность дефицита на горизонте', kpiProbSub:'Доля из {runs} симуляций, где потребность превысила доступный штат хотя бы в одном месяце (разрыв > {thr} чел.).',
   kpiPeakTitle:'Пиковый дефицит (медиана)', kpiPeakSub:'До {p90} чел. в худших 10% сценариев (P90). Пик ожидается на {month}-м месяце.',
   kpiAutoTitle:'FTE под риском автоматизации', kpiAutoSub:'Ожидаемое число позиций к высвобождению за {years} г. (анализ дожития по навыкам).',
   driversTitle:'Драйверы прогноза', driversHint:'Эти параметры управляют моделями оттока, найма и автоматизации.',
@@ -802,7 +824,9 @@ Object.assign(I18N.en, { norm:{
   totalRow:'Total across all work types (operation, before stage multiplier)',
   footnote:'Methods (spec section 5): "{output}", "{time}", "{service}", "{workplace}". Payroll = Attendance x Shifts x k_sp ({absCoeff}).',
   fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type', mainWorkName:'Main Production Work'
-}, chart:{ monthAxis:'project month', deficitAxis:'shortage', surplusAxis:'surplus' },
+}, chart:{ monthAxis:'project month', deficitAxis:'shortage', surplusAxis:'surplus',
+  tipMonth:'Month {n}', tipDemand:'Demand', tipAvail:'Available (P50)',
+  tipBand:'P10–P90 band', tipGap:'Gap' },
 life:{
   eyebrow:'Stage 2 · Modeling over Time', title:'Lifecycle Trajectory',
   lead:'Workforce demand changes across the asset\'s phases: design → construction → commissioning → operation → decommissioning. Set the durations and scenario.',
@@ -824,7 +848,7 @@ life:{
   eyebrow:'Stage 3 · Risk Forecast', title:'Predictive Analytics and Workforce Risks',
   lead:'Real models: exponential attrition, a probabilistic Monte Carlo forecast ({runs} scenarios), and profession survival analysis. Every number reacts to the parameters — nothing here is static.',
   exportLabel:'Forecast (JSON)',
-  kpiProbTitle:'Probability of Shortage by End of Horizon', kpiProbSub:'Share of {runs} simulations where, in month {month}, demand exceeded available headcount.',
+  kpiProbTitle:'Probability of Shortage over the Horizon', kpiProbSub:'Share of {runs} simulations where demand exceeded available headcount in at least one month (gap > {thr} people).',
   kpiPeakTitle:'Peak Shortage (median)', kpiPeakSub:'Up to {p90} people in the worst 10% of scenarios (P90). The peak is expected in month {month}.',
   kpiAutoTitle:'FTE at Automation Risk', kpiAutoSub:'Expected number of positions to be released within {years} yr (skill-based survival analysis).',
   driversTitle:'Forecast Drivers', driversHint:'These parameters control the attrition, hiring and automation models.',
@@ -1046,9 +1070,12 @@ Object.assign(I18N.en, { dash:{
   lead:'A single status overview: the current gap, probability of shortage over the horizon, workforce risk portfolio, and the cost of the action plan. All metrics are aggregated from the calculation models.',
   exportLabel:'Summary (JSON)',
   gapNow:'Gap "now"', gapDeficit:'shortage vs. actual', gapSurplus:'surplus vs. calculated', gapBalance:'balanced',
-  probDeficit:'Probability of Shortage', probSub:'by month {month} ({runs} simulations)',
+  probDeficit:'Probability of Shortage', probSub:'in at least one month of the horizon ({runs} simulations)',
+  probHint:'Share of Monte Carlo simulations where demand exceeded available headcount <b>in at least one month</b> of the horizon — not only in the final month. A shortage counts when the gap exceeds {thr} people (2% of current headcount). Read it together with "Peak Shortage": this answers "will it happen", the peak answers "how deep".',
   riskIndex:'Risk Index (portfolio)', riskSub:'{critical} critical · {elevated} elevated roles',
+  riskHint:'The average workforce-risk index across all positions, weighted by their headcount (0-100). Each position is scored on 6 factors: demographics, key-specialist dependence, skill obsolescence, turnover, market scarcity, and automation risk. The per-role breakdown and weight settings are on the Workforce Risks tab.',
   peakDeficit:'Peak Shortage', peakSub:'median; up to {p90} (P90) in month {month}',
+  peakHint:'The deepest "demand − available headcount" gap across the whole horizon. Each of the {runs} simulations contributes its own maximum gap; the median (P50) and the worst 10% (P90) are then taken across those values. The peak falls in month {month} — usually the construction phase, where demand is highest.',
   fteAuto:'FTE at Automation Risk', fteAutoSub:'to be released within {years} yr',
   planCost:'Plan Cost', planCostSub:'{hire} hire · {reskill} reskill · {release} release',
   trajTitle:'Facility Workforce Trajectory',
@@ -1508,9 +1535,14 @@ function projectGap(){
   let firstDeficit=-1;
   const thr = Math.max(3, S.actualStaff*0.02);
   for(let t=0;t<H;t++){ if(gapP50[t]>thr){firstDeficit=t;break;} }
+  // вероятность дефицита ХОТЯ БЫ В ОДНОМ месяце горизонта: peakDef[r] — максимальный разрыв прогона.
+  // Только «на конец горизонта» вводило в заблуждение: на выводе объекта спрос падает, и показатель
+  // давал 0% даже при огромном дефиците на пике стройки.
+  const deficitAny = peakDef.reduce((c,p)=>c+(p>thr?1:0),0);
 
   return {traj,H,required,availDet,availP10,availP50,availP90,gapP50,
-    monthlyAttr,hireEff,runs,
+    monthlyAttr,hireEff,runs,deficitThreshold:Math.round(thr),
+    probDeficitAny:deficitAny/runs,
     probDeficitEnd:deficitAtEnd/runs,
     peakDeficitMed:percentile(peakSorted,0.50),
     peakDeficitP90:percentile(peakSorted,0.90),
@@ -1694,7 +1726,7 @@ function scenarioMetrics(state,profs){
     const risk=riskAnalysis();
     const plan=actionPlan();
     return {required:b.required, gapNow:b.diff, horizon:M.H,
-      probDeficit:M.probDeficitEnd, peakDeficit:Math.round(M.peakDeficitMed),
+      probDeficit:M.probDeficitAny, peakDeficit:Math.round(M.peakDeficitMed),
       fteAtRisk:automationAnalysis(M.H).totalAtRisk,
       riskIndex:risk.portfolioIndex, planCost:plan.total};
   });
@@ -1736,6 +1768,9 @@ function restore(){
    ============================================================ */
 
 /* ---------------- ПОСТРОИТЕЛИ ГРАФИКОВ (SVG) ---------------- */
+/* ---------- ИНТЕРАКТИВНЫЕ ГРАФИКИ: реестр данных для наведения мышью ---------- */
+let CHARTS={}, chartSeq=0;
+function resetCharts(){ CHARTS={}; chartSeq=0; }
 function svgForecast(M){
   const W=780,H=340,pl=52,pr=18,pt=26,pb=46;
   const n=M.H, iw=W-pl-pr, ih=H-pt-pb;
@@ -1767,13 +1802,22 @@ function svgForecast(M){
   let xlbl=''; const stepX=Math.max(1,Math.ceil(n/8));
   for(let i=0;i<n;i+=stepX){ xlbl+='<text x="'+X(i).toFixed(1)+'" y="'+(H-pb+18)+'" text-anchor="middle" class="vlbl">'+i+'</text>'; }
   xlbl+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-6)+'" text-anchor="middle" class="vlbl" style="font-weight:700">'+esc(t('chart.monthAxis'))+'</text>';
-  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'
+  // данные для наведения мышью + слой курсора-перекрестия
+  const cid='ch'+(++chartSeq);
+  CHARTS[cid]={kind:'forecast',n,W,pl,pt,iw,ih,maxV,
+    required:M.required,p50:M.availP50,p10:M.availP10,p90:M.availP90,phases:M.traj.phases};
+  const hover='<g class="ch-cursor" style="display:none">'
+    +'<line class="ch-line" y1="'+pt+'" y2="'+(pt+ih)+'" stroke="var(--t3)" stroke-width="1" stroke-dasharray="4 3"/>'
+    +'<circle class="ch-d-req" r="4.5" fill="#c4361b" stroke="#fff" stroke-width="1.8"/>'
+    +'<circle class="ch-d-av" r="4.5" fill="#0f766e" stroke="#fff" stroke-width="1.8"/></g>'
+    +'<rect class="ch-hit" x="'+pl+'" y="'+pt+'" width="'+iw+'" height="'+ih+'" fill="transparent" style="cursor:crosshair"/>';
+  return '<svg class="chart" data-chart="'+cid+'" viewBox="0 0 '+W+' '+H+'">'
     +bands+grid
     +'<path d="'+band+'" fill="#0f766e" opacity="0.12"/>'
     +'<path d="'+path(M.required)+'" fill="none" stroke="#c4361b" stroke-width="2.4"/>'
     +'<path d="'+path(M.availP50)+'" fill="none" stroke="#0f766e" stroke-width="2.4"/>'
     +'<path d="'+path(M.availDet)+'" fill="none" stroke="#0f766e" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>'
-    +xlbl+'</svg>';
+    +xlbl+hover+'</svg>';
 }
 
 function svgGap(gap){
@@ -1790,11 +1834,16 @@ function svgGap(gap){
     const c=g>0.5? '#c4361b' : g<-0.5? '#117a5b' : '#c9c2b3';
     bars+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(0.6,h).toFixed(1)+'" fill="'+c+'" rx="1"/>';
   });
-  return '<svg class="chart" viewBox="0 0 '+W+' '+H+'">'
+  const cid='ch'+(++chartSeq);
+  CHARTS[cid]={kind:'gap',n,W,pl,pt,iw,ih,gap};
+  const hover='<g class="ch-cursor" style="display:none">'
+    +'<line class="ch-line" y1="'+pt+'" y2="'+(pt+ih)+'" stroke="var(--t3)" stroke-width="1" stroke-dasharray="4 3"/></g>'
+    +'<rect class="ch-hit" x="'+pl+'" y="'+pt+'" width="'+iw+'" height="'+ih+'" fill="transparent" style="cursor:crosshair"/>';
+  return '<svg class="chart" data-chart="'+cid+'" viewBox="0 0 '+W+' '+H+'">'
     +'<line x1="'+pl+'" y1="'+zeroY+'" x2="'+(W-pr)+'" y2="'+zeroY+'" stroke="#c9c2b3" stroke-width="1.2"/>'
     +'<text x="'+(pl-8)+'" y="'+(pt+10)+'" text-anchor="end" class="axislbl" style="fill:#c4361b">'+esc(t('chart.deficitAxis'))+'</text>'
     +'<text x="'+(pl-8)+'" y="'+(H-pb+2)+'" text-anchor="end" class="axislbl" style="fill:#117a5b">'+esc(t('chart.surplusAxis'))+'</text>'
-    +bars+'</svg>';
+    +bars+hover+'</svg>';
 }
 
 function svgDonut(parts){ // [{v,color,label}]
@@ -1816,7 +1865,119 @@ function hbar(val,color){ // val 0..100
 }
 
 /* ---------------- ОБЩИЕ ЭЛЕМЕНТЫ ---------------- */
-function hint(t){return '<span class="hint">'+ic('help')+'<span class="tip">'+t+'</span></span>';}
+// подсказка «?»: текст живёт в data-tip, показывается общим плавающим боксом (см. initTips)
+function hint(txt){return '<span class="hint" tabindex="0" data-tip="'+esc(txt)+'">'+ic('help')+'</span>';}
+/* ---------- ПЛАВАЮЩИЕ ПОДСКАЗКИ ---------- */
+let tipEl=null, tipAnchor=null;
+function tipBox(){
+  if(!tipEl){ tipEl=document.createElement('div'); tipEl.id='tipbox'; document.body.appendChild(tipEl); }
+  return tipEl;
+}
+function positionTip(){
+  if(!tipAnchor||!tipAnchor.isConnected) return hideTip();
+  const box=tipBox(), M=8, r=tipAnchor.getBoundingClientRect();
+  if(r.bottom<0||r.top>window.innerHeight) return hideTip(); // якорь ушёл за пределы экрана
+  box.style.maxWidth=Math.min(300, window.innerWidth-2*M)+'px';
+  const bw=box.offsetWidth, bh=box.offsetHeight;
+  const above=r.top-bh-10 >= M;   // хватает ли места сверху
+  box.classList.remove('above','below');
+  box.classList.add(above?'above':'below');
+  const top=above ? r.top-bh-10 : r.bottom+10;
+  let left=r.left+r.width/2-bw/2;
+  left=Math.max(M, Math.min(left, window.innerWidth-bw-M));
+  box.style.top=Math.round(top)+'px';
+  box.style.left=Math.round(left)+'px';
+  box.style.setProperty('--ax', Math.round(r.left+r.width/2-left)+'px');
+}
+function showTip(anchor){
+  const txt=anchor.getAttribute('data-tip'); if(!txt) return;
+  const box=tipBox();
+  box.innerHTML=txt;              // допускаем простую разметку (<b>) в подсказках
+  box.className='show';
+  if(tipAnchor&&tipAnchor!==anchor) tipAnchor.classList.remove('on');
+  tipAnchor=anchor; anchor.classList.add('on');
+  positionTip();
+}
+function hideTip(){
+  if(tipEl) tipEl.className='';
+  if(tipAnchor) tipAnchor.classList.remove('on');
+  tipAnchor=null;
+}
+/* ---------- НАВЕДЕНИЕ НА ГРАФИК ---------- */
+let chTipEl=null;
+function chartTipBox(){
+  if(!chTipEl){ chTipEl=document.createElement('div'); chTipEl.id='charttip'; document.body.appendChild(chTipEl); }
+  return chTipEl;
+}
+function hideChartTip(svg){
+  if(chTipEl) chTipEl.className='';
+  const scope=svg||document;
+  scope.querySelectorAll?scope.querySelectorAll('.ch-cursor').forEach(g=>g.style.display='none'):null;
+}
+function phaseAt(phases,i){ const p=(phases||[]).find(ph=>i>=ph.start&&i<ph.end); return p?p.name:''; }
+function chartRow(color,label,val){
+  return '<div class="ct-row"><span class="ct-k">'
+    +(color?'<i style="background:'+color+'"></i>':'')+esc(label)+'</span><b>'+esc(val)+'</b></div>';
+}
+function showChartTip(svg,evt){
+  const cid=svg.getAttribute('data-chart'), d=CHARTS[cid];
+  if(!d) return;
+  const r=svg.getBoundingClientRect();
+  const vx=(evt.clientX-r.left)/r.width*d.W;                 // экранные px -> координаты viewBox
+  const i=clamp(Math.round((vx-d.pl)/d.iw*(d.n-1)),0,d.n-1);
+  const cx=d.pl+d.iw*(d.n>1?i/(d.n-1):0);
+  const g=svg.querySelector('.ch-cursor'); if(!g) return;
+  g.style.display='';
+  const line=g.querySelector('.ch-line'); if(line){ line.setAttribute('x1',cx); line.setAttribute('x2',cx); }
+  let html='<div class="ct-h">'+esc(t('chart.tipMonth',{n:i}))+(d.kind==='forecast'&&phaseAt(d.phases,i)?' · '+esc(phaseAt(d.phases,i)):'')+'</div>';
+  if(d.kind==='forecast'){
+    const Y=v=>d.pt+d.ih-d.ih*(v/d.maxV);
+    const dr=g.querySelector('.ch-d-req'), da=g.querySelector('.ch-d-av');
+    if(dr){ dr.setAttribute('cx',cx); dr.setAttribute('cy',Y(d.required[i])); }
+    if(da){ da.setAttribute('cx',cx); da.setAttribute('cy',Y(d.p50[i])); }
+    const gap=Math.round(d.required[i]-d.p50[i]);
+    html+=chartRow('#c4361b',t('chart.tipDemand'),fmtN(d.required[i]))
+      +chartRow('#0f766e',t('chart.tipAvail'),fmtN(d.p50[i]))
+      +chartRow('',t('chart.tipBand'),fmtN(d.p10[i])+' – '+fmtN(d.p90[i]))
+      +'<div class="ct-row ct-gap"><span class="ct-k">'+esc(t('chart.tipGap'))+'</span><b style="color:'
+      +(gap>0?'#ff8a72':gap<0?'#6fd6ae':'#c3cad4')+'">'+esc((gap>0?'+':'')+fmtN(gap)+' '+(gap>0?t('chart.deficitAxis'):gap<0?t('chart.surplusAxis'):''))+'</b></div>';
+  }else{
+    const v=Math.round(d.gap[i]);
+    html+='<div class="ct-row ct-gap"><span class="ct-k">'+esc(t('chart.tipGap'))+'</span><b style="color:'
+      +(v>0?'#ff8a72':v<0?'#6fd6ae':'#c3cad4')+'">'+esc((v>0?'+':'')+fmtN(v)+' '+(v>0?t('chart.deficitAxis'):v<0?t('chart.surplusAxis'):''))+'</b></div>';
+  }
+  const box=chartTipBox();
+  box.innerHTML=html; box.className='show';
+  const M=8, bw=box.offsetWidth, bh=box.offsetHeight;
+  let left=evt.clientX+14, top=evt.clientY-bh-12;
+  if(left+bw>window.innerWidth-M) left=evt.clientX-bw-14;
+  if(top<M) top=evt.clientY+18;
+  box.style.left=Math.round(Math.max(M,left))+'px';
+  box.style.top=Math.round(Math.min(top,window.innerHeight-bh-M))+'px';
+}
+function initChartHover(){
+  document.addEventListener('mousemove',e=>{
+    const hit=e.target.closest&&e.target.closest('.ch-hit');
+    if(hit){ showChartTip(hit.ownerSVGElement||hit.closest('svg'),e); }
+    else if(chTipEl&&chTipEl.className){ hideChartTip(); }
+  });
+  document.addEventListener('mouseleave',()=>hideChartTip(),true);
+}
+function initTips(){
+  document.addEventListener('mouseover',e=>{ const h=e.target.closest && e.target.closest('[data-tip]'); if(h&&h!==tipAnchor) showTip(h); });
+  document.addEventListener('mouseout',e=>{ const h=e.target.closest && e.target.closest('[data-tip]'); if(h&&h===tipAnchor) hideTip(); });
+  document.addEventListener('focusin',e=>{ const h=e.target.closest && e.target.closest('[data-tip]'); if(h) showTip(h); });
+  document.addEventListener('focusout',()=>hideTip());
+  // тач: тап по «?» открывает/закрывает подсказку
+  document.addEventListener('click',e=>{
+    const h=e.target.closest && e.target.closest('[data-tip]');
+    if(h){ if(h===tipAnchor) hideTip(); else showTip(h); return; }
+    if(tipAnchor) hideTip();
+  });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') hideTip(); });
+  window.addEventListener('scroll',()=>{ if(tipAnchor) positionTip(); },true);
+  window.addEventListener('resize',()=>{ if(tipAnchor) positionTip(); });
+}
 function toolbar(opts){ // opts: {pdf, exportFn, importType}
   let h='<div class="actions">';
   h+='<button class="tool red" data-act="print">'+ic('file')+esc(t('common.pdf'))+'</button>';
@@ -2049,7 +2210,7 @@ function renderPredictive(){
   // покрытие дефицита переобучением: доля выполнимых мостов
   const feasibleShare = bridges.length? Math.round(bridges.filter(x=>x.feasible).length/bridges.length*100):0;
   const turnBenchmark = S.turnover>20?t('pred.benchAbove'):S.turnover>14?t('pred.benchMarket'):t('pred.benchBelow');
-  const probColor = M.probDeficitEnd>0.6?'var(--red)':M.probDeficitEnd>0.3?'var(--amber)':'var(--green)';
+  const probColor = M.probDeficitAny>0.6?'var(--red)':M.probDeficitAny>0.3?'var(--amber)':'var(--green)';
   const STATUS_LABEL={reskill:t('pred.statusReskill'),crosstrain:t('pred.statusCrosstrain'),retain:t('pred.statusRetain')};
 
   const ctrl=(id,label,val,min,max,step,suf,h)=>'<div class="field"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px">'
@@ -2066,8 +2227,8 @@ function renderPredictive(){
   // KPI лента
   +'<div class="grid g3" style="margin-bottom:18px">'
     +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+esc(t('pred.kpiProbTitle'))+'</div>'
-      +'<div class="kv" style="color:'+probColor+'">'+pct(M.probDeficitEnd)+'%</div>'
-      +'<div class="kd">'+esc(t('pred.kpiProbSub',{runs:M.runs.toLocaleString(curLocale()),month:M.H-1}))+'</div></div>'
+      +'<div class="kv" style="color:'+probColor+'">'+pct(M.probDeficitAny)+'%</div>'
+      +'<div class="kd">'+esc(t('pred.kpiProbSub',{runs:M.runs.toLocaleString(curLocale()),thr:fmtN(M.deficitThreshold)}))+'</div></div>'
     +'<div class="kpi" style="border-top:3px solid var(--red)"><div class="kt">'+ic('alert')+esc(t('pred.kpiPeakTitle'))+'</div>'
       +'<div class="kv" style="color:var(--red)">'+fmtN(M.peakDeficitMed)+'</div>'
       +'<div class="kd">'+esc(t('pred.kpiPeakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}))+'</div></div>'
@@ -2271,12 +2432,12 @@ function renderDashboard(){
   const auto=automationAnalysis(M.H);
   const top=risk.rows.slice(0,5);
   const gapColor=b.diff>0?'var(--red)':b.diff<0?'var(--amber)':'var(--green)';
-  const probColor=light(M.probDeficitEnd*100,30,60);
+  const probColor=light(M.probDeficitAny*100,30,60);
   const riskColor=light(risk.portfolioIndex,40,66);
 
-  const tl=(title,val,sub,color,icon)=>'<div class="kpi" style="border-top:3px solid '+color+'">'
-    +'<div class="kt">'+ic(icon)+title+'</div>'
-    +'<div class="kv" style="color:'+color+'">'+val+'</div><div class="kd">'+sub+'</div></div>';
+  const tl=(title,val,sub,color,icon,tip)=>'<div class="kpi" style="border-top:3px solid '+color+'">'
+    +'<div class="kt">'+ic(icon)+esc(title)+(tip?hint(tip):'')+'</div>'
+    +'<div class="kv" style="color:'+color+'">'+val+'</div><div class="kd">'+esc(sub)+'</div></div>';
 
   return '<div class="fadein">'
   +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('dash.eyebrow'))+'</div>'
@@ -2287,14 +2448,17 @@ function renderDashboard(){
   +'<div class="grid g3" style="margin-bottom:18px">'
     +tl(t('dash.gapNow'), (b.diff>0?'−':b.diff<0?'+':'')+fmtN(Math.abs(b.diff)),
         b.diff>0?t('dash.gapDeficit'):b.diff<0?t('dash.gapSurplus'):t('dash.gapBalance'), gapColor,'users')
-    +tl(t('dash.probDeficit'), pct(M.probDeficitEnd)+'%',
-        t('dash.probSub',{month:M.H-1,runs:M.runs.toLocaleString(curLocale())}), probColor,'shield')
+    +tl(t('dash.probDeficit'), pct(M.probDeficitAny)+'%',
+        t('dash.probSub',{month:M.H-1,runs:M.runs.toLocaleString(curLocale())}), probColor,'shield',
+        t('dash.probHint',{thr:fmtN(M.deficitThreshold)}))
     +tl(t('dash.riskIndex'), risk.portfolioIndex+'<small style="font-size:14px;color:var(--t3)"> /100</small>',
-        t('dash.riskSub',{critical:risk.critical,elevated:risk.elevated}), riskColor,'gauge')
+        t('dash.riskSub',{critical:risk.critical,elevated:risk.elevated}), riskColor,'gauge',
+        t('dash.riskHint'))
   +'</div>'
   +'<div class="grid g3" style="margin-bottom:18px">'
     +tl(t('dash.peakDeficit'), fmtN(M.peakDeficitMed),
-        t('dash.peakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}), 'var(--red)','alert')
+        t('dash.peakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}), 'var(--red)','alert',
+        t('dash.peakHint',{runs:M.runs.toLocaleString(curLocale()),month:M.peakMonth}))
     +tl(t('dash.fteAuto'), fmtN(auto.totalAtRisk),
         t('dash.fteAutoSub',{years:auto.years.toFixed(1)}), 'var(--amber)','zap')
     +tl(t('dash.planCost'), fmtKZT(plan.total),
@@ -2560,6 +2724,8 @@ function syncTabs(){
 /* ---------- РЕНДЕР c сохранением фокуса ---------- */
 function render(){
   const view=document.getElementById('view');
+  hideTip(); // подсказка могла указывать на элемент, который сейчас будет заменён
+  hideChartTip(); resetCharts();
   // запомнить активный элемент внутри #view и позицию курсора
   const act=document.activeElement;
   let focusId=null, selS=null, selE=null;
@@ -3140,7 +3306,7 @@ function stateSnapshot(full){
   };
   if(full){
     const M=projectGap(), risk=riskAnalysis(), plan=actionPlan(), auto=automationAnalysis(M.H);
-    Object.assign(snap.kpis,{ horizonMonths:M.H, probDeficitEnd:pct(M.probDeficitEnd)+'%',
+    Object.assign(snap.kpis,{ horizonMonths:M.H, probDeficitAnyMonth:pct(M.probDeficitAny)+'%', probDeficitEnd:pct(M.probDeficitEnd)+'%',
       peakDeficitMed:Math.round(M.peakDeficitMed), firstDeficitMonth:M.firstDeficit,
       fteAtRisk:auto.totalAtRisk, riskIndex:risk.portfolioIndex, planCost:Math.round(plan.total) });
     snap.professions=Object.values(profDB).map(p=>({id:p.id,name:p.name,type:p.type,salary:p.salary,headcount:p.headcount,avgAge:p.avgAge,market:p.market,skills:p.skills}));
@@ -3867,6 +4033,8 @@ function init(){
   worksInit(); // миграция: создать виды работ из легаси-полей при необходимости
   buildTabs();
   bindEvents();
+  initTips();
+  initChartHover();
   initAssistant(); // ИИ-ассистент
   render();
 }
