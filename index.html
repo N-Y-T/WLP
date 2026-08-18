@@ -207,6 +207,7 @@ td.c{text-align:center} td.r{text-align:right}
 .cell-edit:hover{border-bottom-color:var(--line)}
 .cell-edit:focus{border-bottom-color:var(--primary)}
 .dirty td{background:var(--gold-l)!important}
+.fcell{cursor:help}
 /* таблица видов работ: параметры переносятся, имя не обрезается */
 .wtbl td,.wtbl th{padding-left:10px;padding-right:10px}
 .wtbl .wname{min-width:190px;width:24%}
@@ -705,7 +706,15 @@ life:{
   actionSkill:'Программа переобучения под смену технологии',
   actionTurn:'Удержание: пересмотр мотивации и условий',
   actionMarket:'Опережающий рекрутинг / пайплайн кандидатов',
-  actionRedund:'План перераспределения / переквалификации'
+  actionRedund:'План перераспределения / переквалификации',
+  cellDemo:'<b>Демография — {val}%</b><br>Средний возраст по должности: <b>{age}</b> лет (задаётся в Справочнике). Риск растёт линейно от 45 лет к пенсионному возрасту {pension}: ({age}−45)÷({pension}−45).',
+  cellBus:'<b>Ключевой специалист — {val}%</b><br>Носителей компетенции: <b>{hc}</b> чел. (колонка «Числ.» в Справочнике). Чем их меньше, тем выше зависимость: 1−({hc}−1)÷40 = {base}%. Затем × критичность роли {crit} для группы «{type}».',
+  cellSkill:'<b>Навыки — {val}%</b><br>Среднее по навыкам должности: {list}. Проценты берутся из «Лексикона автоматизируемости навыков» на вкладке «Методология»; навык вне лексикона считается как {def}% (помечен *).',
+  cellTurn:'<b>Текучесть — {val}%</b><br>Годовая текучесть <b>{turnover}%</b> (вкладка «Предиктивный анализ») усиливается рыночной дефицитностью этой должности <b>{market}</b>: (текучесть÷45)×(0.7+0.6×{market}).',
+  cellMarket:'<b>Рынок — {val}%</b><br>Рыночная дефицитность <b>{market}</b> — это <u>ваша экспертная оценка</u> из Справочника (колонка «Рынок», 0…1), она не считается системой. Умножается на срок закрытия вакансии <b>{days}</b> дн.: {market}×(0.5+{days}÷180).',
+  cellRedund:'<b>Избыточность — {val}%</b><br>Вероятность того, что роль вытеснит автоматизация за {years} г. Это тот же анализ дожития, что на вкладке «Предиктивный анализ»: там он показан отдельной таблицей, а здесь входит как один из 6 факторов индекса.',
+  cellIndex:'<b>Индекс — {val} из 100</b><br>Взвешенная сумма шести факторов слева:<br>{list}',
+  skillColHint:'Среднее по навыкам должности. Проценты для каждого навыка берутся из «Лексикона автоматизируемости навыков» на вкладке «Методология» — там их можно посмотреть и при необходимости переопределить. Наведите на значение в строке, чтобы увидеть разбор по навыкам.'
 }, act:{
   hireType:'Найм', reskillType:'Переобучение', releaseType:'Высвобождение',
   closeDeficitTarget:'Закрытие дефицита эксплуатации',
@@ -945,7 +954,15 @@ life:{
   actionSkill:'Reskilling program for the technology shift',
   actionTurn:'Retention: revisit motivation and conditions',
   actionMarket:'Proactive recruiting / candidate pipeline',
-  actionRedund:'Redeployment / requalification plan'
+  actionRedund:'Redeployment / requalification plan',
+  cellDemo:'<b>Demographics — {val}%</b><br>Average age for this position: <b>{age}</b> years (set in the Directory). Risk rises linearly from age 45 toward retirement age {pension}: ({age}−45)÷({pension}−45).',
+  cellBus:'<b>Key specialist — {val}%</b><br>People holding this competency: <b>{hc}</b> (the "Count" column in the Directory). The fewer there are, the higher the dependence: 1−({hc}−1)÷40 = {base}%. Then × role criticality {crit} for the "{type}" group.',
+  cellSkill:'<b>Skills — {val}%</b><br>Average across the position\'s skills: {list}. The percentages come from the "Skill Automatability Lexicon" on the Methodology tab; a skill outside the lexicon counts as {def}% (marked *).',
+  cellTurn:'<b>Turnover — {val}%</b><br>Annual turnover <b>{turnover}%</b> (Predictive Analysis tab) amplified by this position\'s market scarcity <b>{market}</b>: (turnover÷45)×(0.7+0.6×{market}).',
+  cellMarket:'<b>Market — {val}%</b><br>Market scarcity <b>{market}</b> is <u>your own expert input</u> from the Directory ("Market" column, 0…1) — it is not computed by the system. It is multiplied by the time-to-fill of <b>{days}</b> days: {market}×(0.5+{days}÷180).',
+  cellRedund:'<b>Redundancy — {val}%</b><br>The probability that automation displaces this role within {years} yr. This is the same survival analysis as on the Predictive Analysis tab: there it is shown as its own table, here it enters as one of the 6 index factors.',
+  cellIndex:'<b>Index — {val} out of 100</b><br>Weighted sum of the six factors on the left:<br>{list}',
+  skillColHint:'The average across the position\'s skills. The percentage for each skill comes from the "Skill Automatability Lexicon" on the Methodology tab, where you can review and override them. Hover a value in a row to see the per-skill breakdown.'
 }, act:{
   hireType:'Hiring', reskillType:'Reskilling', releaseType:'Release',
   closeDeficitTarget:'Closing the operational shortage',
@@ -1587,6 +1604,22 @@ function professionHazard(p){
   if(!sk.length) return def;
   let sum=0; sk.forEach(s=>{ sum += (SKILL_HAZARD[s]!==undefined?SKILL_HAZARD[s]:def); });
   return sum/sk.length;
+}
+// Разбор «риска навыков»: какие именно навыки и с какими весами дали среднее.
+// esc() применяется здесь, т.к. названия навыков вводит пользователь, а подсказка
+// рендерится как HTML (hint() экранирует ещё раз — вложенный esc останется текстом).
+function hazardBreakdown(p){
+  const def=num(S.hazardDefault,HAZARD_DEFAULT);
+  const sk=String(p.skills||'').split(';').map(x=>x.trim()).filter(Boolean);
+  if(!sk.length) return {list:'—',avg:def,unknown:0};
+  let sum=0,unknown=0;
+  const parts=sk.map(x=>{
+    const known=SKILL_HAZARD[x]!==undefined, v=known?SKILL_HAZARD[x]:def;
+    if(!known) unknown++;
+    sum+=v;
+    return esc(skillLabel(x))+' '+pct(v)+'%'+(known?'':'*');
+  });
+  return {list:parts.join(' · '),avg:sum/sk.length,unknown};
 }
 function automationAnalysis(horizonMonths){
   const b = computeBase();
@@ -2302,10 +2335,11 @@ function renderPredictive(){
     +'<div class="card"><div class="ctitle">'+ic('zap')+esc(t('pred.survivalTitle'))
       +hint(t('pred.survivalHint'))+'</div>'
       +'<div class="tbl-wrap"><table><thead><tr>'
-        +'<th>'+esc(t('pred.thProfession'))+'</th><th class="c">'+esc(t('pred.thSkillRisk'))+'</th><th class="c">'+esc(t('pred.thDispProb'))+'</th>'
+        +'<th>'+esc(t('pred.thProfession'))+'</th><th class="c">'+esc(t('pred.thSkillRisk'))+hint(t('risk.skillColHint'))+'</th><th class="c">'+esc(t('pred.thDispProb'))+'</th>'
         +'<th class="c">'+esc(t('pred.thFteRisk'))+'</th><th class="c">'+esc(t('pred.thRecommendation'))+'</th></tr></thead><tbody>'
         +auto.rows.map(r=>'<tr><td style="font-weight:700">'+esc(profName(r.p))+'</td>'
-          +'<td class="c">'+hbar(r.hz*100, r.hz>0.6?'var(--red)':r.hz>0.4?'var(--amber)':'var(--green)')+'<span class="mono small muted">'+pct(r.hz)+'%</span></td>'
+          +'<td class="c fcell" data-tip="'+esc(t('risk.cellSkill',{val:pct(r.hz),list:hazardBreakdown(r.p).list,def:pct(num(S.hazardDefault,HAZARD_DEFAULT))}))+'">'
+            +hbar(r.hz*100, r.hz>0.6?'var(--red)':r.hz>0.4?'var(--amber)':'var(--green)')+'<span class="mono small muted">'+pct(r.hz)+'%</span></td>'
           +'<td class="c mono" style="font-weight:800;color:'+(r.dispProb>0.6?'var(--red)':r.dispProb>0.3?'var(--amber)':'var(--green)')+'">'+pct(r.dispProb)+'%</td>'
           +'<td class="c mono" style="font-weight:700">'+r.dispFTE.toFixed(1)+'</td>'
           +'<td class="c"><span class="badge '+r.bcls+'">'+esc(STATUS_LABEL[r.status]||r.status)+'</span></td></tr>').join('')
@@ -2542,9 +2576,25 @@ function renderRisks(){
              ['turn',t('risk.facTurnShort'),t('risk.facTurnDesc')],
              ['market',t('risk.facMarketShort'),t('risk.facMarketDesc')],
              ['redund',t('risk.facRedundShort'),t('risk.facRedundDesc')]];
-  const cell=v=>{const c=light(v*100,40,66);
-    return '<td class="c" style="background:'+(v>=0.66?'var(--red-l)':v>=0.4?'var(--amber-l)':'var(--green-l)')+'">'
+  const cell=(v,tip)=>{const c=light(v*100,40,66);
+    return '<td class="c fcell"'+(tip?' data-tip="'+esc(tip)+'"':'')+' style="background:'+(v>=0.66?'var(--red-l)':v>=0.4?'var(--amber-l)':'var(--green-l)')+'">'
       +'<span class="mono" style="font-weight:700;color:'+c+'">'+pct(v)+'%</span></td>';};
+  // разбор каждого фактора для конкретной роли — чтобы было видно, ИЗ ЧЕГО получилось число
+  const cellTip=(row,key)=>{
+    const p=row.p, v=row.f[key], years=r.years.toFixed(1);
+    if(key==='demo')   return t('risk.cellDemo',{val:pct(v),age:Number(p.avgAge!=null?p.avgAge:42),pension:PENSION_AGE});
+    if(key==='bus')    return t('risk.cellBus',{val:pct(v),hc:Math.max(1,Number(p.headcount||1)),
+                          base:pct(clamp(1-(Math.max(1,Number(p.headcount||1))-1)/40,0,1)),
+                          crit:(TYPE_CRIT[p.type]||0.8),type:esc(t('common.'+p.type+'Short'))});
+    if(key==='skill'){ const hb=hazardBreakdown(p);
+                       return t('risk.cellSkill',{val:pct(v),list:hb.list,def:pct(num(S.hazardDefault,HAZARD_DEFAULT))}); }
+    if(key==='turn')   return t('risk.cellTurn',{val:pct(v),turnover:S.turnover,market:Number(p.market!=null?p.market:0.4)});
+    if(key==='market') return t('risk.cellMarket',{val:pct(v),market:Number(p.market!=null?p.market:0.4),days:S.fillDays});
+    if(key==='redund') return t('risk.cellRedund',{val:pct(v),years});
+    return '';
+  };
+  const indexTip=row=>t('risk.cellIndex',{val:row.index,
+    list:FAC.map(f=>'· '+esc(f[1])+' '+pct(row.f[f[0]])+'% × '+pct(r.w[f[0]])+'%').join('<br>')});
   const fdesc={demo:t('risk.fdescDemo',{age:PENSION_AGE}), bus:t('risk.fdescBus'), skill:t('risk.fdescSkill'),
     turn:t('risk.fdescTurn'), market:t('risk.fdescMarket'), redund:t('risk.fdescRedund')};
   const LEVEL_LABEL={critical:t('risk.levelCritical'),elevated:t('risk.levelElevated'),moderate:t('risk.levelModerate')};
@@ -2590,8 +2640,8 @@ function renderRisks(){
     +'<th>'+esc(t('norm.thRole'))+'</th>'+FAC.map(f=>'<th class="c" title="'+esc(f[2])+'">'+esc(f[1])+'</th>').join('')
     +'<th class="c" title="'+esc(t('risk.thIndexTitle'))+'">'+esc(t('risk.thIndex'))+'</th><th class="c">'+esc(t('risk.thLevel'))+'</th><th>'+esc(t('pred.thRecommendation'))+'</th></tr></thead><tbody>'
     +r.rows.map(row=>'<tr><td style="font-weight:700">'+esc(profName(row.p))+'</td>'
-      +FAC.map(f=>cell(row.f[f[0]])).join('')
-      +'<td class="c"><span class="mono" style="font-weight:800;font-size:15px;color:'+light(row.index,40,66)+'">'+row.index+'</span></td>'
+      +FAC.map(f=>cell(row.f[f[0]],cellTip(row,f[0]))).join('')
+      +'<td class="c fcell" data-tip="'+esc(indexTip(row))+'"><span class="mono" style="font-weight:800;font-size:15px;color:'+light(row.index,40,66)+'">'+row.index+'</span></td>'
       +'<td class="c"><span class="badge '+row.lvl.b+'">'+esc(LEVEL_LABEL[row.lvl.key])+'</span></td>'
       +'<td class="small">'+esc(ACTION_LABEL[row.actionKey])+'</td></tr>').join('')
     +'</tbody></table></div></div></div>'
@@ -4037,6 +4087,51 @@ Object.assign(I18N.es.work, { footnotePlain:'Cada fila es un tipo de trabajo ind
 Object.assign(I18N.fr.work, { footnotePlain:"Chaque ligne est un type de travail distinct avec sa propre méthode de calcul. L'effectif « de présence » indique combien de personnes sont nécessaires simultanément par poste ; le FTE final tient compte en plus de la couverture des postes et d'une réserve pour congés, arrêts maladie et formation (facteur {absCoeff}). Le total en bas correspond au besoin cumulé avant ajustement selon la phase du projet." });
 Object.assign(I18N.ar.work, { footnotePlain:'كل صف هو نوع عمل مستقل له طريقة حساب خاصة به. يوضّح عدد «الحضور» كم شخصًا يلزم في الوردية الواحدة في آنٍ معًا؛ أما قيمة FTE النهائية فتأخذ في الحسبان أيضًا تغطية الورديات واحتياطيًا للإجازات والإجازات المرضية والتدريب (المعامل {absCoeff}). والإجمالي في الأسفل هو الاحتياج الكلي قبل التعديل حسب مرحلة المشروع.' });
 Object.assign(I18N.zh.work, { footnotePlain:'每一行都是一个独立的作业类型，各有其计算方法。「出勤」人数指同一班次内同时需要的人数；最终 FTE 还会计入班次覆盖以及休假、病假和培训的储备（系数 {absCoeff}）。底部的合计为按项目阶段调整前的总需求。' });
+Object.assign(I18N.kk.risk, {
+  cellDemo:'<b>Демография — {val}%</b><br>Лауазым бойынша орташа жас: <b>{age}</b> жас (Анықтамалықта белгіленеді). Тәуекел 45 жастан зейнет жасына {pension} дейін сызықты өседі: ({age}−45)÷({pension}−45).',
+  cellBus:'<b>Негізгі маман — {val}%</b><br>Құзыретті иеленушілер: <b>{hc}</b> адам (Анықтамалықтағы «Саны» бағаны). Олар неғұрлым аз болса, тәуелділік соғұрлым жоғары: 1−({hc}−1)÷40 = {base}%. Содан кейін × «{type}» тобы үшін рөл маңыздылығы {crit}.',
+  cellSkill:'<b>Дағдылар — {val}%</b><br>Лауазым дағдылары бойынша орташа: {list}. Пайыздар «Әдістеме» қосымшасындағы «Дағдылардың автоматтандырылу лексиконынан» алынады; лексиконнан тыс дағды {def}% деп есептеледі (* белгісі).',
+  cellTurn:'<b>Тұрақтамау — {val}%</b><br>Жылдық тұрақтамау <b>{turnover}%</b> («Болжамды талдау» қосымшасы) осы лауазымның нарықтық тапшылығымен <b>{market}</b> күшейеді: (тұрақтамау÷45)×(0,7+0,6×{market}).',
+  cellMarket:'<b>Нарық — {val}%</b><br>Нарықтық тапшылық <b>{market}</b> — бұл Анықтамалықтан алынған <u>сіздің сараптамалық бағаңыз</u> («Нарық» бағаны, 0…1), оны жүйе есептемейді. Бос орынды жабу мерзіміне <b>{days}</b> күн көбейтіледі: {market}×(0,5+{days}÷180).',
+  cellRedund:'<b>Артықтық — {val}%</b><br>Рөлді {years} жылда автоматтандыру ығыстыру ықтималдығы. Бұл «Болжамды талдау» қосымшасындағы дәл сол аман қалу талдауы: онда ол бөлек кесте, ал мұнда индекстің 6 факторының бірі ретінде кіреді.',
+  cellIndex:'<b>Индекс — 100-ден {val}</b><br>Сол жақтағы алты фактордың өлшенген қосындысы:<br>{list}',
+  skillColHint:'Лауазым дағдылары бойынша орташа мән. Әр дағдының пайызы «Әдістеме» қосымшасындағы «Дағдылардың автоматтандырылу лексиконынан» алынады — оларды сонда қарап, қажет болса өзгертуге болады. Дағдылар бойынша толық талдауды көру үшін жолдағы мәнге меңзерді апарыңыз.' });
+Object.assign(I18N.es.risk, {
+  cellDemo:'<b>Demografía — {val}%</b><br>Edad media del puesto: <b>{age}</b> años (se define en el Directorio). El riesgo crece linealmente desde los 45 años hasta la edad de jubilación {pension}: ({age}−45)÷({pension}−45).',
+  cellBus:'<b>Especialista clave — {val}%</b><br>Personas con esta competencia: <b>{hc}</b> (columna «Cantidad» del Directorio). Cuantas menos haya, mayor es la dependencia: 1−({hc}−1)÷40 = {base}%. Luego × criticidad del rol {crit} para el grupo «{type}».',
+  cellSkill:'<b>Competencias — {val}%</b><br>Media de las competencias del puesto: {list}. Los porcentajes provienen del «Léxico de automatizabilidad de competencias» en la pestaña Metodología; una competencia fuera del léxico se cuenta como {def}% (marcada con *).',
+  cellTurn:'<b>Rotación — {val}%</b><br>La rotación anual del <b>{turnover}%</b> (pestaña Análisis Predictivo) se amplifica con la escasez de mercado de este puesto <b>{market}</b>: (rotación÷45)×(0,7+0,6×{market}).',
+  cellMarket:'<b>Mercado — {val}%</b><br>La escasez de mercado <b>{market}</b> es <u>su propia estimación experta</u> del Directorio (columna «Mercado», 0…1); no la calcula el sistema. Se multiplica por el tiempo de cobertura de <b>{days}</b> días: {market}×(0,5+{days}÷180).',
+  cellRedund:'<b>Redundancia — {val}%</b><br>Probabilidad de que la automatización desplace este rol en {years} años. Es el mismo análisis de supervivencia de la pestaña Análisis Predictivo: allí se muestra como tabla propia y aquí entra como uno de los 6 factores del índice.',
+  cellIndex:'<b>Índice — {val} de 100</b><br>Suma ponderada de los seis factores de la izquierda:<br>{list}',
+  skillColHint:'Media de las competencias del puesto. El porcentaje de cada competencia proviene del «Léxico de automatizabilidad de competencias» en la pestaña Metodología, donde puede revisarlos y ajustarlos. Pase el cursor sobre un valor de la fila para ver el desglose por competencia.' });
+Object.assign(I18N.fr.risk, {
+  cellDemo:"<b>Démographie — {val}%</b><br>Âge moyen du poste : <b>{age}</b> ans (défini dans le Référentiel). Le risque croît linéairement de 45 ans jusqu'à l'âge de départ à la retraite {pension} : ({age}−45)÷({pension}−45).",
+  cellBus:"<b>Spécialiste clé — {val}%</b><br>Détenteurs de la compétence : <b>{hc}</b> (colonne « Effectif » du Référentiel). Moins ils sont nombreux, plus la dépendance est forte : 1−({hc}−1)÷40 = {base}%. Puis × criticité du rôle {crit} pour le groupe « {type} ».",
+  cellSkill:"<b>Compétences — {val}%</b><br>Moyenne des compétences du poste : {list}. Les pourcentages proviennent du « Lexique d'automatisabilité des compétences » de l'onglet Méthodologie ; une compétence absente du lexique compte pour {def}% (marquée *).",
+  cellTurn:"<b>Rotation — {val}%</b><br>La rotation annuelle de <b>{turnover}%</b> (onglet Analyse prédictive) est amplifiée par la rareté de ce poste sur le marché <b>{market}</b> : (rotation÷45)×(0,7+0,6×{market}).",
+  cellMarket:"<b>Marché — {val}%</b><br>La rareté sur le marché <b>{market}</b> est <u>votre propre estimation</u> issue du Référentiel (colonne « Marché », 0…1) ; elle n'est pas calculée par le système. Elle est multipliée par le délai de recrutement de <b>{days}</b> jours : {market}×(0,5+{days}÷180).",
+  cellRedund:"<b>Redondance — {val}%</b><br>Probabilité que l'automatisation remplace ce rôle sous {years} ans. Il s'agit de la même analyse de survie que dans l'onglet Analyse prédictive : elle y figure comme tableau distinct, ici elle entre comme l'un des 6 facteurs de l'indice.",
+  cellIndex:"<b>Indice — {val} sur 100</b><br>Somme pondérée des six facteurs de gauche :<br>{list}",
+  skillColHint:"Moyenne des compétences du poste. Le pourcentage de chaque compétence provient du « Lexique d'automatisabilité des compétences » de l'onglet Méthodologie, où vous pouvez les consulter et les ajuster. Survolez une valeur de la ligne pour voir le détail par compétence." });
+Object.assign(I18N.ar.risk, {
+  cellDemo:'<b>التركيبة العمرية — {val}%</b><br>متوسط العمر لهذه الوظيفة: <b>{age}</b> سنة (يُحدَّد في الدليل). ترتفع المخاطر خطيًا من سن 45 حتى سن التقاعد {pension}: ({age}−45)÷({pension}−45).',
+  cellBus:'<b>الأخصائي الرئيسي — {val}%</b><br>عدد من يمتلكون هذه الكفاءة: <b>{hc}</b> (عمود «العدد» في الدليل). كلما قلّ عددهم زاد الاعتماد عليهم: 1−({hc}−1)÷40 = {base}%. ثم × أهمية الدور {crit} لمجموعة «{type}».',
+  cellSkill:'<b>المهارات — {val}%</b><br>المتوسط عبر مهارات الوظيفة: {list}. تُؤخذ النسب من «معجم قابلية أتمتة المهارات» في تبويب المنهجية؛ وتُحتسب المهارة غير المدرجة بـ {def}% (وتُعلَّم بـ *).',
+  cellTurn:'<b>الدوران الوظيفي — {val}%</b><br>يتضخّم الدوران السنوي البالغ <b>{turnover}%</b> (تبويب التحليل التنبؤي) بندرة هذه الوظيفة في السوق <b>{market}</b>: (الدوران÷45)×(0.7+0.6×{market}).',
+  cellMarket:'<b>السوق — {val}%</b><br>ندرة السوق <b>{market}</b> هي <u>تقديرك الخبير أنت</u> من الدليل (عمود «السوق»، 0…1) ولا يحسبها النظام. وتُضرب في مدة شغل الوظيفة البالغة <b>{days}</b> يومًا: {market}×(0.5+{days}÷180).',
+  cellRedund:'<b>الفائض الوظيفي — {val}%</b><br>احتمال أن تحلّ الأتمتة محل هذا الدور خلال {years} سنة. وهو تحليل البقاء نفسه الموجود في تبويب التحليل التنبؤي: يُعرض هناك في جدول مستقل، ويدخل هنا كأحد عوامل المؤشر الستة.',
+  cellIndex:'<b>المؤشر — {val} من 100</b><br>المجموع المرجّح للعوامل الستة على اليسار:<br>{list}',
+  skillColHint:'المتوسط عبر مهارات الوظيفة. تُؤخذ نسبة كل مهارة من «معجم قابلية أتمتة المهارات» في تبويب المنهجية، حيث يمكنك مراجعتها وتعديلها. مرّر المؤشر فوق قيمة في الصف لعرض التفصيل حسب المهارة.' });
+Object.assign(I18N.zh.risk, {
+  cellDemo:'<b>人口结构 — {val}%</b><br>该岗位平均年龄：<b>{age}</b> 岁（在目录中设置）。风险从 45 岁起向退休年龄 {pension} 岁线性上升：({age}−45)÷({pension}−45)。',
+  cellBus:'<b>关键岗位依赖 — {val}%</b><br>掌握该能力的人数：<b>{hc}</b> 人（目录中的「人数」列）。人数越少依赖度越高：1−({hc}−1)÷40 = {base}%。再乘以「{type}」组的岗位关键度 {crit}。',
+  cellSkill:'<b>技能 — {val}%</b><br>该岗位各项技能的平均值：{list}。百分比取自「方法论」标签页的「技能可自动化程度词典」；词典之外的技能按 {def}% 计算（标记为 *）。',
+  cellTurn:'<b>离职率 — {val}%</b><br>年离职率 <b>{turnover}%</b>（预测分析标签页）会因该岗位的市场稀缺度 <b>{market}</b> 而放大：(离职率÷45)×(0.7+0.6×{market})。',
+  cellMarket:'<b>市场 — {val}%</b><br>市场稀缺度 <b>{market}</b> 是<u>您自己填写的专家判断</u>，来自目录（「市场稀缺度」列，0…1），并非系统计算得出。它会乘以 <b>{days}</b> 天的招聘周期：{market}×(0.5+{days}÷180)。',
+  cellRedund:'<b>被替代风险 — {val}%</b><br>该角色在 {years} 年内被自动化替代的概率。这与预测分析标签页中的生存分析完全相同：在那里它是独立表格，在这里则作为指数六项因素之一参与计算。',
+  cellIndex:'<b>指数 — {val}／100</b><br>左侧六项因素的加权总和：<br>{list}',
+  skillColHint:'该岗位各项技能的平均值。每项技能的百分比取自「方法论」标签页的「技能可自动化程度词典」，可在那里查看并调整。将鼠标悬停在行内数值上可查看按技能的明细。' });
 Object.assign(I18N.kk.cba, { severanceBase:'Жұмыстан босату жәрдемақысы', recruitingBase:'Рекрутинг және бейімдеу', idleBase:'Оқу кезіндегі ақылы бос тұру',
   liveCoefs:'Коэффициенттер «Әдістеме» қосымшасынан алынады және мұнда автоматты түрде қолданылады: жалдау {hire} {hireSuf}, босату {sever} {severSuf}, оқуға бос тұру {idle} {idleSuf}.' });
 Object.assign(I18N.kk.act, { footnoteBase:'Жалдау мен босату құны жалақымен есептеледі, қайта даярлау — CBA моделі бойынша. Мерзімдер жалдау/босату сыйымдылығы мен дағдылар алшақтығының көлемінен шығады.' });
