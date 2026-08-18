@@ -569,8 +569,9 @@ Object.assign(I18N.ru, { norm:{
   actualFactLabel:'Текущий факт', gapLabel:'Разрыв (GAP)',
   deficit:'Дефицит', surplus:'Избыток', balance:'Баланс',
   needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
-  detailTitle:'Детализация по должностям', detailHint:'Распределение потребности по должностям из справочника с учётом оргструктуры и кривой этапа (Q1–Q4 — динамика внутри фазы).',
-  thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель',
+  detailTitle:'Детализация по должностям', detailHint:'Потребность из блока «Сводный результат» делится между должностями справочника: сначала по группам (Основной / ТОиР / ИТР), затем поровну между должностями внутри группы. Столбцы Q1–Q4 показывают, как эта потребность меняется <b>внутри выбранной фазы</b> — от её начала (Q1) к концу (Q4).',
+  qHint:'Фаза «{stage}» неравномерна: в начале людей нужно меньше, чем в конце (или наоборот). Q1–Q4 — четыре контрольные точки этой кривой: {q1} / {q2} / {q3} / {q4} от базового уровня. «FTE цель» — среднее по фазе, поэтому Q-значения закономерно расходятся с ним в обе стороны.',
+  thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель (среднее по фазе)',
   groupCore:'Основной персонал', groupAux:'Службы ТОиР', groupMgmt:'ИТР и менеджмент',
   noPositions:'Нет должностей в справочнике', periodWorks:'{n} видов работ'
 }, work:{
@@ -809,8 +810,9 @@ Object.assign(I18N.en, { norm:{
   actualFactLabel:'Current Actual', gapLabel:'Gap (GAP)',
   deficit:'Shortage', surplus:'Surplus', balance:'Balanced',
   needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
-  detailTitle:'Breakdown by Position', detailHint:'Distribution of demand across directory positions, accounting for org structure and the stage curve (Q1-Q4 - dynamics within the phase).',
-  thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE',
+  detailTitle:'Breakdown by Position', detailHint:'The demand from the Summary Result block is split across directory positions: first by group (Core / Maintenance / Engineering), then evenly among the positions within each group. The Q1-Q4 columns show how that demand changes <b>within the selected phase</b> — from its start (Q1) to its end (Q4).',
+  qHint:'The "{stage}" phase is not flat: fewer people are needed at its start than at its end (or vice versa). Q1-Q4 are the four control points of that curve: {q1} / {q2} / {q3} / {q4} of the base level. "Target FTE" is the phase average, so the Q values naturally sit above and below it.',
+  thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE (phase average)',
   groupCore:'Core Personnel', groupAux:'Maintenance Services', groupMgmt:'Engineering & Management',
   noPositions:'No positions in the directory', periodWorks:'{n} work types'
 }, work:{
@@ -1248,6 +1250,10 @@ const STAGE_NAME_I18N = {
   ru:{ design:'Проектирование', construction:'Строительство (СМР)', commissioning:'Пуско-наладка (ПНР)', operation:'Эксплуатация', decline:'Консервация / вывод' },
   en:{ design:'Design', construction:'Construction', commissioning:'Commissioning', operation:'Operation', decline:'Decommissioning' }
 };
+// Множитель этапа выводится ИЗ кривой Q1–Q4, а не задаётся отдельно: иначе снимок
+// «сейчас» (computeBase) и траектория (requiredAtMonth, она же график и Монте-Карло)
+// считали разный уровень одной и той же фазы — расхождение до 2.9x на «Проектировании».
+function stageMult(id){ const q=(STAGES[id]||STAGES.operation).qTrend; return (q[0]+q[1]+q[2]+q[3])/4; }
 function stageName(id){ const m=STAGE_NAME_I18N[LANG]; return (m&&m[id]) || (STAGE_NAME_I18N.ru[id]) || (STAGES[id]&&STAGES[id].name) || id; }
 
 // Лексикон рисков автоматизации навыков (вероятность, что задача автоматизируема)
@@ -1424,7 +1430,7 @@ function computeBase(){
     : {core:S.rCore/totalR, aux:S.rAux/totalR, mgmt:S.rMgmt/totalR};
   const baseOperational = wt.total>0 ? wt.total : (S.volume/Math.max(1,S.norm))*S.shifts*S.absCoeff;
   const stage = STAGES[S.stage];
-  let calc = baseOperational * stage.mult;
+  let calc = baseOperational * stageMult(S.stage);
   if(S.scenario==='optimistic') calc *= 1.25;
   if(S.scenario==='automation' && (S.stage==='operation'||S.stage==='decline')) calc *= 0.65;
   const required = Math.max(1, Math.round(calc));
@@ -2090,7 +2096,8 @@ function renderNormative(){
       +hint(t('norm.detailHint'))+'</div>'
       +'<div class="tbl-wrap"><table><thead><tr>'
         +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th><th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
-        +'<th class="c">Q1</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
+        +'<th class="c">Q1'+hint(t('norm.qHint',{stage:stageName(S.stage),
+            q1:q[0],q2:q[1],q3:q[2],q4:q[3]}))+'</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
         +groupRows(groups.core,'core',t('norm.groupCore'),'b-blue','var(--blue)')
         +groupRows(groups.aux,'aux',t('norm.groupAux'),'b-green','var(--green)')
         +groupRows(groups.mgmt,'mgmt',t('norm.groupMgmt'),'b-purple','var(--purple)')
@@ -2178,7 +2185,7 @@ function renderLifecycle(){
     +'</div>'
 
     +'<div class="field"><label class="flabel">'+esc(t('life.currentStageLabel'))+hint(t('life.currentStageHint'))+'</label>'
-      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>'<option value="'+id+'"'+(S.stage===id?' selected':'')+'>'+esc(stageName(id))+' (K='+STAGES[id].mult+')</option>').join('')+'</select></div>'
+      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>'<option value="'+id+'"'+(S.stage===id?' selected':'')+'>'+esc(stageName(id))+' (K='+stageMult(id).toFixed(2)+')</option>').join('')+'</select></div>'
 
     +'<div class="field"><label class="flabel">'+esc(t('life.macroLabel'))+hint(t('life.macroHint'))+'</label>'
       +'<select class="select" id="scenario">'
@@ -4068,6 +4075,21 @@ Object.assign(I18N.zh.aiErr, {
   officeLegacyFormat:'不支持旧版文件格式（.doc/.xls/.ppt）。请将文件另存为现代格式（.docx/.xlsx/.pptx）后重新上传。'
 });
 Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
+
+/* Пункт руководства про множитель этапа (K): он теперь ВЫЧИСЛЯЕТСЯ из кривой Q1–Q4,
+   поэтому конкретные числа из старого текста больше не актуальны. Патчим во всех языках. */
+[['ru','K = средний уровень фазы относительно эксплуатации. Вычисляется как среднее четырёх контрольных точек кривой Q1–Q4, поэтому снимок «сейчас» и график траектории всегда согласованы. Текущие значения видны в списке «Текущий этап».'],
+ ['en','K = the average level of the phase relative to operation. It is computed as the mean of the four Q1-Q4 control points, so the "now" snapshot and the trajectory chart always agree. Current values are shown in the "Current Stage" dropdown.'],
+ ['kk','K = пайдалану кезеңіне қатысты фазаның орташа деңгейі. Q1–Q4 қисығының төрт бақылау нүктесінің орташа мәні ретінде есептеледі, сондықтан «қазір» суреті мен траектория графигі әрқашан үйлесімді. Ағымдағы мәндер «Ағымдағы кезең» тізімінде көрсетілген.'],
+ ['es','K = el nivel medio de la fase en relación con la operación. Se calcula como la media de los cuatro puntos de control Q1-Q4, por lo que la instantánea "ahora" y el gráfico de trayectoria siempre coinciden. Los valores actuales se muestran en la lista "Etapa actual".'],
+ ['fr','K = le niveau moyen de la phase par rapport à l\'exploitation. Il est calculé comme la moyenne des quatre points de contrôle Q1-Q4, de sorte que l\'instantané « maintenant » et la courbe de trajectoire concordent toujours. Les valeurs actuelles figurent dans la liste « Étape actuelle ».'],
+ ['ar','K = المستوى المتوسط للمرحلة مقارنةً بمرحلة التشغيل. يُحتسب كمتوسط نقاط التحكم الأربع Q1-Q4، لذا تتوافق لقطة «الآن» مع منحنى المسار دائمًا. تظهر القيم الحالية في قائمة «المرحلة الحالية».'],
+ ['zh','K = 该阶段相对于运营阶段的平均水平。它由 Q1-Q4 四个控制点取平均计算得出，因此「当前」快照与轨迹图始终一致。当前数值可在「当前阶段」下拉列表中查看。']
+].forEach(function(pair){
+  var g=GUIDE_I18N[pair[0]];
+  var it=g&&g[2]&&g[2].items&&g[2].items[1];
+  if(it) it.how=pair[1];
+});
 
 /* ---------- СТАРТ ---------- */
 function init(){
