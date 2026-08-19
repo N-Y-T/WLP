@@ -208,6 +208,23 @@ td.c{text-align:center} td.r{text-align:right}
 .cell-edit:focus{border-bottom-color:var(--primary)}
 .dirty td{background:var(--gold-l)!important}
 .fcell{cursor:help}
+/* иконки внутри крупных значений и служебных строк не должны раздуваться по font-size */
+/* базовый размер любой иконки из ic(): без него SVG в flex-строке растягивается
+   до высоты контейнера (на вкладке CBA доходило до 116px). Точечные правила
+   (.ctitle svg, .tool svg, .tab svg ...) перекрывают это по специфичности. */
+.ic{width:16px;height:16px;flex-shrink:0}
+.mval svg{width:20px;height:20px;stroke-width:2.4}
+.small svg{width:14px;height:14px}
+/* пошаговая расшифровка расчёта потребности */
+.chain{margin-top:18px;padding-top:16px;border-top:1px solid var(--line2)}
+.chtitle{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:1.6px;
+  text-transform:uppercase;color:var(--t3);font-weight:700;margin-bottom:10px}
+.chrow{display:grid;grid-template-columns:20px 1fr auto;align-items:baseline;gap:10px;padding:5px 0;font-size:12.5px;color:var(--t2)}
+.chrow .chn{font-family:var(--mono);font-size:10px;color:var(--t3)}
+.chrow .chv{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;color:var(--t1);white-space:nowrap}
+.chrow.chsum{border-top:1px dashed var(--line);margin-top:3px;padding-top:8px;color:var(--ink);font-weight:700}
+.chrow.chsum .chv{color:var(--primary);font-size:14px}
+.chrow.chsum:last-child .chv{font-size:16px}
 /* таблица видов работ: параметры переносятся, имя не обрезается */
 .wtbl td,.wtbl th{padding-left:10px;padding-right:10px}
 .wtbl .wname{min-width:190px;width:24%}
@@ -467,7 +484,7 @@ const IC = {
   route:'<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
   gauge:'<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>'
 };
-function ic(n,cls){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'+(cls?' class="'+cls+'"':'')+'>'+IC[n]+'</svg>';}
+function ic(n,cls){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ic'+(cls?' '+cls:'')+'">'+IC[n]+'</svg>';}
 
 /* ============================================================
    ИНТЕРНАЦИОНАЛИЗАЦИЯ (7 языков) — словарь, t(), переключатель
@@ -581,6 +598,16 @@ Object.assign(I18N.ru, { norm:{
   thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель (среднее по фазе)',
   groupCore:'Основной персонал', groupAux:'Службы ТОиР', groupMgmt:'ИТР и менеджмент',
   noPositions:'Нет должностей в справочнике', periodWorks:'{n} видов работ',
+  chainTitle:'Как получилась эта цифра',
+  chainStep1:'Явочная численность по всем видам работ (сколько человек нужно одновременно в одну смену)',
+  chainStep2:'× сменность каждой работы (сколько смен нужно закрыть)',
+  chainStep3:'× резерв k_сп {k} (отпуска, больничные, обучение)',
+  chainTotalWorks:'Итого по видам работ — базовый уровень',
+  chainStep4:'× множитель фазы «{stage}» (K = {k})',
+  chainStep5:'× макро-сценарий «{name}» ({k})',
+  chainResult:'Расчётная потребность',
+  chainNoWorks:'Виды работ не заданы — потребность считается из устаревших полей объёма и нормы. Добавьте виды работ в таблице справа, чтобы расчёт стал прозрачным.',
+  chainHint:'Полная цепочка расчёта: от объёма работ до итоговой потребности. Каждый шаг можно проверить — числа берутся из таблицы «Виды работ» справа и из длительностей фаз на вкладке «Жизненный цикл».',
   demoDirWarn:'<b>Виды работ вы задали свои, а справочник должностей — ещё демонстрационный.</b> Поэтому ниже показаны роли из примера (оператор установки, обходчик и т.д.), а не ваши. Замените их на вкладке «Справочник» или попросите ИИ-ассистента: «замени справочник должностей под мой проект».'
 }, work:{
   volume:'Объём', volumePh:'Объём за период', tNorm:'Нвр', tNormPh:'Норма времени на ед., мин',
@@ -606,6 +633,8 @@ life:{
   matrixTitle:'Матрица управления', matrixHint:'Параметры меняют форму кривой потребности и реакцию прогнозных моделей.',
   durationsLabel:'Длительности фаз (мес.)', durationsHint:'Горизонт = сумма всех фаз. Фазы с длительностью 0 исключаются.',
   phaseDesign:'Проект', phaseConstruction:'СМР', phaseCommissioning:'ПНР', phaseOperation:'Эксплуат.', phaseDecline:'Вывод',
+  phaseOff:'нет в проекте (0 мес.)',
+  stageAutoSwitched:'Выбранной фазы нет в проекте (0 мес.) — расчёт ведётся по фазе «{stage}».',
   currentStageLabel:'Текущий этап (для среза «сейчас»)', currentStageHint:'Используется во вкладке «Нормативный расчёт» для снимка потребности.',
   macroLabel:'Макро-сценарий', macroHint:'«Индустрия 4.0» срезает ~35% потребности в рабочих на эксплуатации и сдвигает структуру к ИТР.',
   scenarioBase:'Базовый [×1.0]', scenarioOptimistic:'Агрессивный рост [×1.25]', scenarioAutomation:'Индустрия 4.0 / роботизация [×0.65]',
@@ -833,6 +862,16 @@ Object.assign(I18N.en, { norm:{
   thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE (phase average)',
   groupCore:'Core Personnel', groupAux:'Maintenance Services', groupMgmt:'Engineering & Management',
   noPositions:'No positions in the directory', periodWorks:'{n} work types',
+  chainTitle:'How this number was built',
+  chainStep1:'Attendance headcount across all work types (people needed simultaneously on one shift)',
+  chainStep2:'x shifts of each work type (how many shifts must be covered)',
+  chainStep3:'x reserve k_sp {k} (vacations, sick leave, training)',
+  chainTotalWorks:'Total across work types — base level',
+  chainStep4:'x phase multiplier "{stage}" (K = {k})',
+  chainStep5:'x macro scenario "{name}" ({k})',
+  chainResult:'Calculated demand',
+  chainNoWorks:'No work types defined — demand falls back to the legacy volume and rate fields. Add work types in the table on the right to make the calculation transparent.',
+  chainHint:'The full calculation chain, from work volume to final demand. Every step is checkable — the numbers come from the "Work Types" table on the right and from the phase durations on the Lifecycle tab.',
   demoDirWarn:'<b>You have defined your own work types, but the positions directory is still the demo one.</b> That is why the roles below are from the sample data (process operator, patrol operator, etc.) rather than yours. Replace them on the Directory tab, or ask the AI assistant: "replace the positions directory to match my project".'
 }, work:{
   volume:'Volume', volumePh:'Volume per period', tNorm:'T-norm', tNormPh:'Time norm per unit, min',
@@ -858,6 +897,8 @@ life:{
   matrixTitle:'Control Matrix', matrixHint:'These parameters change the shape of the demand curve and how the forecast models respond.',
   durationsLabel:'Phase Durations (months)', durationsHint:'The horizon = the sum of all phases. Phases with a duration of 0 are excluded.',
   phaseDesign:'Design', phaseConstruction:'Constr.', phaseCommissioning:'Comm.', phaseOperation:'Operation', phaseDecline:'Decline',
+  phaseOff:'not in this project (0 mo.)',
+  stageAutoSwitched:'The selected phase is not part of this project (0 mo.) — the calculation uses the "{stage}" phase.',
   currentStageLabel:'Current Stage (for the "now" snapshot)', currentStageHint:'Used on the Normative Calculation tab for the demand snapshot.',
   macroLabel:'Macro Scenario', macroHint:'"Industry 4.0" cuts ~35% of worker demand during operation and shifts the structure toward engineering.',
   scenarioBase:'Base [x1.0]', scenarioOptimistic:'Aggressive Growth [x1.25]', scenarioAutomation:'Industry 4.0 / Automation [x0.65]',
@@ -1283,6 +1324,18 @@ const STAGE_NAME_I18N = {
 // «сейчас» (computeBase) и траектория (requiredAtMonth, она же график и Монте-Карло)
 // считали разный уровень одной и той же фазы — расхождение до 2.9x на «Проектировании».
 function stageMult(id){ const q=(STAGES[id]||STAGES.operation).qTrend; return (q[0]+q[1]+q[2]+q[3])/4; }
+// Длительности фаз и выпадающий список «Текущий этап» — независимые контролы.
+// Если у выбранной фазы длительность 0, её в проекте нет: берём первую существующую,
+// иначе расчёт применял бы множитель несуществующей фазы (напр. «Эксплуатация» при 0 мес.).
+function phaseDurations(){
+  return {design:S.durDesign,construction:S.durConstruction,commissioning:S.durCommissioning,
+          operation:S.durOperation,decline:S.durDecline};
+}
+function phaseLen(id){ return Math.max(0, Math.round(num(phaseDurations()[id],0))); }
+function activeStage(){
+  if(phaseLen(S.stage)>0) return S.stage;
+  return STAGE_ORDER.find(id=>phaseLen(id)>0) || S.stage;
+}
 function stageName(id){ const m=STAGE_NAME_I18N[LANG]; return (m&&m[id]) || (STAGE_NAME_I18N.ru[id]) || (STAGES[id]&&STAGES[id].name) || id; }
 
 // Лексикон рисков автоматизации навыков (вероятность, что задача автоматизируема)
@@ -1458,12 +1511,24 @@ function computeBase(){
     ? {core:wt.grp.core/wt.total, aux:wt.grp.aux/wt.total, mgmt:wt.grp.mgmt/wt.total}
     : {core:S.rCore/totalR, aux:S.rAux/totalR, mgmt:S.rMgmt/totalR};
   const baseOperational = wt.total>0 ? wt.total : (S.volume/Math.max(1,S.norm))*S.shifts*S.absCoeff;
-  const stage = STAGES[S.stage];
-  let calc = baseOperational * stageMult(S.stage);
-  if(S.scenario==='optimistic') calc *= 1.25;
-  if(S.scenario==='automation' && (S.stage==='operation'||S.stage==='decline')) calc *= 0.65;
+  const stageId = activeStage();
+  const stage = STAGES[stageId];
+  const kSp = Math.max(1, num(S.absCoeff,1));
+  const kStage = stageMult(stageId);
+  const afterStage = baseOperational * kStage;
+  let calc = afterStage, kScenario = 1;
+  if(S.scenario==='optimistic') kScenario = 1.25;
+  if(S.scenario==='automation' && (stageId==='operation'||stageId==='decline')) kScenario = 0.65;
+  calc *= kScenario;
   const required = Math.max(1, Math.round(calc));
   const diff = required - S.actualStaff;
+  // пошаговая расшифровка «откуда взялась потребность» для карточки сводного результата
+  const chain = {
+    yav: (S.works||[]).reduce((a,w)=>a+workYav(w),0),
+    withShifts: (S.works||[]).reduce((a,w)=>a+workYav(w)*Math.max(1,num(w.shifts,1)),0),
+    kSp, worksTotal: wt.total, stageId, kStage, afterStage, kScenario, calc,
+    fromWorks: wt.total>0
+  };
 
   // сдвиг структуры при автоматизации (меньше «рук», больше ИТР/поддержки)
   let dist = {...dist0};
@@ -1479,7 +1544,7 @@ function computeBase(){
   };
   staff.mgmt = Math.max(0, required - staff.core - staff.aux);
 
-  return {totalR,dist0,baseOperational,stage,required,diff,dist,staff};
+  return {totalR,dist0,baseOperational,stage,stageId,required,diff,dist,staff,chain};
 }
 
 /* ---------------- ТРАЕКТОРИЯ ЖИЗНЕННОГО ЦИКЛА ---------------- */
@@ -2078,6 +2143,27 @@ function worksAreCustom(){
   const w=S.works||[];
   return w.length>1 || (w.length===1 && w[0].id!=='w_main');
 }
+// Пошаговая расшифровка: объём работ -> явочная -> смены -> резерв -> фаза -> сценарий
+function demandChain(b){
+  const c=b.chain, SC={base:t('life.scenarioBase'),optimistic:t('life.scenarioOptimistic'),automation:t('life.scenarioAutomation')};
+  const row=(n,label,val,strong)=>'<div class="chrow'+(strong?' chsum':'')+'">'
+    +'<span class="chn">'+(n||'')+'</span><span class="chl">'+esc(label)+'</span>'
+    +'<b class="chv">'+fmtN(val)+'</b></div>';
+  if(!c.fromWorks){
+    return '<div class="chain"><div class="chtitle">'+esc(t('norm.chainTitle'))+hint(t('norm.chainHint'))+'</div>'
+      +'<div class="note note-amber" style="margin:0">'+ic('alert')+'<div>'+esc(t('norm.chainNoWorks'))+'</div></div>'
+      +row('',t('norm.chainResult'),b.required,true)+'</div>';
+  }
+  let h='<div class="chain"><div class="chtitle">'+esc(t('norm.chainTitle'))+hint(t('norm.chainHint'))+'</div>';
+  h+=row('1',t('norm.chainStep1'),c.yav);
+  h+=row('2',t('norm.chainStep2'),c.withShifts);
+  h+=row('3',t('norm.chainStep3',{k:String(+c.kSp.toFixed(2))}),c.worksTotal);
+  h+=row('',t('norm.chainTotalWorks'),c.worksTotal,true);
+  h+=row('4',t('norm.chainStep4',{stage:stageName(c.stageId),k:c.kStage.toFixed(2)}),c.afterStage);
+  if(c.kScenario!==1) h+=row('5',t('norm.chainStep5',{name:SC[S.scenario]||S.scenario,k:'×'+c.kScenario}),c.calc);
+  h+=row('',t('norm.chainResult'),b.required,true);
+  return h+'</div>';
+}
 function renderNormative(){
   const b=computeBase();
   const allT={...DEFAULT_TEMPLATES,...customTemplates};
@@ -2137,15 +2223,15 @@ function renderNormative(){
 
   // ----- ПРАВО: результаты -----
   +'<div class="col-span-8"><div class="grid" style="gap:18px">'
-    +'<div class="card"><div class="ctitle">'+ic('users')+esc(t('norm.summaryTitle'))+hint(t('norm.summaryHint',{stage:stageName(S.stage)}))+'</div>'
+    +'<div class="card"><div class="ctitle">'+ic('users')+esc(t('norm.summaryTitle'))+hint(t('norm.summaryHint',{stage:stageName(b.stageId)}))+'</div>'
       +'<div class="grid g3">'
-        +'<div class="metric"><div class="mlabel">'+esc(t('norm.reqLabel'))+'</div><div class="mval">'+fmtN(b.required)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('norm.reqSub',{stage:stageName(S.stage)}))+'</div></div>'
+        +'<div class="metric"><div class="mlabel">'+esc(t('norm.reqLabel'))+'</div><div class="mval">'+fmtN(b.required)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('norm.reqSub',{stage:stageName(b.stageId)}))+'</div></div>'
         +'<div class="metric"><div class="mlabel">'+esc(t('norm.actualFactLabel'))+'</div><div class="mval">'+fmtN(S.actualStaff)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(periodLabel())+'</div></div>'
         +'<div class="metric '+(b.diff>0?'gap-pos':b.diff<0?'gap-neg':'')+'"><div class="mlabel">'+esc(t('norm.gapLabel'))+'</div>'
           +'<div class="mval" style="display:flex;align-items:center;gap:6px;font-size:27px">'
           +(b.diff>0?ic('up')+esc(t('norm.deficit'))+' '+fmtN(b.diff):b.diff<0?ic('down')+esc(t('norm.surplus'))+' '+fmtN(-b.diff):esc(t('norm.balance')))+'</div>'
           +'<div class="msub">'+(b.diff>0?esc(t('norm.needHire')):b.diff<0?esc(t('norm.needReskill')):esc(t('norm.staffBalanced')))+'</div></div>'
-      +'</div></div>'
+      +'</div>'+demandChain(b)+'</div>'
 
     +worksEditor()
 
@@ -2155,7 +2241,7 @@ function renderNormative(){
         ? '<div class="note note-amber" style="margin-bottom:14px">'+ic('alert')+'<div>'+t('norm.demoDirWarn')+'</div></div>' : '')
       +'<div class="tbl-wrap"><table><thead><tr>'
         +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th><th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
-        +'<th class="c">Q1'+hint(t('norm.qHint',{stage:stageName(S.stage),
+        +'<th class="c">Q1'+hint(t('norm.qHint',{stage:stageName(b.stageId),
             q1:q[0],q2:q[1],q3:q[2],q4:q[3]}))+'</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
         +groupRows(groups.core,'core',t('norm.groupCore'),'b-blue','var(--blue)')
         +groupRows(groups.aux,'aux',t('norm.groupAux'),'b-green','var(--green)')
@@ -2245,7 +2331,14 @@ function renderLifecycle(){
     +'</div>'
 
     +'<div class="field"><label class="flabel">'+esc(t('life.currentStageLabel'))+hint(t('life.currentStageHint'))+'</label>'
-      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>'<option value="'+id+'"'+(S.stage===id?' selected':'')+'>'+esc(stageName(id))+' (K='+stageMult(id).toFixed(2)+')</option>').join('')+'</select></div>'
+      +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>{
+          const off=phaseLen(id)===0;   // фазы с длительностью 0 в проекте нет
+          return '<option value="'+id+'"'+(S.stage===id?' selected':'')+(off?' disabled':'')+'>'
+            +esc(stageName(id))+' (K='+stageMult(id).toFixed(2)+')'+(off?' — '+esc(t('life.phaseOff')):'')+'</option>';
+        }).join('')+'</select>'
+      +(activeStage()!==S.stage
+        ? '<div class="fnote" style="margin-top:6px;color:var(--amber)">'+esc(t('life.stageAutoSwitched',{stage:stageName(activeStage())}))+'</div>' : '')
+      +'</div>'
 
     +'<div class="field"><label class="flabel">'+esc(t('life.macroLabel'))+hint(t('life.macroHint'))+'</label>'
       +'<select class="select" id="scenario">'
@@ -3408,7 +3501,7 @@ function aiResearchOn(){ const el=document.getElementById('aiResearch'); return 
 function stateSnapshot(full){
   const b=computeBase();
   const snap={
-    params:{ stage:S.stage, stageName:STAGES[S.stage].name, scenario:S.scenario, absCoeff:S.absCoeff,
+    params:{ stage:activeStage(), stageName:stageName(activeStage()), scenario:S.scenario, absCoeff:S.absCoeff,
       actualStaff:S.actualStaff, turnover:S.turnover, hireCap:S.hireCap, fillDays:S.fillDays, sepCap:S.sepCap,
       autoPace:S.autoPace, mcRuns:S.mcRuns,
       phasesMonths:{design:S.durDesign,construction:S.durConstruction,commissioning:S.durCommissioning,operation:S.durOperation,decline:S.durDecline} },
@@ -4184,6 +4277,16 @@ Object.assign(I18N.ar.norm, { demoDirWarn:'<b>لقد حدّدت أنواع ال�
 Object.assign(I18N.ar.aiTool, { emptyProfessions:'قائمة الوظائف فارغة', professionsSetNote:'تم استبدال الدليل: {n} وظيفة', professionsSetResult:'تم استبدال دليل الوظائف، بإجمالي {n} وظيفة' });
 Object.assign(I18N.zh.norm, { demoDirWarn:'<b>作业类型已按您的项目设置，但岗位目录仍是演示数据。</b>因此下方显示的是示例角色，而非您的岗位。请在「目录」标签页中替换，或让 AI 助手代劳：「把岗位目录替换成符合我项目的岗位」。' });
 Object.assign(I18N.zh.aiTool, { emptyProfessions:'岗位列表为空', professionsSetNote:'目录已替换：{n} 个岗位', professionsSetResult:'岗位目录已替换，共 {n} 个岗位' });
+Object.assign(I18N.kk.life, { phaseOff:'жобада жоқ (0 ай)', stageAutoSwitched:'Таңдалған фаза жобада жоқ (0 ай) — есептеу «{stage}» фазасы бойынша жүргізіледі.' });
+Object.assign(I18N.es.life, { phaseOff:'no está en el proyecto (0 meses)', stageAutoSwitched:'La fase seleccionada no forma parte del proyecto (0 meses): el cálculo usa la fase «{stage}».' });
+Object.assign(I18N.fr.life, { phaseOff:"absente du projet (0 mois)", stageAutoSwitched:"La phase sélectionnée ne fait pas partie du projet (0 mois) — le calcul utilise la phase « {stage} »." });
+Object.assign(I18N.ar.life, { phaseOff:'غير موجودة في المشروع (0 شهر)', stageAutoSwitched:'المرحلة المحددة ليست ضمن هذا المشروع (0 شهر) — يجري الحساب وفق مرحلة «{stage}».' });
+Object.assign(I18N.zh.life, { phaseOff:'本项目中不存在（0 个月）', stageAutoSwitched:'所选阶段不属于本项目（0 个月）——计算将使用「{stage}」阶段。' });
+Object.assign(I18N.kk.norm, { chainTitle:'Бұл сан қалай шықты', chainStep1:'Барлық жұмыс түрлері бойынша явкалық сан (бір ауысымда бір мезгілде қанша адам қажет)', chainStep2:'× әр жұмыстың ауысымдылығы (қанша ауысымды жабу керек)', chainStep3:'× k_сп резерві {k} (демалыс, ауру парағы, оқу)', chainTotalWorks:'Жұмыс түрлері бойынша жиыны — базалық деңгей', chainStep4:'× «{stage}» фазасының коэффициенті (K = {k})', chainStep5:'× «{name}» макро-сценарийі ({k})', chainResult:'Есептік қажеттілік', chainNoWorks:'Жұмыс түрлері берілмеген — қажеттілік ескірген көлем мен норма өрістерінен есептеледі. Есеп ашық болуы үшін оң жақтағы кестеге жұмыс түрлерін қосыңыз.', chainHint:'Есептеудің толық тізбегі: жұмыс көлемінен қорытынды қажеттілікке дейін. Әр қадамды тексеруге болады — сандар оң жақтағы «Жұмыс түрлері» кестесінен және «Өмірлік цикл» қосымшасындағы фаза ұзақтықтарынан алынады.' });
+Object.assign(I18N.es.norm, { chainTitle:'Cómo se obtuvo esta cifra', chainStep1:'Dotación de presencia en todos los tipos de trabajo (personas necesarias simultáneamente en un turno)', chainStep2:'× turnos de cada tipo de trabajo (cuántos turnos hay que cubrir)', chainStep3:'× reserva k_sp {k} (vacaciones, bajas, formación)', chainTotalWorks:'Total por tipos de trabajo — nivel base', chainStep4:'× multiplicador de la fase «{stage}» (K = {k})', chainStep5:'× macroescenario «{name}» ({k})', chainResult:'Demanda calculada', chainNoWorks:'No hay tipos de trabajo definidos: la demanda se calcula con los campos antiguos de volumen y norma. Añada tipos de trabajo en la tabla de la derecha para que el cálculo sea transparente.', chainHint:'La cadena completa de cálculo, desde el volumen de trabajo hasta la demanda final. Cada paso es verificable: las cifras provienen de la tabla «Tipos de trabajo» de la derecha y de las duraciones de fase en la pestaña Ciclo de Vida.' });
+Object.assign(I18N.fr.norm, { chainTitle:"Comment ce chiffre a été obtenu", chainStep1:"Effectif de présence sur tous les types de travail (personnes nécessaires simultanément sur un poste)", chainStep2:"× nombre de postes de chaque type de travail (combien de postes couvrir)", chainStep3:"× réserve k_sp {k} (congés, arrêts maladie, formation)", chainTotalWorks:"Total par types de travail — niveau de base", chainStep4:"× multiplicateur de la phase « {stage} » (K = {k})", chainStep5:"× macro-scénario « {name} » ({k})", chainResult:"Besoin calculé", chainNoWorks:"Aucun type de travail défini — le besoin est calculé à partir des anciens champs de volume et de norme. Ajoutez des types de travail dans le tableau de droite pour rendre le calcul transparent.", chainHint:"La chaîne de calcul complète, du volume de travail au besoin final. Chaque étape est vérifiable : les chiffres proviennent du tableau « Types de travail » à droite et des durées de phase de l'onglet Cycle de vie." });
+Object.assign(I18N.ar.norm, { chainTitle:'كيف تم الوصول إلى هذا الرقم', chainStep1:'عدد الحضور عبر جميع أنواع العمل (الأشخاص المطلوبون في آنٍ واحد في وردية واحدة)', chainStep2:'× عدد ورديات كل نوع عمل (كم وردية يجب تغطيتها)', chainStep3:'× احتياطي k_sp {k} (الإجازات والإجازات المرضية والتدريب)', chainTotalWorks:'الإجمالي حسب أنواع العمل — المستوى الأساسي', chainStep4:'× معامل مرحلة «{stage}» (K = {k})', chainStep5:'× السيناريو الكلي «{name}» ({k})', chainResult:'الاحتياج المحسوب', chainNoWorks:'لم تُحدَّد أنواع عمل — يُحتسب الاحتياج من حقول الحجم والمعدل القديمة. أضف أنواع عمل في الجدول على اليمين ليصبح الحساب شفافًا.', chainHint:'سلسلة الحساب الكاملة، من حجم العمل حتى الاحتياج النهائي. كل خطوة قابلة للتحقق — تأتي الأرقام من جدول «أنواع العمل» ومن مدد المراحل في تبويب دورة الحياة.' });
+Object.assign(I18N.zh.norm, { chainTitle:'这个数字是怎么算出来的', chainStep1:'所有作业类型的出勤人数（同一班次内同时需要的人数）', chainStep2:'× 各作业类型的班次数（需要覆盖多少个班次）', chainStep3:'× 储备系数 k_sp {k}（休假、病假、培训）', chainTotalWorks:'各作业类型合计 — 基础水平', chainStep4:'× 「{stage}」阶段系数（K = {k}）', chainStep5:'× 宏观情景「{name}」（{k}）', chainResult:'测算需求', chainNoWorks:'未定义作业类型——需求将回退到旧的产量与定额字段计算。请在右侧表格中添加作业类型，使测算过程透明可查。', chainHint:'从作业量到最终需求的完整计算链路。每一步都可核对——数字取自右侧的「作业类型」表格以及生命周期标签页中的各阶段时长。' });
 Object.assign(I18N.kk.cba, { severanceBase:'Жұмыстан босату жәрдемақысы', recruitingBase:'Рекрутинг және бейімдеу', idleBase:'Оқу кезіндегі ақылы бос тұру',
   liveCoefs:'Коэффициенттер «Әдістеме» қосымшасынан алынады және мұнда автоматты түрде қолданылады: жалдау {hire} {hireSuf}, босату {sever} {severSuf}, оқуға бос тұру {idle} {idleSuf}.' });
 Object.assign(I18N.kk.act, { footnoteBase:'Жалдау мен босату құны жалақымен есептеледі, қайта даярлау — CBA моделі бойынша. Мерзімдер жалдау/босату сыйымдылығы мен дағдылар алшақтығының көлемінен шығады.' });
