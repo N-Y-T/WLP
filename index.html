@@ -89,9 +89,10 @@ main{flex:1;padding:26px 22px 60px}
 .g12{grid-template-columns:repeat(12,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g2{grid-template-columns:repeat(2,1fr)}
-@media(max-width:1080px){.g12,.g3,.g2{grid-template-columns:1fr}.col-span-4,.col-span-8,.col-span-7,.col-span-5{grid-column:auto!important}}
+@media(max-width:1080px){.g12,.g3,.g2{grid-template-columns:1fr}.col-span-4,.col-span-8,.col-span-7,.col-span-5,.col-span-12{grid-column:auto!important}}
 .col-span-4{grid-column:span 4}.col-span-5{grid-column:span 5}
 .col-span-7{grid-column:span 7}.col-span-8{grid-column:span 8}
+.col-span-12{grid-column:1/-1}
 
 /* ---------- CARDS ---------- */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
@@ -134,6 +135,7 @@ input[type=range].rp::-moz-range-thumb{background:var(--purple)}
   border-radius:50%;background:var(--line2);color:var(--t3);cursor:help;flex-shrink:0}
 .hint svg{width:11px;height:11px;stroke:currentColor;pointer-events:none}
 .hint:hover,.hint.on{background:var(--primary);color:#fff}
+th .hint,td .hint{margin-inline-start:5px;vertical-align:middle}
 #tipbox{position:fixed;top:0;left:0;max-width:300px;padding:11px 13px;background:var(--ink);
   color:#eef1f5;font-family:var(--sans);font-size:11.5px;font-weight:500;line-height:1.5;
   border-radius:10px;box-shadow:0 10px 30px -8px rgba(0,0,0,.5);text-align:left;letter-spacing:0;
@@ -227,10 +229,16 @@ td.c{text-align:center} td.r{text-align:right}
 .chrow.chsum:last-child .chv{font-size:16px}
 /* таблица видов работ: параметры переносятся, имя не обрезается */
 .wtbl td,.wtbl th{padding-left:10px;padding-right:10px}
-.wtbl .wname{min-width:190px;width:24%}
+.wtbl .wname{min-width:210px;width:24%}
 .wtbl .wcell{font-size:11px;white-space:normal;min-width:215px}
 .wtbl select.cell-edit{padding-left:4px;padding-right:2px}
-.wtbl .wp{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;margin:2px 10px 2px 0}
+.wtbl .wp{display:inline-flex;flex-direction:column;gap:3px;vertical-align:top;margin:2px 12px 2px 0}
+.wtbl .wlab{font-family:var(--mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--t3);white-space:nowrap}
+.wtbl .wfield{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.wtbl .wfield input{width:74px;text-align:right}
+.wtbl .wfield input.wtxt{width:52px;text-align:left;font-size:11px}
+.wtbl input.wmiss{border-color:var(--red)!important;background:var(--red-l)!important;box-shadow:0 0 0 2px rgba(196,54,27,.12)}
+.wtbl tr.wrow-bad td{background:rgba(196,54,27,.045)}
 
 /* ---------- PROGRESS BARS ---------- */
 .bartrack{height:9px;border-radius:9px;background:var(--line2);overflow:hidden}
@@ -587,13 +595,14 @@ Object.assign(I18N.ru, { norm:{
   reserveLabel:'Резерв — коэфф. списочного состава (k_сп)', reserveHint:'Перевод явочной численности в списочную: запас на отпуска, больничные, обучение. 1.15 = +15% к штату.',
   actualLabel:'Текущий (фактический) штат', actualHint:'Сколько людей оформлено сейчас. Разница с расчётом даёт дефицит или профицит.',
   structureLabel:'Структура штата (из видов работ)', structureHint:'Распределение по группам выводится из назначенных видам работ групп. Сдвигается при сценарии «Индустрия 4.0».',
-  noteVolume:'Объём и нормы задаются по каждому виду работ отдельно (таблица справа). Итоговая потребность — сумма по всем работам.',
+  noteVolume:'Объём и нормы задаются по каждому виду работ отдельно — в таблице «Виды работ» ниже. Итоговая потребность — сумма по всем работам.',
   summaryTitle:'Сводный результат (FTE)', summaryHint:'Списочная численность = Σ по видам работ (Явочная × Сменность × k_сп) × Множитель этапа («{stage}»).',
   reqLabel:'Расчётная потребность', reqSub:'этап: {stage}',
   actualFactLabel:'Текущий факт', gapLabel:'Разрыв (GAP)',
   deficit:'Дефицит', surplus:'Избыток', balance:'Баланс',
   needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
   detailTitle:'Детализация по должностям', detailHint:'Потребность из блока «Сводный результат» делится между должностями справочника: сначала по группам (Основной / ТОиР / ИТР), затем поровну между должностями внутри группы. Столбцы Q1–Q4 показывают, как эта потребность меняется <b>внутри выбранной фазы</b> — от её начала (Q1) к концу (Q4).',
+  qHintPlan:'Q1–Q4 взяты из вашего плана численности для фазы «{stage}»: {q} чел. Формула их не пересчитывает. «FTE цель» — среднее по этим четырём точкам, поэтому оно отличается от каждой из них.',
   qHint:'Фаза «{stage}» неравномерна: в начале людей нужно меньше, чем в конце (или наоборот). Q1–Q4 — четыре контрольные точки этой кривой: {q1} / {q2} / {q3} / {q4} от базового уровня. «FTE цель» — среднее по фазе, поэтому Q-значения закономерно расходятся с ним в обе стороны.',
   thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель (среднее по фазе)',
   groupCore:'Основной персонал', groupAux:'Службы ТОиР', groupMgmt:'ИТР и менеджмент',
@@ -606,6 +615,9 @@ Object.assign(I18N.ru, { norm:{
   chainStep4:'× множитель фазы «{stage}» (K = {k})',
   chainStep5:'× макро-сценарий «{name}» ({k})',
   chainResult:'Расчётная потребность',
+  chainPlanNote:'Потребность взята <b>из вашего документа</b> (режим «План численности»), нормы и кривая фазы не применяются. Показана фаза «{stage}».',
+  chainPlanPoints:'Плановая численность по фазе: {q} → среднее',
+  chainPlanGap:'Включён режим «План численности», но для фазы «{stage}» в плане нет чисел. Норму сюда не подставляем — заполните эту фазу на вкладке «Жизненный цикл» или вернитесь к расчёту по нормам.',
   chainNoWorks:'Виды работ не заданы — потребность считается из устаревших полей объёма и нормы. Добавьте виды работ в таблице справа, чтобы расчёт стал прозрачным.',
   chainHint:'Полная цепочка расчёта: от объёма работ до итоговой потребности. Каждый шаг можно проверить — числа берутся из таблицы «Виды работ» справа и из длительностей фаз на вкладке «Жизненный цикл».',
   demoDirWarn:'<b>Виды работ вы задали свои, а справочник должностей — ещё демонстрационный.</b> Поэтому ниже показаны роли из примера (оператор установки, обходчик и т.д.), а не ваши. Замените их на вкладке «Справочник» или попросите ИИ-ассистента: «замени справочник должностей под мой проект».'
@@ -614,6 +626,7 @@ Object.assign(I18N.ru, { norm:{
   fsm:'Фсм', fsmPh:'Фонд смены, мин', kvn:'kвн', kvnPh:'Коэфф. выполнения норм',
   nObjects:'Агрегатов', nObjectsPh:'Число обслуживаемых объектов', serviceNorm:'Нобсл', serviceNormPh:'Норма обслуживания, объектов/чел',
   workplaces:'Раб. места', workplacesPh:'Число рабочих мест', loadCoeff:'k загр', loadCoeffPh:'Коэфф. загрузки',
+  unitCol:'Ед. изм.', periodCol:'Период',
   norm:'Норма', normPh:'Норма выработки на 1 чел', unitDefault:'ед.', periodDefault:'период', periodMonth:'месяц',
   title:'Виды работ — расчёт явочной численности',
   hint:'Каждый вид работ нормируется своей методикой (выработка / норма времени / обслуживание / рабочие места). Группа определяет, к какой части оргструктуры относится работа. Итог — сумма по всем работам.',
@@ -622,7 +635,9 @@ Object.assign(I18N.ru, { norm:{
   noWorks:'Нет видов работ — добавьте первый',
   totalRow:'Итого по всем работам (эксплуатация, до множителя этапа)',
   footnotePlain:'Каждая строка — отдельный вид работ со своей методикой расчёта. «Явочная» численность — сколько человек нужно одновременно в смену; итоговая FTE дополнительно учитывает сменность и резерв на отпуска, больничные и обучение (коэффициент {absCoeff}). Итог внизу — суммарная потребность до поправки на фазу проекта.',
-  fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ', mainWorkName:'Основная технологическая работа'
+  fteTitle:'Явочная {yav} × сменность × k_сп', newWorkName:'Новый вид работ', mainWorkName:'Основная технологическая работа',
+  missingBadge:'нет данных', missingTip:'Не заполнено поле «{field}» — без него эта работа даёт 0 человек и не попадает в итог. Введите число.',
+  missingWarn:'<b>Не заполнено обязательное поле в строках: {n}.</b> Такие виды работ считаются как 0 человек, поэтому итог занижен. Заполните подсвеченные красным поля — или попросите ИИ-ассистента: «проставь недостающие числа по документу».'
 }, chart:{ monthAxis:'месяц проекта', deficitAxis:'дефицит', surplusAxis:'профицит',
   tipMonth:'Месяц {n}', tipDemand:'Потребность', tipAvail:'Доступно (P50)',
   tipBand:'Коридор P10–P90', tipGap:'Разрыв' },
@@ -634,6 +649,14 @@ life:{
   durationsLabel:'Длительности фаз (мес.)', durationsHint:'Горизонт = сумма всех фаз. Фазы с длительностью 0 исключаются.',
   phaseDesign:'Проект', phaseConstruction:'СМР', phaseCommissioning:'ПНР', phaseOperation:'Эксплуат.', phaseDecline:'Вывод',
   phaseOff:'нет в проекте (0 мес.)',
+  demandSourceLabel:'Источник потребности',
+  demandSourceHint:'Откуда брать численность: рассчитывать по нормам из видов работ — или взять готовый график численности из вашего документа. Во втором случае формулы не переопределяют ваши числа.',
+  modeNorm:'Считать по нормам (виды работ × кривая фазы)',
+  modePlan:'План численности из документа',
+  planPhaseCol:'Фаза',
+  planHint:'Введите численность <b>в людях</b> в четырёх точках каждой фазы: Q1 — начало фазы, Q4 — конец. Между точками система интерполирует по месяцам. Заполняйте только те фазы, что есть в проекте.',
+  planEmpty:'План пока пустой — заполните хотя бы одну фазу, иначе расчёт вернётся к нормам.',
+  planMissing:'В плане нет чисел для фаз: {phases}. Пока они пустые, потребность в этих месяцах считается нулевой — нормы вместо них не подставляются.',
   stageAutoSwitched:'Выбранной фазы нет в проекте (0 мес.) — расчёт ведётся по фазе «{stage}».',
   currentStageLabel:'Текущий этап (для среза «сейчас»)', currentStageHint:'Используется во вкладке «Нормативный расчёт» для снимка потребности.',
   macroLabel:'Макро-сценарий', macroHint:'«Индустрия 4.0» срезает ~35% потребности в рабочих на эксплуатации и сдвигает структуру к ИТР.',
@@ -812,6 +835,8 @@ life:{
   workAddedNote:'Добавлена работа: {name}', workAddedResult:'FTE работы={fte}',
   profSavedNote:'Должность сохранена: {name}', profSavedResult:'Сохранено (id={id})',
   emptyProfessions:'Пустой список должностей',
+  emptyPlan:'Пустой план численности',
+  planSetNote:'План численности задан по фазам: {n}', planSetResult:'Режим «план из документа» включён, фаз заполнено {n}, текущая потребность {req} чел.',
   professionsSetNote:'Справочник заменён: {n} должн.', professionsSetResult:'Справочник должностей заменён, всего {n} должностей',
   profNotFound:'Должность не найдена', notFoundResult:'Не найдено',
   profDeletedNote:'Удалена должность {id}', deletedResult:'Удалено',
@@ -851,13 +876,14 @@ Object.assign(I18N.en, { norm:{
   reserveLabel:'Reserve — payroll ratio (k_sp)', reserveHint:'Converts attendance headcount into payroll headcount: a reserve for vacations, sick leave, training. 1.15 = +15% to headcount.',
   actualLabel:'Current (Actual) Headcount', actualHint:'How many people are on staff right now. The difference from the calculation gives a shortage or surplus.',
   structureLabel:'Staff Structure (from work types)', structureHint:'The group breakdown is derived from the groups assigned to work types. It shifts under the "Industry 4.0" scenario.',
-  noteVolume:'Volume and norms are set for each work type separately (table on the right). Total demand is the sum across all work types.',
+  noteVolume:'Volume and norms are set for each work type separately — in the "Work types" table below. Total demand is the sum across all work types.',
   summaryTitle:'Summary Result (FTE)', summaryHint:'Payroll headcount = Sum across work types (Attendance x Shifts x k_sp) x Stage multiplier ("{stage}").',
   reqLabel:'Calculated Demand', reqSub:'stage: {stage}',
   actualFactLabel:'Current Actual', gapLabel:'Gap (GAP)',
   deficit:'Shortage', surplus:'Surplus', balance:'Balanced',
   needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
   detailTitle:'Breakdown by Position', detailHint:'The demand from the Summary Result block is split across directory positions: first by group (Core / Maintenance / Engineering), then evenly among the positions within each group. The Q1-Q4 columns show how that demand changes <b>within the selected phase</b> — from its start (Q1) to its end (Q4).',
+  qHintPlan:'Q1-Q4 come from your headcount plan for the "{stage}" phase: {q} people. No formula recalculates them. "Target FTE" is the average of those four points, which is why it differs from each of them.',
   qHint:'The "{stage}" phase is not flat: fewer people are needed at its start than at its end (or vice versa). Q1-Q4 are the four control points of that curve: {q1} / {q2} / {q3} / {q4} of the base level. "Target FTE" is the phase average, so the Q values naturally sit above and below it.',
   thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE (phase average)',
   groupCore:'Core Personnel', groupAux:'Maintenance Services', groupMgmt:'Engineering & Management',
@@ -870,6 +896,9 @@ Object.assign(I18N.en, { norm:{
   chainStep4:'x phase multiplier "{stage}" (K = {k})',
   chainStep5:'x macro scenario "{name}" ({k})',
   chainResult:'Calculated demand',
+  chainPlanNote:'Demand is taken <b>from your document</b> ("Headcount plan" mode); norms and the phase curve are not applied. Showing the "{stage}" phase.',
+  chainPlanPoints:'Planned headcount for the phase: {q} → average',
+  chainPlanGap:'"Headcount plan" mode is on, but the plan holds no figures for the "{stage}" phase. We do not substitute a norm here — fill this phase in on the "Lifecycle" tab, or switch back to calculating from norms.',
   chainNoWorks:'No work types defined — demand falls back to the legacy volume and rate fields. Add work types in the table on the right to make the calculation transparent.',
   chainHint:'The full calculation chain, from work volume to final demand. Every step is checkable — the numbers come from the "Work Types" table on the right and from the phase durations on the Lifecycle tab.',
   demoDirWarn:'<b>You have defined your own work types, but the positions directory is still the demo one.</b> That is why the roles below are from the sample data (process operator, patrol operator, etc.) rather than yours. Replace them on the Directory tab, or ask the AI assistant: "replace the positions directory to match my project".'
@@ -878,6 +907,7 @@ Object.assign(I18N.en, { norm:{
   fsm:'Shift fund', fsmPh:'Shift fund, min', kvn:'k-comp', kvnPh:'Norm compliance factor',
   nObjects:'Units', nObjectsPh:'Number of serviced units', serviceNorm:'Service rate', serviceNormPh:'Service rate, units/person',
   workplaces:'Workplaces', workplacesPh:'Number of workplaces', loadCoeff:'Load factor', loadCoeffPh:'Load factor',
+  unitCol:'Unit', periodCol:'Period',
   norm:'Rate', normPh:'Output rate per person', unitDefault:'units', periodDefault:'period', periodMonth:'month',
   title:'Work Types — Attendance Headcount Calculation',
   hint:'Each work type is normed with its own method (output / time-norm / service / workplace). The group determines which part of the org structure the work belongs to. The total is the sum across all work types.',
@@ -886,7 +916,9 @@ Object.assign(I18N.en, { norm:{
   noWorks:'No work types — add the first one',
   totalRow:'Total across all work types (operation, before stage multiplier)',
   footnotePlain:'Each row is a separate work type with its own calculation method. The "attendance" figure is how many people are needed on shift at once; the final FTE additionally accounts for shift coverage and a reserve for vacations, sick leave and training (factor {absCoeff}). The total at the bottom is the combined demand before the project-phase adjustment.',
-  fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type', mainWorkName:'Main Production Work'
+  fteTitle:'Attendance {yav} x shifts x k_sp', newWorkName:'New Work Type', mainWorkName:'Main Production Work',
+  missingBadge:'no data', missingTip:'The "{field}" field is empty — without it this work type counts as 0 people and drops out of the total. Enter a number.',
+  missingWarn:'<b>A required field is empty in {n} row(s).</b> Those work types count as 0 people, so the total is understated. Fill in the fields highlighted in red — or ask the AI assistant: "fill in the missing numbers from the document".'
 }, chart:{ monthAxis:'project month', deficitAxis:'shortage', surplusAxis:'surplus',
   tipMonth:'Month {n}', tipDemand:'Demand', tipAvail:'Available (P50)',
   tipBand:'P10–P90 band', tipGap:'Gap' },
@@ -898,6 +930,14 @@ life:{
   durationsLabel:'Phase Durations (months)', durationsHint:'The horizon = the sum of all phases. Phases with a duration of 0 are excluded.',
   phaseDesign:'Design', phaseConstruction:'Constr.', phaseCommissioning:'Comm.', phaseOperation:'Operation', phaseDecline:'Decline',
   phaseOff:'not in this project (0 mo.)',
+  demandSourceLabel:'Source of demand',
+  demandSourceHint:'Where headcount comes from: calculate it from the work-type norms, or take the staffing schedule straight from your document. In the second case the formulas do not override your numbers.',
+  modeNorm:'Calculate from norms (work types x phase curve)',
+  modePlan:'Headcount plan from the document',
+  planPhaseCol:'Phase',
+  planHint:'Enter headcount <b>in people</b> at four points of each phase: Q1 is the phase start, Q4 its end. The system interpolates month by month in between. Fill in only the phases that exist in your project.',
+  planEmpty:'The plan is still empty — fill in at least one phase, otherwise the calculation falls back to the norms.',
+  planMissing:'The plan has no figures for these phases: {phases}. While they stay empty, demand in those months is counted as zero — norms are not substituted for them.',
   stageAutoSwitched:'The selected phase is not part of this project (0 mo.) — the calculation uses the "{stage}" phase.',
   currentStageLabel:'Current Stage (for the "now" snapshot)', currentStageHint:'Used on the Normative Calculation tab for the demand snapshot.',
   macroLabel:'Macro Scenario', macroHint:'"Industry 4.0" cuts ~35% of worker demand during operation and shifts the structure toward engineering.',
@@ -1075,6 +1115,8 @@ life:{
   workAddedNote:'Added work type: {name}', workAddedResult:'Work type FTE={fte}',
   profSavedNote:'Position saved: {name}', profSavedResult:'Saved (id={id})',
   emptyProfessions:'Empty list of positions',
+  emptyPlan:'Empty headcount plan',
+  planSetNote:'Headcount plan set for {n} phase(s)', planSetResult:'"Plan from document" mode enabled, {n} phase(s) filled, current demand {req} people',
   professionsSetNote:'Directory replaced: {n} positions', professionsSetResult:'Positions directory replaced, {n} positions total',
   profNotFound:'Position not found', notFoundResult:'Not found',
   profDeletedNote:'Deleted position {id}', deletedResult:'Deleted',
@@ -1336,6 +1378,34 @@ function activeStage(){
   if(phaseLen(S.stage)>0) return S.stage;
   return STAGE_ORDER.find(id=>phaseLen(id)>0) || S.stage;
 }
+// Потребность в 4 контрольных точках фазы, В ЛЮДЯХ.
+// В режиме 'plan' берём числа из документа как есть — формула их не переопределяет.
+function planFor(id){
+  const p=(S.phasePlan||{})[id];
+  return (Array.isArray(p)&&p.length===4&&p.some(x=>num(x,0)>0)) ? p.map(x=>Math.max(0,num(x,0))) : null;
+}
+function hasPlan(){ return STAGE_ORDER.some(id=>planFor(id)); }
+// Режим плана считается включённым, только когда в нём есть хоть одна заполненная фаза:
+// пустой план не должен обнулять весь расчёт — до первого числа работают нормы.
+function planActive(){ return S.demandMode==='plan' && hasPlan(); }
+// Фазы проекта (длительность > 0), для которых в плане нет чисел.
+function planGapPhases(){ return planActive() ? STAGE_ORDER.filter(id=>phaseLen(id)>0 && !planFor(id)) : []; }
+function scenarioK(stageId){
+  if(S.scenario==='optimistic') return 1.25;
+  if(S.scenario==='automation' && (stageId==='operation'||stageId==='decline')) return 0.65;
+  return 1;
+}
+function phaseQAbs(stageId, baseOperational){
+  const k=scenarioK(stageId);
+  if(planActive()){
+    const pl=planFor(stageId);
+    // фаза не заполнена в плане — показываем 0, а не подставляем норму:
+    // иначе пропуск в документе молча превращался бы в завышенную «нормативную» цифру
+    return pl ? pl.map(v=>v*k) : [0,0,0,0];
+  }
+  const q=(STAGES[stageId]||STAGES.operation).qTrend;
+  return q.map(v=>baseOperational*v*k);
+}
 function stageName(id){ const m=STAGE_NAME_I18N[LANG]; return (m&&m[id]) || (STAGE_NAME_I18N.ru[id]) || (STAGES[id]&&STAGES[id].name) || id; }
 
 // Лексикон рисков автоматизации навыков (вероятность, что задача автоматизируема)
@@ -1387,6 +1457,11 @@ const S = {
   cbaIdleMonths:1.5, // оплачиваемый простой на переобучение, мес.
   hazardDefault:0.4, // риск автоматизации навыка по умолчанию
   hazardLambda:0.35, // масштаб годового hazard в анализе дожития
+  // --- ИСТОЧНИК ПОТРЕБНОСТИ ---
+  // 'norm' — считать из видов работ и кривой фазы (по умолчанию)
+  // 'plan' — использовать численность, заданную в документе заказчика (абсолютные значения)
+  demandMode:'norm',
+  phasePlan:{},        // {design:[q1,q2,q3,q4], ...} — человек, а не множители
   // --- МНОГОРАБОТНАЯ СИСТЕМА НОРМИРОВАНИЯ (виды работ) ---
   works:[]           // заполняется worksInit() — см. ниже
 };
@@ -1474,6 +1549,14 @@ const WORK_METHOD_I18N = {
 function methodName(k){ const m=WORK_METHOD_I18N[LANG]; return (m&&m[k]&&m[k].name)||WORK_METHOD_I18N.ru[k].name; }
 function methodHint(k){ const m=WORK_METHOD_I18N[LANG]; return (m&&m[k]&&m[k].hint)||WORK_METHOD_I18N.ru[k].hint; }
 const WORK_DEFAULTS = {output:{}, time:{tNorm:0.5,Fsm:480,kvn:1.05}, service:{nObjects:20,serviceNorm:4}, workplace:{workplaces:10,loadCoeff:1}};
+// поле, без которого методика даёт 0 человек: используем для явной подсветки «не заполнено»
+const WORK_REQUIRED = {output:'volume', time:'volume', service:'nObjects', workplace:'workplaces'};
+function workMissingField(w){
+  const f=WORK_REQUIRED[w&&w.method]||'volume';
+  const v=w?w[f]:null;
+  return (v===''||v==null||!isFinite(+v)||+v<=0) ? f : null;
+}
+function worksWithIssues(){ return (S.works||[]).filter(w=>workMissingField(w)); }
 // явочная численность по выбранной методике (на смену)
 function workYav(w){
   switch(w.method){
@@ -1516,18 +1599,21 @@ function computeBase(){
   const kSp = Math.max(1, num(S.absCoeff,1));
   const kStage = stageMult(stageId);
   const afterStage = baseOperational * kStage;
-  let calc = afterStage, kScenario = 1;
-  if(S.scenario==='optimistic') kScenario = 1.25;
-  if(S.scenario==='automation' && (stageId==='operation'||stageId==='decline')) kScenario = 0.65;
-  calc *= kScenario;
-  const required = Math.max(1, Math.round(calc));
+  const kScenario = scenarioK(stageId);
+  const qAbs = phaseQAbs(stageId, baseOperational);
+  const usingPlan = planActive() && !!planFor(stageId);
+  const planGap = planActive() && !planFor(stageId);   // режим плана включён, но текущая фаза в нём пустая
+  const calc = qAbs.reduce((a,b)=>a+b,0)/4;   // средний уровень фазы
+  // в «пробеле плана» честный ответ — 0, а не единица от общего минимума
+  const required = planGap ? 0 : Math.max(1, Math.round(calc));
   const diff = required - S.actualStaff;
   // пошаговая расшифровка «откуда взялась потребность» для карточки сводного результата
   const chain = {
     yav: (S.works||[]).reduce((a,w)=>a+workYav(w),0),
     withShifts: (S.works||[]).reduce((a,w)=>a+workYav(w)*Math.max(1,num(w.shifts,1)),0),
     kSp, worksTotal: wt.total, stageId, kStage, afterStage, kScenario, calc,
-    fromWorks: wt.total>0
+    fromWorks: wt.total>0, usingPlan, planGap,
+    planAvg: usingPlan?(planFor(stageId).reduce((a,b)=>a+b,0)/4):0
   };
 
   // сдвиг структуры при автоматизации (меньше «рук», больше ИТР/поддержки)
@@ -1544,7 +1630,7 @@ function computeBase(){
   };
   staff.mgmt = Math.max(0, required - staff.core - staff.aux);
 
-  return {totalR,dist0,baseOperational,stage,stageId,required,diff,dist,staff,chain};
+  return {totalR,dist0,baseOperational,stage,stageId,required,diff,dist,staff,chain,qAbs,usingPlan,planGap};
 }
 
 /* ---------------- ТРАЕКТОРИЯ ЖИЗНЕННОГО ЦИКЛА ---------------- */
@@ -1568,10 +1654,11 @@ function requiredAtMonth(t, phases, base){
   for(const ph of phases){
     if(t>=ph.start && t<ph.end){
       const p = ph.len>1 ? (t-ph.start)/(ph.len-1) : 0;
-      let mult = interp4(STAGES[ph.id].qTrend, p);
-      if(S.scenario==='optimistic') mult*=1.25;
-      if(S.scenario==='automation' && (ph.id==='operation'||ph.id==='decline')) mult*=0.65;
-      return Math.max(0, base*mult);
+      if(planActive()){
+        const pl = planFor(ph.id);
+        return pl ? Math.max(0, interp4(pl, p) * scenarioK(ph.id)) : 0;
+      }
+      return Math.max(0, base * interp4(STAGES[ph.id].qTrend, p) * scenarioK(ph.id));
     }
   }
   return 0;
@@ -1981,11 +2068,12 @@ function svgGap(gap){
 }
 
 function svgDonut(parts){ // [{v,color,label}]
-  const total=parts.reduce((s,p)=>s+p.v,0)||1;
+  const total=parts.reduce((s,p)=>s+p.v,0);
+  const denom=total||1;   // только чтобы не делить на ноль; в подписи показываем настоящую сумму
   const cx=70,cy=70,r=54,sw=22; const C=2*Math.PI*r;
   let off=0,segs='';
   parts.forEach(p=>{
-    const frac=p.v/total, len=C*frac;
+    const frac=p.v/denom, len=C*frac;
     segs+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+p.color+'" stroke-width="'+sw+'" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
     off+=len;
   });
@@ -2149,6 +2237,23 @@ function demandChain(b){
   const row=(n,label,val,strong)=>'<div class="chrow'+(strong?' chsum':'')+'">'
     +'<span class="chn">'+(n||'')+'</span><span class="chl">'+esc(label)+'</span>'
     +'<b class="chv">'+fmtN(val)+'</b></div>';
+  // режим плана включён, но в текущей фазе чисел нет — говорим об этом прямо, а не подставляем норму
+  if(c.planGap){
+    return '<div class="chain"><div class="chtitle">'+esc(t('norm.chainTitle'))+hint(t('norm.chainHint'))+'</div>'
+      +'<div class="note note-amber" style="margin:0 0 10px">'+ic('alert')+'<div>'
+        +t('norm.chainPlanGap',{stage:esc(stageName(c.stageId))})+'</div></div>'
+      +row('',t('norm.chainResult'),b.required,true)+'</div>';
+  }
+  // режим «план из документа»: нормы не участвуют, показываем сам план
+  if(c.usingPlan){
+    const pl=planFor(c.stageId);
+    let ph='<div class="chain"><div class="chtitle">'+esc(t('norm.chainTitle'))+hint(t('norm.chainHint'))+'</div>';
+    ph+='<div class="note note-blue" style="margin:0 0 10px">'+ic('info')+'<div>'+t('norm.chainPlanNote',{stage:esc(stageName(c.stageId))})+'</div></div>';
+    ph+=row('1',t('norm.chainPlanPoints',{q:pl.map(v=>fmtN(v)).join(' · ')}),c.planAvg);
+    if(c.kScenario!==1) ph+=row('2',t('norm.chainStep5',{name:SC[S.scenario]||S.scenario,k:'×'+c.kScenario}),c.calc);
+    ph+=row('',t('norm.chainResult'),b.required,true);
+    return ph+'</div>';
+  }
   if(!c.fromWorks){
     return '<div class="chain"><div class="chtitle">'+esc(t('norm.chainTitle'))+hint(t('norm.chainHint'))+'</div>'
       +'<div class="note note-amber" style="margin:0">'+ic('alert')+'<div>'+esc(t('norm.chainNoWorks'))+'</div></div>'
@@ -2170,6 +2275,10 @@ function renderNormative(){
   const list=Object.values(profDB);
   const groups={core:list.filter(p=>p.type==='core'),aux:list.filter(p=>p.type==='aux'),mgmt:list.filter(p=>p.type==='mgmt')};
   const q=b.stage.qTrend, baseQ=b.baseOperational;
+  // в режиме плана Q1–Q4 — это числа из документа, а не доли базового уровня
+  const qTip = b.usingPlan
+    ? t('norm.qHintPlan',{stage:stageName(b.stageId), q:b.qAbs.map(v=>fmtN(Math.round(v))).join(' · ')})
+    : t('norm.qHint',{stage:stageName(b.stageId), q1:q[0],q2:q[1],q3:q[2],q4:q[3]});
 
   const groupRows=(arr,type,label,bcls,clr)=>{
     const n=arr.length;
@@ -2177,7 +2286,7 @@ function renderNormative(){
     if(!n){h+='<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
     arr.forEach(p=>{
       const req=Math.round(b.staff[type]/n);
-      const perQ=k=>Math.round((baseQ*b.dist[type]/n)*q[k]);
+      const perQ=k=>Math.round(b.qAbs[k]*b.dist[type]/n);
       h+='<tr><td style="font-weight:700">'+esc(profName(p))+'</td>'
         +'<td class="c"><span class="badge '+bcls+'">'+esc(t('common.'+type+'Short'))+'</span></td>'
         +'<td class="c mono" style="font-weight:800;color:'+clr+'">'+req+'</td>'
@@ -2221,8 +2330,8 @@ function renderNormative(){
     +'<div class="note note-blue" style="margin-top:14px">'+ic('info')+'<div>'+esc(t('norm.noteVolume'))+'</div></div>'
   +'</div></div>'
 
-  // ----- ПРАВО: результаты -----
-  +'<div class="col-span-8"><div class="grid" style="gap:18px">'
+  // ----- ПРАВО: сводный результат -----
+  +'<div class="col-span-8">'
     +'<div class="card"><div class="ctitle">'+ic('users')+esc(t('norm.summaryTitle'))+hint(t('norm.summaryHint',{stage:stageName(b.stageId)}))+'</div>'
       +'<div class="grid g3">'
         +'<div class="metric"><div class="mlabel">'+esc(t('norm.reqLabel'))+'</div><div class="mval">'+fmtN(b.required)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('norm.reqSub',{stage:stageName(b.stageId)}))+'</div></div>'
@@ -2232,17 +2341,19 @@ function renderNormative(){
           +(b.diff>0?ic('up')+esc(t('norm.deficit'))+' '+fmtN(b.diff):b.diff<0?ic('down')+esc(t('norm.surplus'))+' '+fmtN(-b.diff):esc(t('norm.balance')))+'</div>'
           +'<div class="msub">'+(b.diff>0?esc(t('norm.needHire')):b.diff<0?esc(t('norm.needReskill')):esc(t('norm.staffBalanced')))+'</div></div>'
       +'</div>'+demandChain(b)+'</div>'
+  +'</div>'
 
-    +worksEditor()
+  // ----- НИЖЕ, ВО ВСЮ ШИРИНУ: таблицы (им нужны все колонки) -----
+  +'<div class="col-span-12">'+worksEditor()+'</div>'
 
+  +'<div class="col-span-12">'
     +'<div class="card"><div class="ctitle">'+ic('layers')+esc(t('norm.detailTitle'))
       +hint(t('norm.detailHint'))+'</div>'
       +(worksAreCustom()&&isDemoDirectory()
         ? '<div class="note note-amber" style="margin-bottom:14px">'+ic('alert')+'<div>'+t('norm.demoDirWarn')+'</div></div>' : '')
       +'<div class="tbl-wrap"><table><thead><tr>'
         +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th><th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
-        +'<th class="c">Q1'+hint(t('norm.qHint',{stage:stageName(b.stageId),
-            q1:q[0],q2:q[1],q3:q[2],q4:q[3]}))+'</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
+        +'<th class="c">Q1'+hint(qTip)+'</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
         +groupRows(groups.core,'core',t('norm.groupCore'),'b-blue','var(--blue)')
         +groupRows(groups.aux,'aux',t('norm.groupAux'),'b-green','var(--green)')
         +groupRows(groups.mgmt,'mgmt',t('norm.groupMgmt'),'b-purple','var(--purple)')
@@ -2252,45 +2363,56 @@ function renderNormative(){
 }
 /* ----- РЕДАКТОР ВИДОВ РАБОТ (многоработное нормирование) ----- */
 function workParamCells(w){
-  const inp=(f,ph,step)=>'<input class="cell-edit mono" data-work="'+w.id+'" data-wf="'+f+'" type="number"'+(step?' step="'+step+'"':'')
-    +' value="'+(w[f]!=null?w[f]:'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:74px;text-align:right">';
+  const miss=workMissingField(w);
+  const inp=(f,ph,step)=>'<input class="cell-edit mono'+(miss===f?' wmiss':'')+'" data-work="'+w.id+'" data-wf="'+f+'" type="number"'+(step?' step="'+step+'"':'')
+    +' value="'+(w[f]!=null?w[f]:'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'">';
   const txt=(f,ph,wd)=>{ const raw=w[f]||''; const disp=f==='unit'?unitLabel(raw):f==='period'?periodWordLabel(raw):raw;
-    return '<input class="cell-edit" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(disp)+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'" style="width:'+(wd||58)+'px">'; };
-  const lbl=s=>'<span class="muted" style="font-size:10px">'+esc(s)+'</span> ';
-  const u=parts=>'<span class="wp">'+parts+'</span>';   // неразрывная группа «подпись + поле»
+    return '<input class="cell-edit wtxt" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(disp)+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'">'; };
+  // каждая величина — самостоятельное поле: подпись сверху, поле снизу, колонки выравнены
+  const u=(label,field,extra)=>'<span class="wp"><span class="wlab">'+esc(label)+'</span>'
+    +'<span class="wfield">'+field+(extra||'')+'</span></span>';
   switch(w.method){
-    case 'time':      return u(lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46))
-                      +u(lbl(t('work.tNorm'))+inp('tNorm',t('work.tNormPh'),0.01))
-                      +u(lbl(t('work.fsm'))+inp('Fsm',t('work.fsmPh')))
-                      +u(lbl(t('work.kvn'))+inp('kvn',t('work.kvnPh'),0.01));
-    case 'service':   return u(lbl(t('work.nObjects'))+inp('nObjects',t('work.nObjectsPh')))
-                      +u(lbl(t('work.serviceNorm'))+inp('serviceNorm',t('work.serviceNormPh'),0.1));
-    case 'workplace': return u(lbl(t('work.workplaces'))+inp('workplaces',t('work.workplacesPh')))
-                      +u(lbl(t('work.loadCoeff'))+inp('loadCoeff',t('work.loadCoeffPh'),0.05));
-    default:          return u(lbl(t('work.volume'))+inp('volume',t('work.volumePh'))+' '+txt('unit',t('work.unitDefault'),46)+'/'+txt('period',t('work.periodDefault'),64))
-                      +u(lbl(t('work.norm'))+inp('norm',t('work.normPh')));
+    case 'time':      return u(t('work.volume'),inp('volume',t('work.volumePh')))
+                      +u(t('work.unitCol'),txt('unit',t('work.unitDefault')))
+                      +u(t('work.tNorm'),inp('tNorm',t('work.tNormPh'),0.01))
+                      +u(t('work.fsm'),inp('Fsm',t('work.fsmPh')))
+                      +u(t('work.kvn'),inp('kvn',t('work.kvnPh'),0.01));
+    case 'service':   return u(t('work.nObjects'),inp('nObjects',t('work.nObjectsPh')))
+                      +u(t('work.serviceNorm'),inp('serviceNorm',t('work.serviceNormPh'),0.1));
+    case 'workplace': return u(t('work.workplaces'),inp('workplaces',t('work.workplacesPh')))
+                      +u(t('work.loadCoeff'),inp('loadCoeff',t('work.loadCoeffPh'),0.05));
+    default:          return u(t('work.volume'),inp('volume',t('work.volumePh')))
+                      +u(t('work.unitCol'),txt('unit',t('work.unitDefault')))
+                      +u(t('work.periodCol'),txt('period',t('work.periodDefault')))
+                      +u(t('work.norm'),inp('norm',t('work.normPh')));
   }
 }
 function worksEditor(){
   const rows=(S.works||[]).map(w=>{
-    const gsel='<select class="cell-edit" data-work="'+w.id+'" data-wf="group" style="text-align:center;width:100%;min-width:76px">'
+    const gsel='<select class="cell-edit" data-work="'+w.id+'" data-wf="group" style="text-align:center;width:100%;min-width:104px">'
       +[['core',t('common.core')],['aux',t('common.aux')],['mgmt',t('common.mgmt')]].map(([v,lb])=>'<option value="'+v+'"'+(w.group===v?' selected':'')+'>'+esc(lb)+'</option>').join('')+'</select>';
-    const msel='<select class="cell-edit" data-work="'+w.id+'" data-wf="method" style="width:100%;min-width:116px">'
+    const msel='<select class="cell-edit" data-work="'+w.id+'" data-wf="method" style="width:100%;min-width:164px">'
       +Object.keys(WORK_METHODS).map(k=>'<option value="'+k+'"'+(w.method===k?' selected':'')+'>'+esc(methodName(k))+'</option>').join('')+'</select>';
     const shs='<input class="cell-edit mono" data-work="'+w.id+'" data-wf="shifts" type="number" min="1" max="4" value="'+num(w.shifts,1)+'" style="width:44px;text-align:center">';
-    return '<tr data-workrow="'+w.id+'">'
+    const bad=workMissingField(w);
+    return '<tr data-workrow="'+w.id+'"'+(bad?' class="wrow-bad"':'')+'>'
       +'<td class="wname"><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(workDisplayName(w))+'" title="'+esc(workDisplayName(w))+'" style="font-weight:700;width:100%"></td>'
       +'<td class="c">'+gsel+'</td>'
       +'<td>'+msel+'</td>'
       +'<td class="wcell">'+workParamCells(w)+'</td>'
       +'<td class="c">'+shs+'</td>'
-      +'<td class="r mono" style="font-weight:800;color:var(--primary)" title="'+esc(t('work.fteTitle',{yav:fmtN(workYav(w))}))+'">'+fmtN(workFTE(w))+'</td>'
+      +(bad
+        ? '<td class="r" data-tip="'+esc(t('work.missingTip',{field:t('work.'+bad)}))+'"><span class="badge b-red">'+esc(t('work.missingBadge'))+'</span></td>'
+        : '<td class="r mono" style="font-weight:800;color:var(--primary)" title="'+esc(t('work.fteTitle',{yav:fmtN(workYav(w))}))+'">'+fmtN(workFTE(w))+'</td>')
       +'<td class="c"><button class="xbtn" data-delwork="'+w.id+'" style="width:28px;height:28px">'+ic('trash')+'</button></td></tr>';
   }).join('');
   const total=worksTotals().total;
   return '<div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('layers')+esc(t('work.title'))
     +hint(t('work.hint'))
     +'<span class="sp"></span><button class="tool" data-act="add-work" style="padding:6px 11px">'+ic('plus')+esc(t('work.addBtn'))+'</button></div>'
+    +(worksWithIssues().length
+      ? '<div style="padding:0 22px 12px"><div class="note note-red" style="margin:0">'+ic('alert')
+        +'<div>'+t('work.missingWarn',{n:worksWithIssues().length})+'</div></div></div>' : '')
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table class="wtbl"><thead><tr>'
     +'<th>'+esc(t('work.thName'))+'</th><th class="c">'+esc(t('work.thGroup'))+'</th><th>'+esc(t('work.thMethod'))+'</th><th>'+esc(t('work.thParams'))+'</th><th class="c">'+esc(t('work.thShifts'))+'</th><th class="r">'+esc(t('work.thFte'))+'</th><th class="c">×</th>'
     +'</tr></thead><tbody>'+(rows||'<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic;padding:18px">'+esc(t('work.noWorks'))+'</td></tr>')
@@ -2308,6 +2430,27 @@ function slider(id,label,valPct,clr){
 /* ============================================================
    ВКЛАДКА 2 — ЖИЗНЕННЫЙ ЦИКЛ (траектория)
    ============================================================ */
+// Сетка «плановая численность по фазам»: 5 фаз × 4 контрольные точки, в людях
+function planEditor(){
+  const cell=(id,k)=>{ const v=((S.phasePlan||{})[id]||[])[k];
+    return '<input class="cell-edit mono" data-plan="'+id+'" data-q="'+k+'" type="number" min="0" '
+      +'value="'+(v!=null&&v!==''?v:'')+'" placeholder="0" style="width:100%;text-align:center">'; };
+  let rows='';
+  STAGE_ORDER.forEach(id=>{
+    const off=phaseLen(id)===0;
+    rows+='<tr'+(off?' style="opacity:.45"':'')+'><td style="font-weight:600;font-size:11.5px">'+esc(stageName(id))
+      +(off?' <span class="muted" style="font-size:10px">('+esc(t('life.phaseOff'))+')</span>':'')+'</td>'
+      +[0,1,2,3].map(k=>'<td style="padding:4px 3px">'+cell(id,k)+'</td>').join('')+'</tr>';
+  });
+  const gaps=planGapPhases();
+  return '<div class="note note-blue" style="margin-bottom:10px">'+ic('info')+'<div>'+t('life.planHint')+'</div></div>'
+    +'<div class="tbl-wrap" style="margin-bottom:4px"><table><thead><tr>'
+    +'<th>'+esc(t('life.planPhaseCol'))+'</th><th class="c">Q1</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>'
+    +(hasPlan()?'':'<div class="fnote" style="color:var(--amber)">'+esc(t('life.planEmpty'))+'</div>')
+    +(gaps.length?'<div class="note note-amber" style="margin:8px 0 0">'+ic('alert')+'<div>'
+      +esc(t('life.planMissing',{phases:gaps.map(stageName).join(', ')}))+'</div></div>':'');
+}
 function renderLifecycle(){
   const M=projectGap();
   const b=computeBase();
@@ -2330,11 +2473,20 @@ function renderLifecycle(){
       +phaseInput('durOperation',t('life.phaseOperation'))+phaseInput('durDecline',t('life.phaseDecline'))
     +'</div>'
 
+    +'<div class="divider"></div>'
+    +'<div class="section-label">'+esc(t('life.demandSourceLabel'))+hint(t('life.demandSourceHint'))+'</div>'
+    +'<div class="field"><select class="select" id="demandMode">'
+      +'<option value="norm"'+(S.demandMode!=='plan'?' selected':'')+'>'+esc(t('life.modeNorm'))+'</option>'
+      +'<option value="plan"'+(S.demandMode==='plan'?' selected':'')+'>'+esc(t('life.modePlan'))+'</option>'
+    +'</select></div>'
+    +(S.demandMode==='plan' ? planEditor() : '')
+    +'<div class="divider"></div>'
     +'<div class="field"><label class="flabel">'+esc(t('life.currentStageLabel'))+hint(t('life.currentStageHint'))+'</label>'
       +'<select class="select" id="stage">'+STAGE_ORDER.map(id=>{
           const off=phaseLen(id)===0;   // фазы с длительностью 0 в проекте нет
+          // в режиме плана множитель фазы не применяется — не показываем K, чтобы не путать
           return '<option value="'+id+'"'+(S.stage===id?' selected':'')+(off?' disabled':'')+'>'
-            +esc(stageName(id))+' (K='+stageMult(id).toFixed(2)+')'+(off?' — '+esc(t('life.phaseOff')):'')+'</option>';
+            +esc(stageName(id))+(planActive()?'':' (K='+stageMult(id).toFixed(2)+')')+(off?' — '+esc(t('life.phaseOff')):'')+'</option>';
         }).join('')+'</select>'
       +(activeStage()!==S.stage
         ? '<div class="fnote" style="margin-top:6px;color:var(--amber)">'+esc(t('life.stageAutoSwitched',{stage:stageName(activeStage())}))+'</div>' : '')
@@ -2940,6 +3092,9 @@ function render(){
     focusId=act.id;
     try{ selS=act.selectionStart; selE=act.selectionEnd; }catch(e){}
   }
+  // снять фокус ДО замены разметки: иначе blur сработает в момент удаления узла
+  // и браузер бросит «The node to be removed is no longer a child of this node»
+  if(act && view.contains(act)){ try{ act.blur(); }catch(e){} }
   const tab=TABS.find(t=>t.id===activeTab)||TABS[0];
   view.innerHTML = tab.render();
   persist(); // автосохранение состояния в localStorage
@@ -3370,6 +3525,15 @@ function applyInput(el){
     }
     return true;
   }
+  // редактирование плановой численности по фазам
+  if(el.dataset && el.dataset.plan!=null && el.dataset.plan!==''){
+    const id=el.dataset.plan, k=+el.dataset.q;
+    if(!S.phasePlan||typeof S.phasePlan!=='object') S.phasePlan={};
+    const arr=(S.phasePlan[id]&&S.phasePlan[id].length===4)?S.phasePlan[id].slice():[0,0,0,0];
+    const v=parseFloat(el.value); arr[k]=isNaN(v)?0:Math.max(0,v);
+    S.phasePlan[id]=arr;
+    return 'plan';
+  }
   // редактирование ячеек видов работ
   if(el.dataset && el.dataset.work){
     const w=(S.works||[]).find(x=>x.id===el.dataset.work); if(!w) return false;
@@ -3538,6 +3702,7 @@ function systemPrompt(){
 '• workplace (по рабочим местам): Чяв = Рабочие_места × Коэфф_загрузки',
 'Списочная FTE работы = Чяв × Сменность × k_сп (absCoeff). Группа работы (core=основной / aux=ТОиР / mgmt=ИТР) формирует оргструктуру. Итог по объекту = сумма по всем работам, затем × множитель фазы жизненного цикла.',
 'Поле work: {name, group:core|aux|mgmt, method:output|time|service|workplace, volume, unit, period, norm, tNorm, Fsm, kvn, nObjects, serviceNorm, workplaces, loadCoeff, shifts}.',
+'ОБЯЗАТЕЛЬНО заполняй числовое поле выбранной методики, иначе работа даст 0 человек и весь итог обнулится: output -> volume и norm; time -> volume и tNorm; service -> nObjects и serviceNorm; workplace -> workplaces (число рабочих мест/постов) и loadCoeff. Если в документе точного числа нет — поставь обоснованную оценку и укажи её как допущение, но НИКОГДА не оставляй поле пустым или нулевым.',
 '',
 'ПАРАМЕТРЫ для update_params: stage(design|construction|commissioning|operation|decline), scenario(base|optimistic|automation), absCoeff, actualStaff, turnover(%), hireCap(чел/мес), fillDays(дн), sepCap(чел/мес), autoPace(множитель темпа автоматизации), mcRuns, durDesign/durConstruction/durCommissioning/durOperation/durDecline(мес), sourceProf/targetProf(id должности для CBA).',
 'ВЕСА РИСКА для set_risk_weights: wDemo,wBus,wSkill,wTurn,wMarket,wRedund (демография, ключевой спец., навыки, текучесть, рынок, избыточность).',
@@ -3548,6 +3713,7 @@ function systemPrompt(){
 'РЕАЛЬНОЕ ИССЛЕДОВАНИЕ: если доступен web_search и вопрос требует внешних данных (нормы труда, профстандарты/ЕТКС РК и РФ, дефицитность профессий и сроки закрытия вакансий, зарплаты по региону, темпы автоматизации, демография) — используй веб-поиск и ССЫЛАЙСЯ на источники. Чётко разделяй: что взято из источника, что — экспертная оценка, что — посчитано системой. Нормативы не выдумывай; при отсутствии данных помечай допущение явно.',
 'ПРОЗРАЧНОСТЬ: все числа в системе выводятся из формул и заданных параметров (см. вкладку «Методология»). Если спрашивают «откуда цифра» — объясни формулу и входные значения.',
 'При загрузке ТЭО/проектных документов: извлеки производственную программу, мощность, режим, фазы и уровень автоматизации; затем спроектируй виды работ (set_works) и параметры (update_params).',
+'ЕСЛИ В ДОКУМЕНТЕ ЕСТЬ ГОТОВЫЙ ГРАФИК ЧИСЛЕННОСТИ (сколько людей по месяцам/этапам) — не пересчитывай его через нормы: вызови set_phase_plan и передай числа из документа как есть. Нормативный расчёт по видам работ даёт СВОЮ оценку, и она почти всегда расходится с документом; для клиента истина — его документ. Виды работ в этом случае всё равно задай (они определяют структуру Основной/ТОиР/ИТР), но потребность будет браться из плана.',
 'ВАЖНО — СПРАВОЧНИК ДОЛЖНОСТЕЙ. В приложении по умолчанию лежат ДЕМО-должности (оператор установки, обходчик, буровик и т.п.). Это образец, а не данные клиента. Если ты проектируешь расчёт по документу, ты ОБЯЗАН одним вызовом set_professions заменить справочник на должности, которые реально нужны этому объекту и соответствуют заданным видам работ. Иначе вкладки «Детализация по должностям», «Кадровые риски» и CBA покажут чужие роли, и весь расчёт будет бессмысленным. Для каждой должности задай оклад, численность (headcount), средний возраст и рыночную дефицитность — если в документе их нет, поставь разумную оценку и явно пометь её как допущение.',
 'Кратко перечисли допущения, требующие подтверждения.',
 '',
@@ -3563,6 +3729,7 @@ const AI_TOOLS = [
   {name:'update_params',description:'Изменить вводные/прогнозные параметры расчёта.',input_schema:{type:'object',properties:{params:{type:'object',description:'Объект {ключ:значение}, например {"turnover":12,"stage":"operation","autoPace":1.3}'}},required:['params']}},
   {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). Используй для проектирования расчёта по ТЭО.',input_schema:{type:'object',properties:{works:{type:'array',items:{type:'object'},description:'Массив объектов work (см. системную подсказку)'}},required:['works']}},
   {name:'add_work',description:'Добавить один вид работ.',input_schema:{type:'object',properties:{work:{type:'object'}},required:['work']}},
+  {name:'set_phase_plan',description:'Задать ПЛАНОВУЮ численность персонала по фазам напрямую из документа заказчика (в людях, а не в множителях) и переключить расчёт в режим «план». Используй, когда в документе есть готовый график численности по месяцам/этапам — тогда потребность берётся из документа, а не выводится из норм.',input_schema:{type:'object',properties:{plan:{type:'object',description:'{design:[q1,q2,q3,q4], construction:[...], commissioning:[...], operation:[...], decline:[...]} — численность в 4 точках каждой фазы (начало→конец). Указывай только те фазы, что есть в проекте.'}},required:['plan']}},
   {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). Используй это при проектировании расчёта по документу заказчика: одним вызовом задай тот набор должностей, который реально нужен объекту.',input_schema:{type:'object',properties:{professions:{type:'array',items:{type:'object'},description:'Массив должностей: {name, type:core|aux|mgmt, salary, trainingBase, skillRate, skills, headcount, avgAge, market}'}},required:['professions']}},
   {name:'upsert_profession',description:'Добавить или обновить ОДНУ должность в справочнике.',input_schema:{type:'object',properties:{profession:{type:'object'}},required:['profession']}},
   {name:'delete_profession',description:'Удалить должность по id.',input_schema:{type:'object',properties:{id:{type:'string'}},required:['id']}},
@@ -3582,6 +3749,7 @@ const GEMINI_TOOLS = [
   {name:'update_params',description:'Изменить вводные/прогнозные параметры. params_json — JSON-строка объекта {ключ:значение}, напр. {"turnover":12,"stage":"operation","autoPace":1.3}.',parameters:{type:'object',properties:{params_json:{type:'string'}},required:['params_json']}},
   {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). works_json — JSON-строка массива объектов work.',parameters:{type:'object',properties:{works_json:{type:'string'}},required:['works_json']}},
   {name:'add_work',description:'Добавить один вид работ. work_json — JSON-строка объекта work.',parameters:{type:'object',properties:{work_json:{type:'string'}},required:['work_json']}},
+  {name:'set_phase_plan',description:'Задать плановую численность по фазам из документа (в людях) и включить режим «план». plan_json — JSON-строка {design:[q1,q2,q3,q4], construction:[...], ...}.',parameters:{type:'object',properties:{plan_json:{type:'string'}},required:['plan_json']}},
   {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). professions_json — JSON-строка массива должностей.',parameters:{type:'object',properties:{professions_json:{type:'string'}},required:['professions_json']}},
   {name:'upsert_profession',description:'Добавить/обновить ОДНУ должность. profession_json — JSON-строка объекта должности.',parameters:{type:'object',properties:{profession_json:{type:'string'}},required:['profession_json']}},
   {name:'delete_profession',description:'Удалить должность по id.',parameters:{type:'object',properties:{id:{type:'string'}},required:['id']}},
@@ -3598,6 +3766,7 @@ function geminiNormArgs(name,args){
     case 'set_methodology': return {params:J(args.params_json,{})};
     case 'set_works': return {works:J(args.works_json,[])};
     case 'add_work': return {work:J(args.work_json,{})};
+    case 'set_phase_plan': return {plan:J(args.plan_json,{})};
     case 'set_professions': return {professions:J(args.professions_json,[])};
     case 'upsert_profession': return {profession:J(args.profession_json,{})};
     case 'set_risk_weights': return {weights:J(args.weights_json,{})};
@@ -3615,7 +3784,9 @@ function aiNormalizeWork(w){
     volume:num(w.volume,0),unit:w.unit||'ед.',period:w.period||'месяц',norm:num(w.norm,1),
     tNorm:num(w.tNorm,0),Fsm:num(w.Fsm,480),kvn:num(w.kvn,1),
     nObjects:num(w.nObjects,0),serviceNorm:num(w.serviceNorm,1),
-    workplaces:num(w.workplaces,0),loadCoeff:num(w.loadCoeff,1), shifts:num(w.shifts,1)};
+    // модель нередко присылает синонимы или вовсе опускает поле — раньше это молча давало 0 FTE
+    workplaces:num(w.workplaces!=null?w.workplaces:(w.posts!=null?w.posts:w.places),0),
+    loadCoeff:num(w.loadCoeff,1), shifts:num(w.shifts,1)};
 }
 function aiNormalizeProfession(pr){
   if(!pr||typeof pr!=='object') return null;
@@ -3648,6 +3819,19 @@ function executeAiTool(name,input){
         const w=aiNormalizeWork(input.work); if(!w) return {ok:false,note:t('aiTool.invalidWork'),result:t('aiTool.errorResult')};
         S.works=S.works||[]; S.works.push(w); aiApplyAfterMutation();
         return {ok:true,note:t('aiTool.workAddedNote',{name:w.name}),result:t('aiTool.workAddedResult',{fte:fmtN(workFTE(w))})};
+      }
+      case 'set_phase_plan':{
+        const pl=input.plan||{}; const next={}; let n=0;
+        STAGE_ORDER.forEach(id=>{
+          const a=pl[id];
+          if(Array.isArray(a)&&a.length){
+            const four=[0,1,2,3].map(k=>Math.max(0,num(a[Math.min(k,a.length-1)],0)));
+            if(four.some(v=>v>0)){ next[id]=four; n++; }
+          }
+        });
+        if(!n) return {ok:false,note:t('aiTool.emptyPlan'),result:t('aiTool.errorResult')};
+        S.phasePlan=next; S.demandMode='plan'; aiApplyAfterMutation();
+        return {ok:true,note:t('aiTool.planSetNote',{n}),result:t('aiTool.planSetResult',{n,req:fmtN(computeBase().required)})};
       }
       case 'set_professions':{
         const arr=(input.professions||[]).map(aiNormalizeProfession).filter(Boolean);
@@ -4287,6 +4471,51 @@ Object.assign(I18N.es.norm, { chainTitle:'Cómo se obtuvo esta cifra', chainStep
 Object.assign(I18N.fr.norm, { chainTitle:"Comment ce chiffre a été obtenu", chainStep1:"Effectif de présence sur tous les types de travail (personnes nécessaires simultanément sur un poste)", chainStep2:"× nombre de postes de chaque type de travail (combien de postes couvrir)", chainStep3:"× réserve k_sp {k} (congés, arrêts maladie, formation)", chainTotalWorks:"Total par types de travail — niveau de base", chainStep4:"× multiplicateur de la phase « {stage} » (K = {k})", chainStep5:"× macro-scénario « {name} » ({k})", chainResult:"Besoin calculé", chainNoWorks:"Aucun type de travail défini — le besoin est calculé à partir des anciens champs de volume et de norme. Ajoutez des types de travail dans le tableau de droite pour rendre le calcul transparent.", chainHint:"La chaîne de calcul complète, du volume de travail au besoin final. Chaque étape est vérifiable : les chiffres proviennent du tableau « Types de travail » à droite et des durées de phase de l'onglet Cycle de vie." });
 Object.assign(I18N.ar.norm, { chainTitle:'كيف تم الوصول إلى هذا الرقم', chainStep1:'عدد الحضور عبر جميع أنواع العمل (الأشخاص المطلوبون في آنٍ واحد في وردية واحدة)', chainStep2:'× عدد ورديات كل نوع عمل (كم وردية يجب تغطيتها)', chainStep3:'× احتياطي k_sp {k} (الإجازات والإجازات المرضية والتدريب)', chainTotalWorks:'الإجمالي حسب أنواع العمل — المستوى الأساسي', chainStep4:'× معامل مرحلة «{stage}» (K = {k})', chainStep5:'× السيناريو الكلي «{name}» ({k})', chainResult:'الاحتياج المحسوب', chainNoWorks:'لم تُحدَّد أنواع عمل — يُحتسب الاحتياج من حقول الحجم والمعدل القديمة. أضف أنواع عمل في الجدول على اليمين ليصبح الحساب شفافًا.', chainHint:'سلسلة الحساب الكاملة، من حجم العمل حتى الاحتياج النهائي. كل خطوة قابلة للتحقق — تأتي الأرقام من جدول «أنواع العمل» ومن مدد المراحل في تبويب دورة الحياة.' });
 Object.assign(I18N.zh.norm, { chainTitle:'这个数字是怎么算出来的', chainStep1:'所有作业类型的出勤人数（同一班次内同时需要的人数）', chainStep2:'× 各作业类型的班次数（需要覆盖多少个班次）', chainStep3:'× 储备系数 k_sp {k}（休假、病假、培训）', chainTotalWorks:'各作业类型合计 — 基础水平', chainStep4:'× 「{stage}」阶段系数（K = {k}）', chainStep5:'× 宏观情景「{name}」（{k}）', chainResult:'测算需求', chainNoWorks:'未定义作业类型——需求将回退到旧的产量与定额字段计算。请在右侧表格中添加作业类型，使测算过程透明可查。', chainHint:'从作业量到最终需求的完整计算链路。每一步都可核对——数字取自右侧的「作业类型」表格以及生命周期标签页中的各阶段时长。' });
+Object.assign(I18N.kk.work, { missingBadge:'дерек жоқ', missingTip:'«{field}» өрісі толтырылмаған — онсыз бұл жұмыс 0 адам береді және қорытындыға кірмейді. Сан енгізіңіз.', missingWarn:'<b>Міндетті өріс толтырылмаған жолдар: {n}.</b> Мұндай жұмыс түрлері 0 адам деп есептеледі, сондықтан қорытынды төмендетілген. Қызылмен белгіленген өрістерді толтырыңыз — немесе AI көмекшіден сұраңыз: «құжат бойынша жетіспейтін сандарды қой».' });
+Object.assign(I18N.es.work, { missingBadge:'sin datos', missingTip:'El campo «{field}» está vacío: sin él este tipo de trabajo cuenta como 0 personas y queda fuera del total. Introduzca un número.', missingWarn:'<b>Falta un campo obligatorio en {n} fila(s).</b> Esos tipos de trabajo cuentan como 0 personas, por lo que el total queda subestimado. Rellene los campos marcados en rojo, o pida al asistente de IA: «completa los números que faltan según el documento».' });
+Object.assign(I18N.fr.work, { missingBadge:'sans données', missingTip:"Le champ « {field} » est vide — sans lui, ce type de travail compte pour 0 personne et disparaît du total. Saisissez un nombre.", missingWarn:"<b>Un champ obligatoire est vide dans {n} ligne(s).</b> Ces types de travail comptent pour 0 personne, le total est donc sous-évalué. Remplissez les champs surlignés en rouge — ou demandez à l'assistant IA : « complète les nombres manquants d'après le document »." });
+Object.assign(I18N.ar.work, { missingBadge:'لا توجد بيانات', missingTip:'الحقل «{field}» فارغ — بدونه يُحتسب نوع العمل هذا بصفر أشخاص ويخرج من الإجمالي. أدخل رقمًا.', missingWarn:'<b>يوجد حقل مطلوب فارغ في {n} صف.</b> تُحتسب أنواع العمل هذه بصفر أشخاص، لذا فإن الإجمالي أقل من الواقع. املأ الحقول المظللة بالأحمر — أو اطلب من مساعد الذكاء الاصطناعي: «أكمل الأرقام الناقصة من المستند».' });
+Object.assign(I18N.zh.work, { missingBadge:'无数据', missingTip:'「{field}」字段为空——缺少它，该作业类型将按 0 人计算并从合计中剔除。请输入数值。', missingWarn:'<b>有 {n} 行的必填字段为空。</b>这些作业类型按 0 人计算，因此合计被低估。请填写以红色高亮的字段，或让 AI 助手代劳：「根据文档补齐缺失的数字」。' });
+Object.assign(I18N.kk.life, { demandSourceLabel:'Қажеттілік көзі', demandSourceHint:'Санды қайдан алу керек: жұмыс түрлерінің нормалары бойынша есептеу — немесе құжатыңыздағы дайын сан кестесін алу. Екінші жағдайда формулалар сіздің сандарыңызды ауыстырмайды.', modeNorm:'Нормалар бойынша есептеу (жұмыс түрлері × фаза қисығы)', modePlan:'Құжаттағы сан жоспары', planPhaseCol:'Фаза', planHint:'Әр фазаның төрт нүктесінде <b>адам санын</b> енгізіңіз: Q1 — фаза басы, Q4 — соңы. Нүктелер арасын жүйе ай сайын интерполяциялайды. Тек жобада бар фазаларды толтырыңыз.', planEmpty:'Жоспар әзірге бос — кемінде бір фазаны толтырыңыз, әйтпесе есеп нормаларға оралады.' });
+Object.assign(I18N.kk.life, { planMissing:'Жоспарда мына фазалар үшін сан жоқ: {phases}. Олар бос тұрғанда бұл айлардағы қажеттілік нөл деп есептеледі — олардың орнына нормалар қойылмайды.' });
+Object.assign(I18N.kk.work, { unitCol:'Өлш. бір.', periodCol:'Кезең' });
+Object.assign(I18N.kk.norm, { noteVolume:'Көлем мен нормалар әр жұмыс түрі үшін бөлек — төмендегі «Жұмыс түрлері» кестесінде — беріледі. Қорытынды қажеттілік — барлық жұмыстар бойынша қосынды.' });
+Object.assign(I18N.kk.norm, { qHintPlan:'Q1–Q4 «{stage}» фазасы бойынша сіздің сан жоспарыңыздан алынды: {q} адам. Формула оларды қайта есептемейді. «FTE мақсат» — осы төрт нүктенің орташасы, сондықтан ол әрқайсысынан өзгеше.' });
+Object.assign(I18N.kk.norm, { chainPlanGap:'«Сан жоспары» режимі қосулы, бірақ «{stage}» фазасы үшін жоспарда сан жоқ. Мұнда норма қойылмайды — бұл фазаны «Өмірлік цикл» бетінде толтырыңыз немесе нормалар бойынша есепке қайтыңыз.' });
+Object.assign(I18N.kk.norm, { chainPlanNote:'Қажеттілік <b>сіздің құжатыңыздан</b> алынды («Сан жоспары» режимі), нормалар мен фаза қисығы қолданылмайды. «{stage}» фазасы көрсетілген.', chainPlanPoints:'Фаза бойынша жоспарлы сан: {q} → орташа' });
+Object.assign(I18N.kk.aiTool, { emptyPlan:'Сан жоспары бос', planSetNote:'Сан жоспары фазалар бойынша берілді: {n}', planSetResult:'«Құжаттан жоспар» режимі қосылды, толтырылған фаза: {n}, ағымдағы қажеттілік {req} адам' });
+Object.assign(I18N.es.life, { demandSourceLabel:'Origen de la demanda', demandSourceHint:'De dónde procede la dotación: calcularla a partir de las normas de los tipos de trabajo, o tomar el calendario de personal directamente de su documento. En el segundo caso las fórmulas no anulan sus cifras.', modeNorm:'Calcular por normas (tipos de trabajo × curva de fase)', modePlan:'Plan de dotación del documento', planPhaseCol:'Fase', planHint:'Introduzca la dotación <b>en personas</b> en cuatro puntos de cada fase: Q1 es el inicio de la fase y Q4 su final. El sistema interpola mes a mes entre ellos. Rellene solo las fases que existan en su proyecto.', planEmpty:'El plan aún está vacío: rellene al menos una fase o el cálculo volverá a las normas.' });
+Object.assign(I18N.es.life, { planMissing:'El plan no tiene cifras para estas fases: {phases}. Mientras sigan vacías, la demanda de esos meses se cuenta como cero: no se sustituyen por las normas.' });
+Object.assign(I18N.es.work, { unitCol:'Unidad', periodCol:'Periodo' });
+Object.assign(I18N.es.norm, { noteVolume:'El volumen y las normas se definen por separado para cada tipo de trabajo, en la tabla «Tipos de trabajo» de abajo. La demanda total es la suma de todos los tipos de trabajo.' });
+Object.assign(I18N.es.norm, { qHintPlan:'Q1-Q4 proceden de su plan de dotación para la fase «{stage}»: {q} personas. Ninguna fórmula las recalcula. «FTE objetivo» es la media de esos cuatro puntos, por eso difiere de cada uno de ellos.' });
+Object.assign(I18N.es.norm, { chainPlanGap:'El modo «Plan de dotación» está activo, pero el plan no contiene cifras para la fase «{stage}». Aquí no sustituimos ninguna norma: rellene esta fase en la pestaña «Ciclo de vida» o vuelva al cálculo por normas.' });
+Object.assign(I18N.es.norm, { chainPlanNote:'La demanda se toma <b>de su documento</b> (modo «Plan de dotación»); no se aplican las normas ni la curva de fase. Se muestra la fase «{stage}».', chainPlanPoints:'Dotación planificada de la fase: {q} → media' });
+Object.assign(I18N.es.aiTool, { emptyPlan:'Plan de dotación vacío', planSetNote:'Plan de dotación definido para {n} fase(s)', planSetResult:'Modo «plan del documento» activado, {n} fase(s) rellenada(s), demanda actual {req} personas' });
+Object.assign(I18N.fr.life, { demandSourceLabel:"Origine du besoin", demandSourceHint:"D'où vient l'effectif : le calculer à partir des normes des types de travail, ou reprendre le calendrier d'effectifs directement de votre document. Dans le second cas, les formules ne remplacent pas vos chiffres.", modeNorm:"Calculer selon les normes (types de travail × courbe de phase)", modePlan:"Plan d'effectifs issu du document", planPhaseCol:'Phase', planHint:"Saisissez l'effectif <b>en personnes</b> à quatre points de chaque phase : Q1 correspond au début de la phase, Q4 à sa fin. Le système interpole mois par mois entre ces points. Ne remplissez que les phases présentes dans votre projet.", planEmpty:"Le plan est encore vide — remplissez au moins une phase, sinon le calcul revient aux normes." });
+Object.assign(I18N.fr.life, { planMissing:"Le plan ne contient aucun chiffre pour ces phases : {phases}. Tant qu'elles restent vides, le besoin de ces mois est compté comme nul — les normes ne les remplacent pas." });
+Object.assign(I18N.fr.work, { unitCol:'Unité', periodCol:'Période' });
+Object.assign(I18N.fr.norm, { noteVolume:'Le volume et les normes se définissent séparément pour chaque type de travail, dans le tableau « Types de travail » ci-dessous. Le besoin total est la somme de tous les types de travail.' });
+Object.assign(I18N.fr.norm, { qHintPlan:"Q1-Q4 proviennent de votre plan d'effectifs pour la phase « {stage} » : {q} personnes. Aucune formule ne les recalcule. « FTE cible » est la moyenne de ces quatre points, d'où son écart avec chacun d'eux." });
+Object.assign(I18N.fr.norm, { chainPlanGap:"Le mode « Plan d'effectifs » est actif, mais le plan ne contient aucun chiffre pour la phase « {stage} ». Aucune norme n'est substituée ici : renseignez cette phase dans l'onglet « Cycle de vie » ou revenez au calcul selon les normes." });
+Object.assign(I18N.fr.norm, { chainPlanNote:"Le besoin provient <b>de votre document</b> (mode « Plan d'effectifs ») ; les normes et la courbe de phase ne sont pas appliquées. Phase affichée : « {stage} ».", chainPlanPoints:"Effectif planifié pour la phase : {q} → moyenne" });
+Object.assign(I18N.fr.aiTool, { emptyPlan:"Plan d'effectifs vide", planSetNote:"Plan d'effectifs défini pour {n} phase(s)", planSetResult:"Mode « plan du document » activé, {n} phase(s) renseignée(s), besoin actuel {req} personnes" });
+Object.assign(I18N.ar.life, { demandSourceLabel:'مصدر الاحتياج', demandSourceHint:'من أين يأتي عدد الموظفين: احتسابه من معايير أنواع العمل، أو أخذ جدول التوظيف مباشرةً من مستندك. في الحالة الثانية لا تتجاوز المعادلات أرقامك.', modeNorm:'الاحتساب وفق المعايير (أنواع العمل × منحنى المرحلة)', modePlan:'خطة الأعداد من المستند', planPhaseCol:'المرحلة', planHint:'أدخل العدد <b>بالأشخاص</b> عند أربع نقاط لكل مرحلة: Q1 هي بداية المرحلة وQ4 نهايتها. ويقوم النظام بالاستيفاء شهريًا بينهما. املأ المراحل الموجودة في مشروعك فقط.', planEmpty:'الخطة ما زالت فارغة — املأ مرحلة واحدة على الأقل، وإلا سيعود الحساب إلى المعايير.' });
+Object.assign(I18N.ar.life, { planMissing:'لا تتضمن الخطة أرقامًا للمراحل التالية: {phases}. وما دامت فارغة يُحتسب الاحتياج في تلك الأشهر صفرًا — ولا تحل المعايير محلها.' });
+Object.assign(I18N.ar.work, { unitCol:'الوحدة', periodCol:'الفترة' });
+Object.assign(I18N.ar.norm, { noteVolume:'يُحدَّد الحجم والمعايير لكل نوع عمل على حدة في جدول «أنواع العمل» أدناه. والاحتياج الإجمالي هو مجموع جميع أنواع العمل.' });
+Object.assign(I18N.ar.norm, { qHintPlan:'قيم Q1–Q4 مأخوذة من خطة الأعداد الخاصة بك لمرحلة «{stage}»: {q} شخصًا. ولا تُعيد أي معادلة احتسابها. أما «FTE المستهدف» فهو متوسط هذه النقاط الأربع، ولذلك يختلف عن كل منها.' });
+Object.assign(I18N.ar.norm, { chainPlanGap:'وضع «خطة الأعداد» مفعَّل، لكن الخطة لا تتضمن أرقامًا لمرحلة «{stage}». ولا نستبدل بها معيارًا هنا — املأ هذه المرحلة في تبويب «دورة الحياة» أو عُد إلى الاحتساب وفق المعايير.' });
+Object.assign(I18N.ar.norm, { chainPlanNote:'الاحتياج مأخوذ <b>من مستندك</b> (وضع «خطة الأعداد»)، ولا تُطبَّق المعايير ولا منحنى المرحلة. المعروض هو مرحلة «{stage}».', chainPlanPoints:'العدد المخطط للمرحلة: {q} ← المتوسط' });
+Object.assign(I18N.ar.aiTool, { emptyPlan:'خطة الأعداد فارغة', planSetNote:'تم ضبط خطة الأعداد لعدد {n} مرحلة', planSetResult:'تم تفعيل وضع «الخطة من المستند»، وعدد المراحل المعبأة {n}، والاحتياج الحالي {req} شخصًا' });
+Object.assign(I18N.zh.life, { demandSourceLabel:'需求来源', demandSourceHint:'人数从何而来：根据作业类型的定额测算，或直接采用您文档中的人员配置计划。采用后者时，公式不会覆盖您的数字。', modeNorm:'按定额测算（作业类型 × 阶段曲线）', modePlan:'来自文档的人数计划', planPhaseCol:'阶段', planHint:'请在每个阶段的四个节点填写<b>人数</b>：Q1 为阶段开始，Q4 为阶段结束，系统会在两者之间按月插值。仅填写项目中实际存在的阶段。', planEmpty:'计划仍为空——请至少填写一个阶段，否则测算将回退到定额方式。' });
+Object.assign(I18N.zh.life, { planMissing:'计划中缺少以下阶段的人数：{phases}。在填写之前，这些月份的需求按零计算——不会用定额代替。' });
+Object.assign(I18N.zh.work, { unitCol:'单位', periodCol:'周期' });
+Object.assign(I18N.zh.norm, { noteVolume:'每个作业类型的工作量和定额在下方「作业类型」表中单独设置。总需求为各作业类型之和。' });
+Object.assign(I18N.zh.norm, { qHintPlan:'Q1–Q4 取自您为「{stage}」阶段填写的人数计划：{q} 人，公式不会重新计算。「FTE 目标」是这四个节点的平均值，因此与其中任何一个都不相同。' });
+Object.assign(I18N.zh.norm, { chainPlanGap:'已启用「人数计划」模式，但计划中没有「{stage}」阶段的数字。此处不会代入定额——请在「生命周期」标签页补充该阶段，或改回按定额测算。' });
+Object.assign(I18N.zh.norm, { chainPlanNote:'需求取自<b>您的文档</b>（「人数计划」模式），不套用定额与阶段曲线。当前显示「{stage}」阶段。', chainPlanPoints:'该阶段的计划人数：{q} → 平均' });
+Object.assign(I18N.zh.aiTool, { emptyPlan:'人数计划为空', planSetNote:'已为 {n} 个阶段设置人数计划', planSetResult:'已启用「来自文档的计划」模式，已填写 {n} 个阶段，当前需求 {req} 人' });
 Object.assign(I18N.kk.cba, { severanceBase:'Жұмыстан босату жәрдемақысы', recruitingBase:'Рекрутинг және бейімдеу', idleBase:'Оқу кезіндегі ақылы бос тұру',
   liveCoefs:'Коэффициенттер «Әдістеме» қосымшасынан алынады және мұнда автоматты түрде қолданылады: жалдау {hire} {hireSuf}, босату {sever} {severSuf}, оқуға бос тұру {idle} {idleSuf}.' });
 Object.assign(I18N.kk.act, { footnoteBase:'Жалдау мен босату құны жалақымен есептеледі, қайта даярлау — CBA моделі бойынша. Мерзімдер жалдау/босату сыйымдылығы мен дағдылар алшақтығының көлемінен шығады.' });
@@ -4352,6 +4581,79 @@ Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
   var it=g&&g[2]&&g[2].items&&g[2].items[1];
   if(it) it.how=pair[1];
 });
+
+/* ---------- ДОГОНЯЮЩИЕ ПЕРЕВОДЫ: ключи, добавленные после первичной локализации ---------- */
+(function(){
+  var PATCH = {
+    kk:{
+      dash:{
+        probHint:'Монте-Карло симуляцияларының ішінде қажеттілік қолжетімді штаттан <b>кемінде бір айда</b> асып кеткендерінің үлесі — тек соңғы айда емес. Тапшылық деп {thr} адамнан асатын алшақтық саналады (ағымдағы штаттың 2%-ы). Бұл көрсеткішті «Шыңдағы тапшылықпен» бірге қараңыз: ол «бола ма?» дегенге, ал шыңдағы «қаншалықты терең?» дегенге жауап береді.',
+        riskHint:'Барлық лауазымдар бойынша орташа кадрлық тәуекел индексі, олардың саны бойынша салмақталған (0–100). Әр лауазым 6 фактор бойынша бағаланады: демография, кілт маманға тәуелділік, дағдылардың ескіруі, тұрақтамау, нарықтағы тапшылық және автоматтандыру тәуекелі. Рөлдер бойынша талдау мен салмақтарды баптау — «Кадрлық тәуекелдер» бетінде.',
+        peakHint:'Бүкіл горизонт бойындағы «қажеттілік − қолжетімді штат» ең терең алшақтығы. {runs} симуляцияның әрқайсысынан оның ең үлкен алшақтығы алынады, содан кейін осы мәндер бойынша медиана (P50) мен ең нашар 10% (P90) есептеледі. Шың {month}-айға келеді — әдетте бұл қажеттілік ең жоғары ҚМЖ фазасы.'
+      },
+      norm:{ qHint:'«{stage}» фазасы біркелкі емес: басында адам аз керек, соңында көбірек (немесе керісінше). Q1–Q4 — осы қисықтың төрт бақылау нүктесі: базалық деңгейден {q1} / {q2} / {q3} / {q4}. «FTE мақсат» — фаза бойынша орташа, сондықтан Q-мәндері одан екі жаққа да ауытқиды.' },
+      chart:{ tipMonth:'{n}-ай', tipDemand:'Қажеттілік', tipAvail:'Қолжетімді (P50)', tipBand:'P10–P90 дәлізі', tipGap:'Алшақтық' },
+      pred:{ kpiProbTitle:'Горизонт бойындағы тапшылық ықтималдығы',
+        kpiProbSub:'Қажеттілік қолжетімді штаттан кемінде бір айда асып кеткен {runs} симуляцияның үлесі (алшақтық > {thr} адам).' },
+      cba:{ salaryForms:'айлық жалақы|айлық жалақы|айлық жалақы' }
+    },
+    zh:{
+      dash:{
+        probHint:'在蒙特卡洛模拟中，需求<b>至少在一个月内</b>超过可用人数的模拟占比——而不仅仅是最后一个月。缺口超过 {thr} 人（现有人数的 2%）才算短缺。请与「峰值缺口」一起解读：本指标回答「会不会发生」，峰值回答「有多严重」。',
+        riskHint:'所有岗位人力风险指数的加权平均值（按各岗位人数加权，0–100）。每个岗位按 6 个因素评分：人口结构、关键人员依赖、技能过时、流失率、市场稀缺度和自动化风险。分角色明细与权重设置见「人力风险」标签页。',
+        peakHint:'整个规划期内「需求 − 可用人数」的最大缺口。在 {runs} 次模拟中各取其最大缺口，再据此计算中位数（P50）和最差的 10%（P90）。峰值出现在第 {month} 个月——通常是需求最高的施工阶段。'
+      },
+      norm:{ qHint:'「{stage}」阶段并不平坦：开始时所需人数少于结束时（或相反）。Q1–Q4 是该曲线的四个控制点：相对基准水平的 {q1} / {q2} / {q3} / {q4}。「FTE 目标」是阶段平均值，因此 Q 值自然会在其上下波动。' },
+      chart:{ tipMonth:'第 {n} 个月', tipDemand:'需求', tipAvail:'可用（P50）', tipBand:'P10–P90 区间', tipGap:'缺口' },
+      pred:{ kpiProbTitle:'规划期内出现短缺的概率',
+        kpiProbSub:'在 {runs} 次模拟中，需求至少有一个月超过可用人数的比例（缺口 > {thr} 人）。' },
+      cba:{ salaryForms:'倍月薪|倍月薪|倍月薪' }
+    },
+    es:{
+      dash:{
+        probHint:'Proporción de simulaciones de Monte Carlo en las que la demanda superó la dotación disponible <b>en al menos un mes</b> del horizonte, no solo en el último. Se cuenta como déficit una brecha superior a {thr} personas (2 % de la plantilla actual). Léalo junto con «Déficit máximo»: este responde «¿ocurrirá?» y el máximo, «¿de qué profundidad?».',
+        riskHint:'Índice medio de riesgo de personal de todos los puestos, ponderado por su dotación (0-100). Cada puesto se evalúa según 6 factores: demografía, dependencia de un especialista clave, obsolescencia de competencias, rotación, escasez en el mercado y riesgo de automatización. El desglose por rol y el ajuste de pesos están en la pestaña «Riesgos de la fuerza laboral».',
+        peakHint:'La brecha «demanda − dotación disponible» más profunda de todo el horizonte. De cada una de las {runs} simulaciones se toma su brecha máxima y, sobre esos valores, se calculan la mediana (P50) y el peor 10 % (P90). El máximo se sitúa en el mes {month}, normalmente la fase de construcción, donde la demanda es mayor.'
+      },
+      norm:{ qHint:'La fase «{stage}» no es plana: al principio se necesita menos gente que al final (o al revés). Q1-Q4 son los cuatro puntos de control de esa curva: {q1} / {q2} / {q3} / {q4} del nivel base. «FTE objetivo» es la media de la fase, por eso los valores Q quedan naturalmente por encima y por debajo.' },
+      chart:{ tipMonth:'Mes {n}', tipDemand:'Demanda', tipAvail:'Disponible (P50)', tipBand:'Banda P10-P90', tipGap:'Brecha' },
+      pred:{ kpiProbTitle:'Probabilidad de déficit en el horizonte',
+        kpiProbSub:'Proporción de {runs} simulaciones en las que la demanda superó la dotación disponible en al menos un mes (brecha > {thr} personas).' },
+      cba:{ salaryForms:'salario|salarios|salarios' }
+    },
+    fr:{
+      dash:{
+        probHint:"Part des simulations de Monte-Carlo où le besoin a dépassé l'effectif disponible <b>sur au moins un mois</b> de l'horizon, et pas seulement sur le dernier. Un déficit est compté lorsque l'écart dépasse {thr} personnes (2 % de l'effectif actuel). À lire avec le « Déficit maximal » : cet indicateur répond à « cela arrivera-t-il ? », le maximal à « avec quelle ampleur ? ».",
+        riskHint:"Indice moyen de risque RH sur l'ensemble des postes, pondéré par leurs effectifs (0-100). Chaque poste est noté sur 6 facteurs : démographie, dépendance à un spécialiste clé, obsolescence des compétences, turnover, rareté sur le marché et risque d'automatisation. Le détail par rôle et le réglage des pondérations se trouvent dans l'onglet « Risques RH ».",
+        peakHint:"L'écart « besoin − effectif disponible » le plus profond sur tout l'horizon. Chacune des {runs} simulations fournit son écart maximal ; la médiane (P50) et les 10 % les plus défavorables (P90) sont ensuite calculés sur ces valeurs. Le pic se situe au mois {month} — généralement la phase de construction, où le besoin est maximal."
+      },
+      norm:{ qHint:"La phase « {stage} » n'est pas plate : il faut moins de personnes au début qu'à la fin (ou l'inverse). Q1-Q4 sont les quatre points de contrôle de cette courbe : {q1} / {q2} / {q3} / {q4} du niveau de base. « FTE cible » est la moyenne de la phase, d'où l'écart naturel des valeurs Q de part et d'autre." },
+      chart:{ tipMonth:'Mois {n}', tipDemand:'Besoin', tipAvail:'Disponible (P50)', tipBand:'Plage P10-P90', tipGap:'Écart' },
+      pred:{ kpiProbTitle:"Probabilité de déficit sur l'horizon",
+        kpiProbSub:"Part des {runs} simulations où le besoin a dépassé l'effectif disponible sur au moins un mois (écart > {thr} personnes)." },
+      cba:{ salaryForms:'salaire|salaires|salaires' }
+    },
+    ar:{
+      dash:{
+        probHint:'نسبة محاكاات مونت كارلو التي تجاوز فيها الاحتياج العدد المتاح <b>في شهر واحد على الأقل</b> من الأفق الزمني، وليس في الشهر الأخير فقط. ويُحتسب النقص عندما تتجاوز الفجوة {thr} شخصًا (2% من العدد الحالي). اقرأ هذا المؤشر مع «ذروة النقص»: فهو يجيب عن «هل سيحدث؟» بينما تجيب الذروة عن «ما مدى عمقه؟».',
+        riskHint:'متوسط مؤشر المخاطر البشرية لجميع الوظائف مرجَّحًا بأعدادها (0–100). تُقيَّم كل وظيفة وفق ستة عوامل: التركيبة العمرية، والاعتماد على أخصائي رئيسي، وتقادم المهارات، ودوران العمالة، وندرة السوق، ومخاطر الأتمتة. التفصيل حسب الدور وضبط الأوزان في تبويب «المخاطر البشرية».',
+        peakHint:'أعمق فجوة بين الاحتياج والعدد المتاح على مدى الأفق الزمني بأكمله. تُؤخذ من كل محاكاة من المحاكاات الـ{runs} أكبر فجوة فيها، ثم يُحتسب على هذه القيم الوسيط (P50) وأسوأ 10% (P90). وتقع الذروة في الشهر {month} — وهي عادةً مرحلة الإنشاء حيث يبلغ الاحتياج أقصاه.'
+      },
+      norm:{ qHint:'مرحلة «{stage}» ليست ثابتة: يقل عدد الأشخاص المطلوب في بدايتها عنه في نهايتها (أو العكس). وQ1–Q4 هي نقاط التحكم الأربع لهذا المنحنى: {q1} / {q2} / {q3} / {q4} من المستوى الأساسي. أما «FTE المستهدف» فهو متوسط المرحلة، ولذلك تقع قيم Q طبيعيًا فوقه وتحته.' },
+      chart:{ tipMonth:'الشهر {n}', tipDemand:'الاحتياج', tipAvail:'المتاح (P50)', tipBand:'نطاق P10–P90', tipGap:'الفجوة' },
+      pred:{ kpiProbTitle:'احتمال حدوث نقص خلال الأفق الزمني',
+        kpiProbSub:'نسبة المحاكاات ({runs}) التي تجاوز فيها الاحتياج العدد المتاح في شهر واحد على الأقل (فجوة > {thr} شخصًا).' },
+      cba:{ salaryForms:'راتب|رواتب|رواتب' }
+    },
+    en:{ cba:{ salaryForms:'salary|salaries|salaries' } }
+  };
+  Object.keys(PATCH).forEach(function(lang){
+    var dst = I18N[lang] = I18N[lang] || {};
+    Object.keys(PATCH[lang]).forEach(function(sec){
+      dst[sec] = Object.assign(dst[sec] || {}, PATCH[lang][sec]);
+    });
+  });
+})();
 
 /* ---------- СТАРТ ---------- */
 function init(){
