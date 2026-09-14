@@ -236,7 +236,7 @@ td.c{text-align:center} td.r{text-align:right}
 .wtbl .wlab{font-family:var(--mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--t3);white-space:nowrap}
 .wtbl .wfield{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
 .wtbl .wfield input{width:74px;text-align:right}
-.wtbl .wfield input.wtxt{width:52px;text-align:left;font-size:11px}
+.wtbl .wfield input.wtxt{width:88px;text-align:left;font-size:11px;text-overflow:ellipsis}
 .wtbl input.wmiss{border-color:var(--red)!important;background:var(--red-l)!important;box-shadow:0 0 0 2px rgba(196,54,27,.12)}
 .wtbl tr.wrow-bad td{background:rgba(196,54,27,.045)}
 
@@ -252,6 +252,35 @@ td.c{text-align:center} td.r{text-align:right}
 .demobar .demo-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
 .demobar .demo-primary svg{stroke:#fff}
 @media print{.demobar{display:none}}
+
+/* ---------- ДОРАБОТКИ ТАБЛИЦ (итоги, формулы, переносы) ---------- */
+/* подставленная формула под параметрами вида работ */
+.wtbl .wformula{margin-top:6px;font-size:10px;color:var(--t3);line-height:1.5;
+  white-space:normal;max-width:420px;letter-spacing:0}
+/* строка итогов — её раньше не было вовсе */
+tfoot tr.totrow td{background:var(--ink);color:#fff;font-weight:800;font-size:12.5px;
+  border-top:2px solid var(--ink);padding-top:11px;padding-bottom:11px}
+tfoot tr.totrow td.mono{font-family:var(--mono)}
+/* значение достроено интерполяцией / переопределено пользователем */
+input.pderived{color:var(--t3);font-style:italic;background:var(--surface2)}
+/* справочник: длинные названия не должны обрезаться */
+.dname{min-width:300px;width:22%}
+.dname input{width:100%;text-overflow:ellipsis}
+.dskills{min-width:280px;width:20%}
+.dskills input{width:100%;text-overflow:ellipsis}
+/* числовые колонки справочника держим узкими, чтобы текстовым осталась ширина */
+.dnum{width:1%;white-space:nowrap}
+/* на ноутбуках поуже отдаём текстовым колонкам ровно столько, чтобы таблица влезла целиком */
+@media(max-width:1320px){
+  .dname{min-width:210px}
+  .dskills{min-width:190px}
+  /* в языках с длинными словами (es/fr) заголовки переносим, а не растягиваем таблицу */
+  .dnum{white-space:normal}
+}
+/* рекомендация в тепловой карте переносится, а не растягивает таблицу */
+td.recocell{min-width:190px;max-width:280px;white-space:normal;line-height:1.45}
+/* «Детализация по должностям»: имя должности целиком */
+td.pname{min-width:210px;white-space:normal;line-height:1.4}
 
 /* ---------- PROGRESS BARS ---------- */
 .bartrack{height:9px;border-radius:9px;background:var(--line2);overflow:hidden}
@@ -650,6 +679,13 @@ Object.assign(I18N.ru, { norm:{
   deficit:'Дефицит', surplus:'Избыток', balance:'Баланс',
   needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
   detailTitle:'Детализация по должностям', detailHint:'Потребность из блока «Сводный результат» делится между должностями справочника: сначала по группам (Основной / ТОиР / ИТР), затем поровну между должностями внутри группы. Столбцы Q1–Q4 показывают, как эта потребность меняется <b>внутри выбранной фазы</b> — от её начала (Q1) к концу (Q4).',
+  qMonthShort:'мес. {m}', monthRange:'мес. {from}–{to}',
+  thWhen:'Когда нужны', thWhenHint:'Месяцы проекта, в которые эта фаза идёт. Набор должен быть закрыт к началу интервала, иначе люди выйдут позже, чем понадобятся.',
+  totalRow:'Итого по всем должностям',
+  qFootnote:'Q1–Q4 — не календарные кварталы, а четыре контрольные точки внутри выбранной фазы: Q1 — её начало, Q4 — конец. Месяц рядом с подписью — это месяц проекта. В режиме «План численности из документа» эти числа берутся из вашего плана; в режиме «по нормам» — считаются по кривой фазы, поэтому вручную не правятся (правьте план на вкладке «Жизненный цикл»).',
+  tplBuiltin:'Готовые отрасли', tplMine:'Мои отрасли', tplActions:'Действия',
+  tplNewOption:'+ Добавить свою отрасль…', tplDelete:'Удалить этот шаблон',
+  tplAiNote:'Нет вашей отрасли в списке? Выберите «Добавить свою отрасль» — или попросите ИИ-ассистента: «сделай шаблон под горнодобычу по моему документу», и он заполнит все параметры сам.',
   qHintPlan:'Q1–Q4 взяты из вашего плана численности для фазы «{stage}»: {q} чел. Формула их не пересчитывает. «FTE цель» — среднее по этим четырём точкам, поэтому оно отличается от каждой из них.',
   qHint:'Фаза «{stage}» неравномерна: в начале людей нужно меньше, чем в конце (или наоборот). Q1–Q4 — четыре контрольные точки этой кривой: {q1} / {q2} / {q3} / {q4} от базового уровня. «FTE цель» — среднее по фазе, поэтому Q-значения закономерно расходятся с ним в обе стороны.',
   thPosition:'Должность', thRole:'Роль', thFteTarget:'FTE цель (среднее по фазе)',
@@ -674,6 +710,11 @@ Object.assign(I18N.ru, { norm:{
   fsm:'Фсм', fsmPh:'Фонд смены, мин', kvn:'kвн', kvnPh:'Коэфф. выполнения норм',
   nObjects:'Агрегатов', nObjectsPh:'Число обслуживаемых объектов', serviceNorm:'Нобсл', serviceNormPh:'Норма обслуживания, объектов/чел',
   workplaces:'Раб. места', workplacesPh:'Число рабочих мест', loadCoeff:'k загр', loadCoeffPh:'Коэфф. загрузки',
+  fmOutput:'Объём {vol} {unit} ÷ норма {norm} = {yav} чел. в смену',
+  fmTime:'({vol} × {tn} мин) ÷ ({fsm} мин × {kvn}) = {yav} чел. в смену',
+  fmService:'{objs} агрегатов ÷ норма обслуживания {norm} = {yav} чел. в смену',
+  fmWorkplace:'{wp} раб. мест × загрузка {load} = {yav} чел. в смену',
+  fmFte:'{yav} × {shifts} смен × резерв {ksp} = {fte} FTE в штате',
   unitCol:'Ед. изм.', periodCol:'Период',
   norm:'Норма', normPh:'Норма выработки на 1 чел', unitDefault:'ед.', periodDefault:'период', periodMonth:'месяц',
   title:'Виды работ — расчёт явочной численности',
@@ -704,6 +745,9 @@ life:{
   planPhaseCol:'Фаза',
   planHint:'Введите численность <b>в людях</b> в четырёх точках каждой фазы: Q1 — начало фазы, Q4 — конец. Между точками система интерполирует по месяцам. Заполняйте только те фазы, что есть в проекте.',
   planEmpty:'План пока пустой — заполните хотя бы одну фазу, иначе расчёт вернётся к нормам.',
+  planInactive:'Режим «План численности» выбран, но ни одна фаза не заполнена, поэтому расчёт пока идёт <b>по нормам</b> — с множителем фазы. Впишите численность хотя бы для одной фазы в таблицу ниже, и план сразу начнёт действовать.',
+  planActiveNote:'План действует: нормы и множитель фазы не применяются.',
+  planDerivedNote:'Серым курсивом показаны точки, которые система достроила сама — по заданным вами началу и концу фазы. Впишите своё число, чтобы переопределить.',
   noHorizon:'Длительность всех фаз равна нулю, поэтому проекта во времени нет: прогноз, графики и план найма строить не из чего. Укажите, сколько месяцев длится хотя бы одна фаза.',
   planMissing:'В плане нет чисел для фаз: {phases}. Пока они пустые, потребность в этих месяцах считается нулевой — нормы вместо них не подставляются.',
   stageAutoSwitched:'Выбранной фазы нет в проекте (0 мес.) — расчёт ведётся по фазе «{stage}».',
@@ -727,6 +771,17 @@ life:{
   driversTitle:'Драйверы прогноза', driversHint:'Эти параметры управляют моделями оттока, найма и автоматизации.',
   turnoverLabel:'Годовая текучесть', turnoverHint:'Доля персонала, увольняющегося за год. Переводится в месячную вероятность: 1−(1−p)^(1/12).',
   benchmarkNote:'Оценка: <b>{level}</b> (бенчмарк ~12–18%).',
+  effectTitle:'На что влияют эти ползунки',
+  effectHint:'Каждая строка — результат настоящего пересчёта: система прогоняет всю модель Монте-Карло ещё раз с драйвером, увеличенным на 25%, и показывает, как меняется пиковый дефицит. Красное — станет хуже, зелёное — лучше. Так видно, какой рычаг реально работает на вашем проекте, а какой почти ничего не меняет.',
+  verdictCertain:'Дефицит неизбежен: он возникает во всех симуляциях. Первый провал — на {month}-м месяце, в пике не хватит {peak} чел.',
+  verdictLikely:'Дефицит скорее случится, чем нет ({pct}% симуляций). Первый провал ожидается на {month}-м месяце.',
+  verdictPossible:'Дефицит возможен, но не предопределён: он возникает в {pct}% симуляций. Решают отток и скорость найма.',
+  verdictNone:'Дефицит не прогнозируется: во всех симуляциях штата хватает. Следите за профицитом и стоимостью удержания.',
+  whyMonteCarlo:'<b>Зачем здесь случайность.</b> Одна линия прогноза — это обман: никто не знает точно, сколько людей уйдёт в марте и сколько вакансий закроется в срок. Поэтому будущее проигрывается {runs} раз, каждый раз со своими случайными отклонениями оттока (±40%), спроса (±5%) и успешности найма. Из этих {runs} исходов и получается коридор: <b>P50</b> — срединный сценарий, <b>P10–P90</b> — интервал, в который попадает 80% исходов. Широкий коридор означает, что результат сильно зависит от везения, и на него нельзя закладываться; узкий — что прогноз устойчив.',
+  effectRow:'{label} выше на 25% →', effectRowDown:'{label} ниже на 25% →',
+  effectNoteAvail:'Изменение доступного штата к концу горизонта (сейчас {avail} чел.). Дефицита на горизонте нет, поэтому показано влияние на обеспеченность: зелёное — людей останется больше, красное — меньше.',
+  effectNote:'Изменение пикового дефицита (сейчас {peak} чел.) при росте драйвера на четверть. Ноль означает, что на этих данных драйвер упирается в другое ограничение.',
+
   benchAbove:'выше нормы', benchMarket:'на уровне рынка', benchBelow:'ниже рынка',
   hireCapLabel:'Ёмкость найма', hireCapHint:'Сколько человек реально можно нанять за месяц при текущих рекрутинговых ресурсах.',
   fillDaysLabel:'Срок закрытия вакансии', fillDaysHint:'Чем дольше закрывается вакансия, тем ниже реализуемость найма в модели.',
@@ -779,7 +834,10 @@ life:{
   editModeNote:'Режим редактирования. Изменения нужно сохранить, чтобы применить к расчётам.',
   saveDbBtn:'Сохранить БД',
   thSalary:'Оклад ₸', thTrainingBase:'База ДПО ₸', thSkillPrice:'Цена навыка ₸',
-  thHeadcount:'Числ.', thAvgAge:'Ср.возр.', thMarket:'Рынок', thSkills:'Навыки (через ;)'
+  thHeadcount:'Числ.', thAvgAge:'Ср.возр.', thMarket:'Рынок', thSkills:'Навыки (через ;)',
+  thSkillsHint:'Через точку с запятой. Начните печатать — появится список навыков из лексикона автоматизируемости (вкладка «Методология»). Пишите именно их названия: именно по ним считается риск автоматизации и стоимость доучивания. Свои навыки тоже можно — им присвоится средний риск.',
+  thTrainCost:'Стоить доучить', thTrainCostHint:'Сколько стоит довести человека до полного набора навыков этой должности: база ДПО + цена каждого навыка. Цена навыка = «Цена навыка» этой должности × множитель сложности из лексикона на вкладке «Методология». Поэтому «Машинное обучение» дороже, чем «Обход».',
+  skillsFootnote:'<b>«Цена навыка»</b> — ваша ставка за один доучиваемый навык для этой должности. <b>«База ДПО»</b> (дополнительное профессиональное образование) — постоянная часть: сам курс, документы, экзамен — то, что платится один раз независимо от числа навыков. Итоговая стоимость переобучения = база ДПО + сумма по недостающим навыкам, где каждый навык умножается на свой множитель сложности (вкладка «Методология»).'
 }, risk:{
   eyebrow:'Этап 4 · Кто рискует уйти', title:'Кадровые риски — многофакторная оценка',
   lead:'Шесть факторов риска по каждой роли сводятся во взвешенный индекс 0–100. Веса настраиваются под приоритеты предприятия. Каждый риск связан с рекомендованным действием (митигейшн).',
@@ -787,6 +845,22 @@ life:{
   portfolioLabel:'Индекс риска (портфель)', portfolioSub:'взвешен по численности ролей',
   criticalLabel:'Критических ролей', criticalSub:'индекс ≥ 66 — нужен план',
   elevatedLabel:'Повышенный риск', elevatedSub:'индекс 40–65 — мониторинг',
+  linkedNote:'<b>«Навыки» и «Избыточность» — не одно и то же, но растут из одного источника.</b> «Навыки» — доля автоматизируемых операций в роли <i>прямо сейчас</i>. «Избыточность» — вероятность, что за горизонт проекта роль действительно вытеснят: тот же показатель, помноженный на время и темп автоматизации. Если поставить большой вес обоим, один и тот же риск учтётся дважды — разумнее оставить вес у одного из них.',
+  sourcesTitle:'Откуда берутся эти шесть чисел',
+  sourcesHint:'Ни один фактор не придуман системой: каждый выводится либо из справочника должностей, либо из параметров прогноза, либо из лексикона навыков. Здесь видно, что заполнять и где.',
+  thFactor:'Фактор', thSource:'Из чего считается', thWhere:'Где это задать',
+  src_demo:'Средний возраст по должности: чем ближе к пенсионному, тем выше риск ухода по возрасту.',
+  where_demo:'Справочник → колонка «Ср. возраст»',
+  src_bus:'Сколько людей владеет компетенцией. Один-два носителя = зависимость от конкретного человека.',
+  where_bus:'Справочник → колонка «Числ.»',
+  src_skill:'Доля автоматизируемых операций в наборе навыков должности — по лексикону автоматизируемости.',
+  where_skill:'Справочник → «Навыки» + Методология → лексикон',
+  src_turn:'Годовая текучесть по предприятию, усиленная дефицитностью этой роли на рынке.',
+  where_turn:'Предиктивный анализ → «Годовая текучесть» + Справочник → «Рынок»',
+  src_market:'Ваша экспертная оценка дефицитности роли на рынке труда (0…1) и срок закрытия вакансии.',
+  where_market:'Справочник → «Рынок» + Предиктивный анализ → «Срок закрытия»',
+  src_redund:'«Навыки» × темп автоматизации × длительность проекта: вероятность вытеснения за горизонт.',
+  where_redund:'Предиктивный анализ → «Темп автоматизации» + длительности фаз',
   weightsTitle:'Веса факторов риска', weightsHint:'Насколько каждый из 6 факторов важен для вашего предприятия. Влияет на итоговый индекс.',
   weightsNote:'Число слева (0–40) — лишь <b>положение ползунка</b>, само по себе оно ничего не значит. Важна <b>доля фактора</b> (справа, в сумме 100%): именно она задаёт вклад в индекс. Удвоив вес — вдвое усиливаете влияние фактора.',
   factorDemo:'Демографический', factorBus:'Ключевой специалист', factorSkill:'Компетентностный разрыв',
@@ -875,6 +949,10 @@ life:{
   hazardLambdaLabel:'Масштаб дожития (λ)', hazardLambdaSuf:'—', hazardLambdaNote:'Калибровка скорости вытеснения ролей технологиями.',
   confirmNote:'Под конкретную юрисдикцию и отрасль эти значения следует подтвердить у заказчика. ИИ-ассистент может подобрать их по источникам (set_methodology).',
   lexiconTitle:'Лексикон автоматизируемости навыков',
+  lexiconOrigin:'<b>Откуда эти числа.</b> Это <i>стартовые оценки</i>, а не измеренный факт. Они собраны по открытым исследованиям автоматизируемости профессий (методика Frey &amp; Osborne «The Future of Employment», отчёты McKinsey Global Institute о потенциале автоматизации и ILO по промышленным профессиям) и переложены с профессий на отдельные операции по одному принципу: <b>чем более операция рутинна, наблюдаема и описывается правилами, тем выше её автоматизируемость</b>. Поэтому обход и замеры — 85–90%, диагностика и КИПиА — около 45–55%, а аналитика и машинное обучение — 8–10%. <b>Числа можно и нужно править</b> под вашу отрасль и уровень оснащённости: они прямо влияют на «Навыки», «Избыточность» и анализ дожития. Навык, которого в лексиконе нет, считается со средним риском (параметр «Риск по умолчанию» выше).',
+  thRiskHint:'Вероятность, что эта операция будет автоматизирована при полном внедрении доступных сегодня технологий. Это потенциал, а не срок: когда именно это произойдёт, задаёт «Темп автоматизации» на вкладке «Предиктивный анализ».',
+  thCostMult:'× цена', thCostMultHint:'Множитель стоимости обучения этому навыку относительно ставки должности. 0.5 — короткий инструктаж, 1.0 — обычный курс, 2.5 — длительная переподготовка с нуля. Правьте под ваши реальные расценки: курсивом показаны значения, которые вы изменили.',
+  lexiconAiNote:'Можно поручить ассистенту: «уточни автоматизируемость навыков по источникам для горнодобычи» — он найдёт данные, сошлётся на источники и обновит таблицу.',
   lexiconHint:'Вероятность того, что задача навыка автоматизируема. Питает анализ дожития и компетентностный риск.',
   thSkill:'Навык', thLevel:'Уровень', thRisk:'Риск'
 }, aiTool:{
@@ -888,6 +966,9 @@ life:{
   profSavedNote:'Должность сохранена: {name}', profSavedResult:'Сохранено (id={id})',
   emptyProfessions:'Пустой список должностей',
   emptyPlan:'Пустой план численности',
+  tplNoName:'Не указано название отрасли',
+  tplSetNote:'Создан отраслевой шаблон: {name}',
+  tplSetResult:'Шаблон «{name}» создан и применён. Текущая расчётная потребность: {req} чел. Виды работ задай отдельно — шаблон задаёт только базовые параметры.',
   planSetNote:'План численности задан по фазам: {n}', planSetResult:'Режим «план из документа» включён, фаз заполнено {n}, текущая потребность {req} чел.',
   professionsSetNote:'Справочник заменён: {n} должн.', professionsSetResult:'Справочник должностей заменён, всего {n} должностей',
   profNotFound:'Должность не найдена', notFoundResult:'Не найдено',
@@ -936,6 +1017,13 @@ Object.assign(I18N.en, { norm:{
   deficit:'Shortage', surplus:'Surplus', balance:'Balanced',
   needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
   detailTitle:'Breakdown by Position', detailHint:'The demand from the Summary Result block is split across directory positions: first by group (Core / Maintenance / Engineering), then evenly among the positions within each group. The Q1-Q4 columns show how that demand changes <b>within the selected phase</b> — from its start (Q1) to its end (Q4).',
+  qMonthShort:'mo. {m}', monthRange:'mo. {from}-{to}',
+  thWhen:'When needed', thWhenHint:'The project months this phase runs. Hiring must be finished by the start of the interval, otherwise people arrive later than they are needed.',
+  totalRow:'Total across all positions',
+  qFootnote:'Q1-Q4 are not calendar quarters but four control points inside the selected phase: Q1 is its start, Q4 its end. The month beside each label is the project month. In "Headcount plan from the document" mode these figures come from your plan; in "from norms" mode they are derived from the phase curve and so are not editable here (edit the plan on the Lifecycle tab).',
+  tplBuiltin:'Built-in industries', tplMine:'My industries', tplActions:'Actions',
+  tplNewOption:'+ Add my own industry...', tplDelete:'Delete this template',
+  tplAiNote:'Your industry not in the list? Pick "Add my own industry" — or ask the AI assistant: "build a template for mining from my document", and it will fill in every parameter itself.',
   qHintPlan:'Q1-Q4 come from your headcount plan for the "{stage}" phase: {q} people. No formula recalculates them. "Target FTE" is the average of those four points, which is why it differs from each of them.',
   qHint:'The "{stage}" phase is not flat: fewer people are needed at its start than at its end (or vice versa). Q1-Q4 are the four control points of that curve: {q1} / {q2} / {q3} / {q4} of the base level. "Target FTE" is the phase average, so the Q values naturally sit above and below it.',
   thPosition:'Position', thRole:'Role', thFteTarget:'Target FTE (phase average)',
@@ -960,6 +1048,11 @@ Object.assign(I18N.en, { norm:{
   fsm:'Shift fund', fsmPh:'Shift fund, min', kvn:'k-comp', kvnPh:'Norm compliance factor',
   nObjects:'Units', nObjectsPh:'Number of serviced units', serviceNorm:'Service rate', serviceNormPh:'Service rate, units/person',
   workplaces:'Workplaces', workplacesPh:'Number of workplaces', loadCoeff:'Load factor', loadCoeffPh:'Load factor',
+  fmOutput:'Volume {vol} {unit} / rate {norm} = {yav} people per shift',
+  fmTime:'({vol} x {tn} min) / ({fsm} min x {kvn}) = {yav} people per shift',
+  fmService:'{objs} units / service norm {norm} = {yav} people per shift',
+  fmWorkplace:'{wp} workplaces x load {load} = {yav} people per shift',
+  fmFte:'{yav} x {shifts} shifts x reserve {ksp} = {fte} FTE on payroll',
   unitCol:'Unit', periodCol:'Period',
   norm:'Rate', normPh:'Output rate per person', unitDefault:'units', periodDefault:'period', periodMonth:'month',
   title:'Work Types — Attendance Headcount Calculation',
@@ -990,6 +1083,9 @@ life:{
   planPhaseCol:'Phase',
   planHint:'Enter headcount <b>in people</b> at four points of each phase: Q1 is the phase start, Q4 its end. The system interpolates month by month in between. Fill in only the phases that exist in your project.',
   planEmpty:'The plan is still empty — fill in at least one phase, otherwise the calculation falls back to the norms.',
+  planInactive:'"Headcount plan" mode is selected, but no phase is filled in, so the calculation still runs <b>from norms</b> — with the phase multiplier. Enter headcount for at least one phase in the table below and the plan takes effect immediately.',
+  planActiveNote:'The plan is in effect: norms and the phase multiplier are not applied.',
+  planDerivedNote:'Points shown in grey italics were filled in by the system from the phase start and end you gave. Type your own number to override.',
   noHorizon:'Every phase has zero duration, so there is no project in time: nothing to build a forecast, a chart or a hiring plan from. Set how many months at least one phase lasts.',
   planMissing:'The plan has no figures for these phases: {phases}. While they stay empty, demand in those months is counted as zero — norms are not substituted for them.',
   stageAutoSwitched:'The selected phase is not part of this project (0 mo.) — the calculation uses the "{stage}" phase.',
@@ -1013,6 +1109,17 @@ life:{
   driversTitle:'Forecast Drivers', driversHint:'These parameters control the attrition, hiring and automation models.',
   turnoverLabel:'Annual Turnover', turnoverHint:'The share of staff leaving per year. Converted into a monthly probability: 1-(1-p)^(1/12).',
   benchmarkNote:'Assessment: <b>{level}</b> (benchmark ~12-18%).',
+  effectTitle:'What these sliders actually move',
+  effectHint:'Each row is a real recalculation: the whole Monte Carlo model is run again with the driver raised by 25%, and the change in peak shortage is shown. Red means worse, green means better. This shows which lever genuinely works on your project and which barely changes anything.',
+  verdictCertain:'A shortage is unavoidable: it occurs in every simulation. The first shortfall is in month {month}, and at the peak {peak} people are missing.',
+  verdictLikely:'A shortage is more likely than not ({pct}% of simulations). The first shortfall is expected in month {month}.',
+  verdictPossible:'A shortage is possible but not predetermined: it occurs in {pct}% of simulations. Attrition and hiring speed decide it.',
+  verdictNone:'No shortage is projected: headcount suffices in every simulation. Watch the surplus and the cost of retention instead.',
+  whyMonteCarlo:'<b>Why randomness is here.</b> A single forecast line is a deception: nobody knows exactly how many people leave in March or how many vacancies close on time. So the future is played out {runs} times, each with its own random deviations in attrition (±40%), demand (±5%) and hiring success. Those {runs} outcomes produce the band: <b>P50</b> is the median scenario, <b>P10-P90</b> the interval holding 80% of outcomes. A wide band means the result depends heavily on luck and cannot be relied on; a narrow one means the forecast is robust.',
+  effectRow:'{label} 25% higher →', effectRowDown:'{label} 25% lower →',
+  effectNoteAvail:'Change in available headcount by the end of the horizon (currently {avail} people). There is no shortage over the horizon, so the effect on staffing is shown instead: green means more people remain, red means fewer.',
+  effectNote:'Change in peak shortage (currently {peak} people) when the driver rises by a quarter. Zero means that on this data the driver is blocked by another constraint.',
+
   benchAbove:'above the norm', benchMarket:'at market level', benchBelow:'below the norm',
   hireCapLabel:'Hiring Capacity', hireCapHint:'How many people can realistically be hired per month with current recruiting resources.',
   fillDaysLabel:'Time-to-Fill', fillDaysHint:'The longer a vacancy stays open, the lower the realized hiring in the model.',
@@ -1064,7 +1171,10 @@ life:{
   editModeNote:'Edit mode. Changes must be saved to apply to the calculations.',
   saveDbBtn:'Save Database',
   thSalary:'Salary ₸', thTrainingBase:'Training Base ₸', thSkillPrice:'Price per Skill ₸',
-  thHeadcount:'Count', thAvgAge:'Avg. Age', thMarket:'Market', thSkills:'Skills (semicolon-separated)'
+  thHeadcount:'Count', thAvgAge:'Avg. Age', thMarket:'Market', thSkills:'Skills (semicolon-separated)',
+  thSkillsHint:'Separate with semicolons. Start typing and the skills from the automatability lexicon (Methodology tab) appear. Use exactly those names: automation risk and retraining cost are computed from them. Your own skills are fine too — they get the average risk.',
+  thTrainCost:'Cost to retrain', thTrainCostHint:'What it costs to bring a person up to the full skill set of this position: the CPD base plus the price of each skill. Skill price = this position "skill price" x the difficulty multiplier from the Methodology lexicon. That is why "Machine Learning" costs more than "Patrols".',
+  skillsFootnote:'<b>"Skill price"</b> is your rate for one skill retrained for this position. <b>"CPD base"</b> (continuing professional development) is the fixed part: the course itself, paperwork, the exam — paid once regardless of how many skills are involved. Total reskilling cost = CPD base + the sum over missing skills, each multiplied by its own difficulty multiplier (Methodology tab).'
 }, risk:{
   eyebrow:'Step 4 · Who is at risk of leaving', title:'Workforce Risks — Multi-Factor Assessment',
   lead:'Six risk factors for each role are combined into a weighted index of 0-100. Weights are tuned to enterprise priorities. Each risk is linked to a recommended mitigation action.',
@@ -1072,6 +1182,22 @@ life:{
   portfolioLabel:'Risk Index (portfolio)', portfolioSub:'weighted by role headcount',
   criticalLabel:'Critical Roles', criticalSub:'index >= 66 — a plan is needed',
   elevatedLabel:'Elevated Risk', elevatedSub:'index 40-65 — monitor',
+  linkedNote:'<b>"Skills" and "Redundancy" are not the same thing, but they grow from one source.</b> "Skills" is the share of automatable operations in the role <i>right now</i>. "Redundancy" is the probability that the role really is displaced within the project horizon: the same measure multiplied by time and the pace of automation. Give both a large weight and the same risk is counted twice — it is wiser to keep the weight on one of them.',
+  sourcesTitle:'Where these six numbers come from',
+  sourcesHint:'No factor is invented by the system: each is derived either from the positions directory, from the forecast parameters, or from the skills lexicon. This shows what to fill in and where.',
+  thFactor:'Factor', thSource:'What it is computed from', thWhere:'Where to set it',
+  src_demo:'Average age for the position: the closer to retirement, the higher the risk of leaving by age.',
+  where_demo:'Directory → "Avg. age" column',
+  src_bus:'How many people hold the competence. One or two carriers means dependence on a specific person.',
+  where_bus:'Directory → "Headcount" column',
+  src_skill:'Share of automatable operations in the position skill set, per the automatability lexicon.',
+  where_skill:'Directory → "Skills" + Methodology → lexicon',
+  src_turn:'Company-wide annual turnover, amplified by this role scarcity on the market.',
+  where_turn:'Predictive → "Annual turnover" + Directory → "Market"',
+  src_market:'Your expert estimate of the role scarcity on the labour market (0-1) and the time to fill a vacancy.',
+  where_market:'Directory → "Market" + Predictive → "Time to fill"',
+  src_redund:'"Skills" x pace of automation x project length: the probability of displacement over the horizon.',
+  where_redund:'Predictive → "Pace of automation" + phase durations',
   weightsTitle:'Risk Factor Weights', weightsHint:'How important each of the 6 factors is for your enterprise. Affects the final index.',
   weightsNote:'The number on the left (0-40) is only the <b>slider position</b> — on its own it means nothing. What matters is the <b>factor share</b> (right, summing to 100%): that is what sets the contribution to the index. Doubling the weight doubles the factor\'s influence.',
   factorDemo:'Demographic', factorBus:'Key Specialist', factorSkill:'Competency Gap',
@@ -1160,6 +1286,10 @@ life:{
   hazardLambdaLabel:'Survival Scale (λ)', hazardLambdaSuf:'—', hazardLambdaNote:'Calibrates the speed at which technology displaces roles.',
   confirmNote:'For a specific jurisdiction and industry, these values should be confirmed with the client. The AI assistant can tune them from sources (set_methodology).',
   lexiconTitle:'Skill Automatability Lexicon',
+  lexiconOrigin:'<b>Where these numbers come from.</b> These are <i>starting estimates</i>, not measured fact. They are compiled from open research on occupational automatability (the Frey &amp; Osborne "The Future of Employment" method, McKinsey Global Institute automation-potential reports, and ILO work on industrial occupations) and carried over from occupations to individual operations on one principle: <b>the more routine, observable and rule-describable an operation is, the more automatable it is</b>. Hence patrols and measurements sit at 85-90%, diagnostics and instrumentation around 45-55%, and analytics and machine learning at 8-10%. <b>These figures can and should be edited</b> for your industry and level of equipment: they feed "Skills", "Redundancy" and the survival analysis directly. A skill absent from the lexicon is scored at the average risk (the "Default risk" parameter above).',
+  thRiskHint:'The probability that this operation gets automated under full adoption of technology available today. This is potential, not timing: when it actually happens is set by "Pace of automation" on the Predictive tab.',
+  thCostMult:'x cost', thCostMultHint:'Training-cost multiplier for this skill relative to the position rate. 0.5 is a short briefing, 1.0 a normal course, 2.5 a long retraining from scratch. Adjust to your real prices: values you changed are shown in italics.',
+  lexiconAiNote:'You can delegate this: ask the assistant to "refine skill automatability from sources for mining" — it will find the data, cite the sources and update the table.',
   lexiconHint:'The probability that a skill\'s task is automatable. Feeds the survival analysis and the competency risk factor.',
   thSkill:'Skill', thLevel:'Level', thRisk:'Risk'
 }, aiTool:{
@@ -1173,6 +1303,9 @@ life:{
   profSavedNote:'Position saved: {name}', profSavedResult:'Saved (id={id})',
   emptyProfessions:'Empty list of positions',
   emptyPlan:'Empty headcount plan',
+  tplNoName:'No industry name given',
+  tplSetNote:'Industry template created: {name}',
+  tplSetResult:'Template "{name}" created and applied. Current calculated demand: {req} people. Set the work types separately — the template only carries the base parameters.',
   planSetNote:'Headcount plan set for {n} phase(s)', planSetResult:'"Plan from document" mode enabled, {n} phase(s) filled, current demand {req} people',
   professionsSetNote:'Directory replaced: {n} positions', professionsSetResult:'Positions directory replaced, {n} positions total',
   profNotFound:'Position not found', notFoundResult:'Not found',
@@ -1207,6 +1340,8 @@ life:{
 Object.assign(I18N.ru, { toast:{
   clamped:'«{label}»: допустимы значения от {min} до {max} — поправил на ближайшее.',
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
+  tplDeleted:'Шаблон «{name}» удалён',
+  industryCreated:'Отрасль «{name}» создана. Заполните виды работ — или попросите ассистента сделать это по документу.',
   dataExported:'{label} выгружены в JSON', defaultDataLabel:'Данные',
   dictExportedCsv:'Справочник выгружен в CSV', csvEmpty:'CSV пуст или не распознан',
   noPositionsFound:'Не найдено ни одной должности', importedPositions:'Импортировано должностей: {count}',
@@ -1218,6 +1353,8 @@ Object.assign(I18N.ru, { toast:{
   fileReadError:'Не удалось прочитать файл', aiConnected:'Готово — ассистент подключён ({provider})', keyRemoved:'Ключ удалён'
 }, prompt:{
   newTemplateName:'Название нового шаблона:', newTemplateDefault:'Мой профиль',
+  newIndustryName:'Как называется ваша отрасль? (например: Горнодобыча, Электроэнергетика, Логистика)',
+  deleteTemplate:'Удалить шаблон «{name}»? Данные расчёта останутся, удалится только сам шаблон.',
   scenarioName:'Название сценария:', scenarioDefault:'Сценарий {n}',
   newProfessionName:'Новая должность', unnamed:'Без названия', workMain:'{name} — основная работа'
 }, exportLabel:{
@@ -1227,6 +1364,8 @@ Object.assign(I18N.ru, { toast:{
 Object.assign(I18N.en, { toast:{
   clamped:'"{label}": allowed range is {min} to {max} — adjusted to the nearest valid value.',
   tplApplied:'Template "{name}" applied', tplSaved:'Template "{name}" saved',
+  tplDeleted:'Template "{name}" deleted',
+  industryCreated:'Industry "{name}" created. Fill in the work types — or ask the assistant to do it from your document.',
   dataExported:'{label} exported to JSON', defaultDataLabel:'Data',
   dictExportedCsv:'Directory exported to CSV', csvEmpty:'CSV is empty or unrecognized',
   noPositionsFound:'No positions found', importedPositions:'Imported positions: {count}',
@@ -1238,6 +1377,8 @@ Object.assign(I18N.en, { toast:{
   fileReadError:'Could not read the file', aiConnected:'Done — assistant connected ({provider})', keyRemoved:'Key removed'
 }, prompt:{
   newTemplateName:'New template name:', newTemplateDefault:'My Profile',
+  newIndustryName:'What is your industry called? (for example: Mining, Power Generation, Logistics)',
+  deleteTemplate:'Delete the template "{name}"? Your calculation data stays; only the template is removed.',
   scenarioName:'Scenario name:', scenarioDefault:'Scenario {n}',
   newProfessionName:'New Position', unnamed:'Untitled', workMain:'{name} — main work'
 }, exportLabel:{
@@ -1414,8 +1555,44 @@ function templateLabel(key,tpl){
 }
 // переводы для отображения известных слов ед.измерения/периода (данные остаются как есть, меняется только показ)
 const UNIT_I18N = { 'баррелей':{ru:'баррелей',en:'barrels'}, 'изделий':{ru:'изделий',en:'units'},
-  'story points':{ru:'story points',en:'story points'} };
-const PERIOD_I18N = { 'месяц':{ru:'месяц',en:'month'}, 'год':{ru:'год',en:'year'}, 'спринт':{ru:'спринт',en:'sprint'} };
+  'story points':{ru:'story points',en:'story points'},
+  'тонн':{ru:'тонн',en:'tonnes'}, 'м³':{ru:'м³',en:'m³'}, 'м²':{ru:'м²',en:'m²'}, 'м':{ru:'м',en:'m'},
+  'км':{ru:'км',en:'km'}, 'шт':{ru:'шт',en:'pcs'}, 'ч':{ru:'ч',en:'h'},
+  'чел.-ч':{ru:'чел.-ч',en:'man-hours'}, 'кВт·ч':{ru:'кВт·ч',en:'kWh'},
+  'заявок':{ru:'заявок',en:'requests'}, 'операций':{ru:'операций',en:'operations'},
+  'скважин':{ru:'скважин',en:'wells'}, 'единиц':{ru:'единиц',en:'units'} };
+const PERIOD_I18N = { 'месяц':{ru:'месяц',en:'month'}, 'год':{ru:'год',en:'year'}, 'спринт':{ru:'спринт',en:'sprint'},
+  'смена':{ru:'смена',en:'shift'}, 'сутки':{ru:'сутки',en:'day'}, 'неделя':{ru:'неделя',en:'week'},
+  'квартал':{ru:'квартал',en:'quarter'} };
+// что предлагаем в выпадающем списке (вводить своё по-прежнему можно)
+const UNIT_SUGGEST = ['тонн','м³','м²','м','км','шт','единиц','ч','чел.-ч','баррелей','изделий','скважин','операций','заявок','кВт·ч','story points'];
+const PERIOD_SUGGEST = ['смена','сутки','неделя','месяц','квартал','год','спринт'];
+// свободный ввод приводим к словарной форме, если это узнаваемый синоним:
+// иначе «т», «тонн», «тонны» станут тремя разными единицами
+const UNIT_ALIAS = {'т':'тонн','тонна':'тонн','тонны':'тонн','тн':'тонн','ton':'тонн','tons':'тонн','tonnes':'тонн',
+  'м3':'м³','куб.м':'м³','куб м':'м³','m3':'м³','м2':'м²','кв.м':'м²','m2':'м²',
+  'штук':'шт','шт.':'шт','pcs':'шт','pc':'шт','ед':'единиц','ед.':'единиц','units':'единиц',
+  'час':'ч','часов':'ч','часы':'ч','h':'ч','hours':'ч','чел-ч':'чел.-ч','человеко-часов':'чел.-ч',
+  'баррель':'баррелей','барр':'баррелей','bbl':'баррелей','barrels':'баррелей',
+  'изделие':'изделий','изделия':'изделий','скважина':'скважин','скважины':'скважин'};
+const PERIOD_ALIAS = {'мес':'месяц','мес.':'месяц','месяцев':'месяц','month':'месяц','m':'месяц',
+  'г':'год','г.':'год','лет':'год','года':'год','year':'год','y':'год',
+  'сут':'сутки','сут.':'сутки','день':'сутки','дней':'сутки','day':'сутки',
+  'нед':'неделя','нед.':'неделя','недель':'неделя','week':'неделя',
+  'кв':'квартал','кв.':'квартал','quarter':'квартал','смен':'смена','shift':'смена','sprint':'спринт'};
+function canonUnit(v){
+  const raw=String(v||'').trim(); if(!raw) return raw;
+  // уже каноническая форма (в т.ч. переведённая) — оставляем ключ словаря
+  for(const k in UNIT_I18N){ const e=UNIT_I18N[k];
+    if(k===raw || Object.keys(e).some(l=>e[l]===raw)) return k; }
+  return UNIT_ALIAS[raw.toLowerCase()] || raw;
+}
+function canonPeriod(v){
+  const raw=String(v||'').trim(); if(!raw) return raw;
+  for(const k in PERIOD_I18N){ const e=PERIOD_I18N[k];
+    if(k===raw || Object.keys(e).some(l=>e[l]===raw)) return k; }
+  return PERIOD_ALIAS[raw.toLowerCase()] || raw;
+}
 function unitLabel(u){ const e=UNIT_I18N[u]; return e?(e[LANG]||e.ru):u; }
 function periodWordLabel(p){ const e=PERIOD_I18N[p]; return e?(e[LANG]||e.ru):p; }
 
@@ -1450,9 +1627,34 @@ function activeStage(){
 }
 // Потребность в 4 контрольных точках фазы, В ЛЮДЯХ.
 // В режиме 'plan' берём числа из документа как есть — формула их не переопределяет.
+// Пользователь обычно знает только начало и/или конец фазы. Пустые середины
+// достраиваем линейно, а не считаем нулями: 0 в середине искажал бы всю кривую.
+function fillPlanGaps(raw){
+  const v=[0,1,2,3].map(k=>{ const x=raw[k]; return (x===''||x==null||!isFinite(+x))?null:Math.max(0,+x); });
+  const known=v.map((x,i)=>x!=null?i:-1).filter(i=>i>=0);
+  if(!known.length) return null;
+  if(known.length===1){ const only=v[known[0]]; return [only,only,only,only]; }
+  const out=v.slice();
+  // концы продлеваем ближайшим известным, середины — линейной интерполяцией
+  for(let i=0;i<4;i++){
+    if(out[i]!=null) continue;
+    const lo=known.filter(k=>k<i).pop(), hi=known.find(k=>k>i);
+    if(lo==null&&hi!=null) out[i]=v[hi];
+    else if(hi==null&&lo!=null) out[i]=v[lo];
+    else out[i]=v[lo]+(v[hi]-v[lo])*((i-lo)/(hi-lo));
+  }
+  return out.map(x=>Math.max(0,x));
+}
+// какие точки фазы пользователь задал сам (остальные достроены)
+function planGivenPoints(id){
+  const p=(S.phasePlan||{})[id]; if(!Array.isArray(p)) return [];
+  return [0,1,2,3].filter(k=>{ const x=p[k]; return !(x===''||x==null||!isFinite(+x)) && +x>0; });
+}
 function planFor(id){
   const p=(S.phasePlan||{})[id];
-  return (Array.isArray(p)&&p.length===4&&p.some(x=>num(x,0)>0)) ? p.map(x=>Math.max(0,num(x,0))) : null;
+  if(!Array.isArray(p)) return null;
+  if(!p.some(x=>num(x,0)>0)) return null;
+  return fillPlanGaps(p);
 }
 function hasPlan(){ return STAGE_ORDER.some(id=>planFor(id)); }
 // Режим плана считается включённым, только когда в нём есть хоть одна заполненная фаза:
@@ -1486,6 +1688,30 @@ const SKILL_HAZARD = {
   'Телеметрия':0.25,'Сети':0.25,'Python':0.10,'Машинное обучение':0.08,'SQL':0.20
 };
 const HAZARD_DEFAULT = 0.40;
+// Обучение разным навыкам стоит по-разному: промышленная безопасность — не то же,
+// что машинное обучение. Множитель применяется к ставке должности (skillRate).
+// Правится на вкладке «Методология», ключ — канонический RU-текст навыка.
+const SKILL_COST_MULT = {
+  'ТБ':0.5,'Обход':0.5,'Замеры':0.6,'Арматура':0.8,'Давление':0.9,'Диагностика':1.2,
+  'Бурение':1.6,'Гидравлика':1.1,'Тяжелая техника':1.5,'Чертежи':0.9,'Инструмент':0.6,
+  'Механика':1.0,'Электробезопасность':0.8,'Схемы':0.9,'КИПиА':1.3,'Датчики':1.1,
+  'Телеметрия':1.3,'Сети':1.2,'Python':1.8,'Машинное обучение':2.5,'SQL':1.0
+};
+function skillCostMult(skill){
+  const ov=(S.skillCostOverrides||{})[skill];
+  if(ov!=null && isFinite(+ov)) return Math.max(0,+ov);
+  const v=SKILL_COST_MULT[skill];
+  return v!=null ? v : 1;
+}
+// стоимость доучивания одного навыка для конкретной должности
+function skillPrice(p,skill){ return Math.max(0, num(p&&p.skillRate,0)) * skillCostMult(skill); }
+// короткая сводка «сколько стоит доучить весь набор навыков этой должности»
+function skillPriceSummary(p){
+  const list=String(p&&p.skills||'').split(';').map(x=>x.trim()).filter(Boolean);
+  if(!list.length) return '—';
+  const total=list.reduce((a,sk)=>a+skillPrice(p,sk),0);
+  return fmtKZT(Math.round(num(p.trainingBase,0)+total));
+}
 // переводы названий навыков лексикона (для отображения; ключ сопоставления — канонический RU-текст)
 const SKILL_NAME_I18N = {
   en:{ 'ТБ':'HSE / Safety','Обход':'Patrols','Замеры':'Measurements','Арматура':'Valves & Fittings','Давление':'Pressure',
@@ -1530,6 +1756,7 @@ const S = {
   // --- ИСТОЧНИК ПОТРЕБНОСТИ ---
   // 'norm' — считать из видов работ и кривой фазы (по умолчанию)
   // 'plan' — использовать численность, заданную в документе заказчика (абсолютные значения)
+  skillCostOverrides:{},  // своя цена обучения по навыку (множитель к ставке должности)
   demoDismissed:false,   // пользователь закрыл/принял полосу «это демо-пример»
   demandMode:'norm',
   phasePlan:{},        // {design:[q1,q2,q3,q4], ...} — человек, а не множители
@@ -1636,6 +1863,24 @@ function workYav(w){
     case 'workplace': return num(w.workplaces)*num(w.loadCoeff,1);
     default:          return num(w.volume)/Math.max(1e-9, num(w.norm)); // output
   }
+}
+// Формула с подставленными числами — чтобы «По выработке» и «По норме времени»
+// не приходилось угадывать: показываем ровно то, что посчитано.
+function workFormula(w){
+  const n=v=>{ const x=num(v,0); return Number.isInteger(x)?fmtN(x):String(+x.toFixed(3)); };
+  const yav=workYav(w), kSp=Math.max(1,num(S.absCoeff,1)), sh=Math.max(1,num(w.shifts,1));
+  let expr;
+  switch(w.method){
+    case 'time':
+      expr=t('work.fmTime',{vol:n(w.volume),tn:n(w.tNorm),fsm:n(w.Fsm),kvn:n(w.kvn||1),yav:n(yav)}); break;
+    case 'service':
+      expr=t('work.fmService',{objs:n(w.nObjects),norm:n(w.serviceNorm),yav:n(yav)}); break;
+    case 'workplace':
+      expr=t('work.fmWorkplace',{wp:n(w.workplaces),load:n(w.loadCoeff||1),yav:n(yav)}); break;
+    default:
+      expr=t('work.fmOutput',{vol:n(w.volume),unit:unitLabel(w.unit||''),norm:n(w.norm),yav:n(yav)});
+  }
+  return expr+'  →  '+t('work.fmFte',{yav:n(yav),shifts:n(sh),ksp:n(kSp),fte:n(workFTE(w))});
 }
 // списочная FTE по работе: явочная × сменность × коэфф. списочного состава
 function workFTE(w){
@@ -1890,13 +2135,16 @@ function cbaPair(source,target){
   const severance = source.salary*num(S.cbaSever,3);
   const recruiting = target.salary*num(S.cbaHire,1.5);
   const replaceCost = severance+recruiting;
-  const trainingCost = Number(target.trainingBase) + missing.length*Number(target.skillRate);
+  // цена зависит от того, КАКИХ навыков не хватает, а не только от их количества
+  const missingCost = missing.reduce((a,sk)=>a+skillPrice(target,sk),0);
+  const trainingCost = Number(target.trainingBase||0) + missingCost;
   const lostProd = source.salary*num(S.cbaIdleMonths,1.5);
   const reskillCost = trainingCost+lostProd;
   const netSavings = replaceCost-reskillCost;
   const roi = Math.round((netSavings/Math.max(1,reskillCost))*100);
   return {srcSkills,tgtSkills,overlap,missing,overlapPct,gapPct,severance,recruiting,replaceCost,
-    trainingCost,lostProd,reskillCost,netSavings,roi,positive:roi>=0};
+    trainingCost,missingCost,lostProd,reskillCost,netSavings,roi,positive:roi>=0,
+    missingDetail:missing.map(sk=>({skill:sk,mult:skillCostMult(sk),price:Math.round(skillPrice(target,sk))}))};
 }
 
 /* ---------------- РЕКОМЕНДУЕМЫЕ МОСТЫ ПЕРЕОБУЧЕНИЯ ---------------- */
@@ -2137,8 +2385,9 @@ function svgGap(gap){
     +'<rect class="ch-hit" x="'+pl+'" y="'+pt+'" width="'+iw+'" height="'+ih+'" fill="transparent" style="cursor:crosshair"/>';
   return '<svg class="chart" data-chart="'+cid+'" viewBox="0 0 '+W+' '+H+'">'
     +'<line x1="'+pl+'" y1="'+zeroY+'" x2="'+(W-pr)+'" y2="'+zeroY+'" stroke="#c9c2b3" stroke-width="1.2"/>'
-    +'<text x="'+(pl-8)+'" y="'+(pt+10)+'" text-anchor="end" class="axislbl" style="fill:#c4361b">'+esc(t('chart.deficitAxis'))+'</text>'
-    +'<text x="'+(pl-8)+'" y="'+(H-pb+2)+'" text-anchor="end" class="axislbl" style="fill:#117a5b">'+esc(t('chart.surplusAxis'))+'</text>'
+    // подписи внутри области графика: слева за осью они обрезались краем SVG
+    +'<text x="'+(pl+4)+'" y="'+(pt+10)+'" text-anchor="start" class="axislbl" style="fill:#c4361b">'+esc(t('chart.deficitAxis'))+'</text>'
+    +'<text x="'+(pl+4)+'" y="'+(H-pb+2)+'" text-anchor="start" class="axislbl" style="fill:#117a5b">'+esc(t('chart.surplusAxis'))+'</text>'
     +bars+hover+'</svg>';
 }
 
@@ -2383,8 +2632,23 @@ function demandChain(b){
   h+=row('',t('norm.chainResult'),b.required,true);
   return h+'</div>';
 }
+// Контрольные точки фазы в месяцах проекта: Q1 — начало фазы, Q4 — её конец.
+// Нужно, чтобы подписи Q1…Q4 не читались как календарные кварталы.
+function phaseWindow(stageId){
+  const {phases}=buildPhases();
+  const ph=phases.find(x=>x.id===stageId);
+  if(!ph) return null;
+  const last=Math.max(ph.start, ph.end-1);
+  const at=k=>Math.round(ph.start+(last-ph.start)*(k/3));
+  return {start:ph.start, end:last, len:ph.len, months:[at(0),at(1),at(2),at(3)]};
+}
+function qColLabel(k,win){
+  const base='Q'+(k+1);
+  return win ? base+' · '+t('norm.qMonthShort',{m:win.months[k]+1}) : base;
+}
 function renderNormative(){
   const b=computeBase();
+  const win=phaseWindow(b.stageId);
   const allT={...DEFAULT_TEMPLATES,...customTemplates};
   const list=Object.values(profDB);
   const groups={core:list.filter(p=>p.type==='core'),aux:list.filter(p=>p.type==='aux'),mgmt:list.filter(p=>p.type==='mgmt')};
@@ -2394,15 +2658,19 @@ function renderNormative(){
     ? t('norm.qHintPlan',{stage:stageName(b.stageId), q:b.qAbs.map(v=>fmtN(Math.round(v))).join(' · ')})
     : t('norm.qHint',{stage:stageName(b.stageId), q1:q[0],q2:q[1],q3:q[2],q4:q[3]});
 
+  const NCOL=8;
+  const TOT={req:0,q:[0,0,0,0]};   // итоги по всей таблице — их не хватало
   const groupRows=(arr,type,label,bcls,clr)=>{
     const n=arr.length;
-    let h='<tr class="grouprow"><td colspan="7">'+esc(label)+' · '+pct(b.dist[type])+'% · '+fmtN(b.staff[type])+' '+esc(t('common.person'))+'</td></tr>';
-    if(!n){h+='<tr><td colspan="7" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
+    let h='<tr class="grouprow"><td colspan="'+NCOL+'">'+esc(label)+' · '+pct(b.dist[type])+'% · '+fmtN(b.staff[type])+' '+esc(t('common.person'))+'</td></tr>';
+    if(!n){h+='<tr><td colspan="'+NCOL+'" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
     arr.forEach(p=>{
       const req=Math.round(b.staff[type]/n);
       const perQ=k=>Math.round(b.qAbs[k]*b.dist[type]/n);
-      h+='<tr><td style="font-weight:700">'+esc(profName(p))+'</td>'
+      TOT.req+=req; [0,1,2,3].forEach(k=>{ TOT.q[k]+=perQ(k); });
+      h+='<tr><td class="pname" style="font-weight:700">'+esc(profName(p))+'</td>'
         +'<td class="c"><span class="badge '+bcls+'">'+esc(t('common.'+type+'Short'))+'</span></td>'
+        +'<td class="c mono muted small">'+(win?esc(t('norm.monthRange',{from:win.start+1,to:win.end+1})):'—')+'</td>'
         +'<td class="c mono" style="font-weight:800;color:'+clr+'">'+req+'</td>'
         +'<td class="c mono muted">'+perQ(0)+'</td><td class="c mono muted">'+perQ(1)+'</td>'
         +'<td class="c mono muted">'+perQ(2)+'</td><td class="c mono" style="font-weight:700;color:'+clr+'">'+perQ(3)+'</td></tr>';
@@ -2423,8 +2691,22 @@ function renderNormative(){
 
     +'<div class="field" style="background:var(--surface2);padding:14px;border-radius:11px;border:1px solid var(--line)">'
       +'<label class="flabel">'+esc(t('norm.templateLabel'))+hint(t('norm.templateHint'))+'</label>'
-      +'<select class="select" id="tpl">'+Object.entries(allT).map(([k,v])=>'<option value="'+k+'"'+(S.template===k?' selected':'')+'>'+esc(templateLabel(k,v).name)+'</option>').join('')+'</select>'
-      +'<button class="tool" id="saveTpl" style="width:100%;justify-content:center;margin-top:9px;border-style:dashed;color:var(--primary)">'+ic('save')+esc(t('norm.saveTplBtn'))+'</button>'
+      +'<select class="select" id="tpl">'
+        +'<optgroup label="'+esc(t('norm.tplBuiltin'))+'">'
+        +Object.entries(DEFAULT_TEMPLATES).map(([k,v])=>'<option value="'+k+'"'+(S.template===k?' selected':'')+'>'+esc(templateLabel(k,v).name)+'</option>').join('')
+        +'</optgroup>'
+        +(Object.keys(customTemplates).length?'<optgroup label="'+esc(t('norm.tplMine'))+'">'
+          +Object.entries(customTemplates).map(([k,v])=>'<option value="'+k+'"'+(S.template===k?' selected':'')+'>'+esc(templateLabel(k,v).name)+'</option>').join('')
+          +'</optgroup>':'')
+        +'<optgroup label="'+esc(t('norm.tplActions'))+'">'
+        +'<option value="__new">'+esc(t('norm.tplNewOption'))+'</option>'
+        +'</optgroup>'
+      +'</select>'
+      +'<div style="display:flex;gap:8px;margin-top:9px">'
+        +'<button class="tool" id="saveTpl" style="flex:1;justify-content:center;border-style:dashed;color:var(--primary)">'+ic('save')+esc(t('norm.saveTplBtn'))+'</button>'
+        +(customTemplates[S.template]?'<button class="tool red" data-act="del-tpl" title="'+esc(t('norm.tplDelete'))+'">'+ic('trash')+'</button>':'')
+      +'</div>'
+      +'<div class="fnote" style="margin-top:8px">'+t('norm.tplAiNote')+'</div>'
     +'</div>'
 
     +'<div class="field"><label class="flabel">'+esc(t('norm.reserveLabel'))+hint(t('norm.reserveHint'))+'</label>'
@@ -2467,12 +2749,22 @@ function renderNormative(){
       +(worksAreCustom()&&isDemoDirectory()
         ? '<div class="note note-amber" style="margin-bottom:14px">'+ic('alert')+'<div>'+t('norm.demoDirWarn')+'</div></div>' : '')
       +'<div class="tbl-wrap"><table><thead><tr>'
-        +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th><th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
-        +'<th class="c">Q1'+hint(qTip)+'</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th></tr></thead><tbody>'
+        +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th>'
+        +'<th class="c">'+esc(t('norm.thWhen'))+hint(t('norm.thWhenHint'))+'</th>'
+        +'<th class="c">'+esc(t('norm.thFteTarget'))+'</th>'
+        +'<th class="c">'+esc(qColLabel(0,win))+hint(qTip)+'</th>'
+        +'<th class="c">'+esc(qColLabel(1,win))+'</th>'
+        +'<th class="c">'+esc(qColLabel(2,win))+'</th>'
+        +'<th class="c">'+esc(qColLabel(3,win))+'</th></tr></thead><tbody>'
         +groupRows(groups.core,'core',t('norm.groupCore'),'b-blue','var(--blue)')
         +groupRows(groups.aux,'aux',t('norm.groupAux'),'b-green','var(--green)')
         +groupRows(groups.mgmt,'mgmt',t('norm.groupMgmt'),'b-purple','var(--purple)')
-      +'</tbody></table></div></div>'
+      +'</tbody><tfoot><tr class="totrow">'
+        +'<td colspan="3">'+esc(t('norm.totalRow'))+'</td>'
+        +'<td class="c mono">'+fmtN(TOT.req)+'</td>'
+        +[0,1,2,3].map(k=>'<td class="c mono">'+fmtN(TOT.q[k])+'</td>').join('')
+      +'</tr></tfoot></table></div>'
+      +'<div class="fnote">'+esc(t('norm.qFootnote'))+'</div></div>'
   +'</div></div>'
   +'</div></div>';
 }
@@ -2481,8 +2773,12 @@ function workParamCells(w){
   const miss=workMissingField(w);
   const inp=(f,ph,step)=>'<input class="cell-edit mono'+(miss===f?' wmiss':'')+'" data-work="'+w.id+'" data-wf="'+f+'" type="number"'+(step?' step="'+step+'"':'')
     +' value="'+(w[f]!=null?w[f]:'')+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'">';
+  // список подсказок, но ввести можно и своё: одна и та же величина не должна
+  // записываться пятью способами, а экзотические единицы всё равно нужны
   const txt=(f,ph,wd)=>{ const raw=w[f]||''; const disp=f==='unit'?unitLabel(raw):f==='period'?periodWordLabel(raw):raw;
-    return '<input class="cell-edit wtxt" data-work="'+w.id+'" data-wf="'+f+'" value="'+esc(disp)+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'">'; };
+    const list=f==='unit'?'unitlist':f==='period'?'periodlist':'';
+    return '<input class="cell-edit wtxt" data-work="'+w.id+'" data-wf="'+f+'"'+(list?' list="'+list+'"':'')
+      +' value="'+esc(disp)+'" title="'+esc(ph)+'" placeholder="'+esc(ph)+'">'; };
   // каждая величина — самостоятельное поле: подпись сверху, поле снизу, колонки выравнены
   const u=(label,field,extra)=>'<span class="wp"><span class="wlab">'+esc(label)+'</span>'
     +'<span class="wfield">'+field+(extra||'')+'</span></span>';
@@ -2514,15 +2810,18 @@ function worksEditor(){
       +'<td class="wname"><input class="cell-edit" data-work="'+w.id+'" data-wf="name" value="'+esc(workDisplayName(w))+'" title="'+esc(workDisplayName(w))+'" style="font-weight:700;width:100%"></td>'
       +'<td class="c">'+gsel+'</td>'
       +'<td>'+msel+'</td>'
-      +'<td class="wcell">'+workParamCells(w)+'</td>'
+      +'<td class="wcell">'+workParamCells(w)
+        +(bad?'':'<div class="wformula mono">'+esc(workFormula(w))+'</div>')+'</td>'
       +'<td class="c">'+shs+'</td>'
       +(bad
         ? '<td class="r" data-tip="'+esc(t('work.missingTip',{field:t('work.'+bad)}))+'"><span class="badge b-red">'+esc(t('work.missingBadge'))+'</span></td>'
-        : '<td class="r mono" style="font-weight:800;color:var(--primary)" title="'+esc(t('work.fteTitle',{yav:fmtN(workYav(w))}))+'">'+fmtN(workFTE(w))+'</td>')
+        : '<td class="r mono fcell" style="font-weight:800;color:var(--primary)" data-tip="'+esc(workFormula(w))+'">'+fmtN(workFTE(w))+'</td>')
       +'<td class="c"><button class="xbtn" data-delwork="'+w.id+'" style="width:28px;height:28px">'+ic('trash')+'</button></td></tr>';
   }).join('');
   const total=worksTotals().total;
-  return '<div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('layers')+esc(t('work.title'))
+  const dl=(id,arr)=>'<datalist id="'+id+'">'+arr.map(v=>'<option value="'+esc(v)+'"></option>').join('')+'</datalist>';
+  return dl('unitlist',UNIT_SUGGEST.map(u=>unitLabel(u)))+dl('periodlist',PERIOD_SUGGEST.map(v=>periodWordLabel(v)))
+  +'<div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('layers')+esc(t('work.title'))
     +hint(t('work.hint'))
     +'<span class="sp"></span><button class="tool" data-act="add-work" style="padding:6px 11px">'+ic('plus')+esc(t('work.addBtn'))+'</button></div>'
     +(worksWithIssues().length
@@ -2547,21 +2846,31 @@ function slider(id,label,valPct,clr){
    ============================================================ */
 // Сетка «плановая численность по фазам»: 5 фаз × 4 контрольные точки, в людях
 function planEditor(){
-  const cell=(id,k)=>{ const v=((S.phasePlan||{})[id]||[])[k];
-    return '<input class="cell-edit mono" data-plan="'+id+'" data-q="'+k+'" type="number" min="0" '
-      +'value="'+(v!=null&&v!==''?v:'')+'" placeholder="0" style="width:100%;text-align:center">'; };
+  const cell=(id,k,derived)=>{ const v=((S.phasePlan||{})[id]||[])[k];
+    const filled=planFor(id);
+    // достроенное значение показываем как подсказку в placeholder, а не как введённое:
+    // так видно, где данные пользователя, а где интерполяция
+    const ph=(derived&&filled)?String(Math.round(filled[k])):'—';
+    return '<input class="cell-edit mono'+(derived?' pderived':'')+'" data-plan="'+id+'" data-q="'+k+'" type="number" min="0" '
+      +'value="'+(v!=null&&v!==''&&+v>0?v:'')+'" placeholder="'+esc(ph)+'" style="width:100%;text-align:center">'; };
   let rows='';
   STAGE_ORDER.forEach(id=>{
     const off=phaseLen(id)===0;
+    const given=planGivenPoints(id);
+    const win=phaseWindow(id);
     rows+='<tr'+(off?' style="opacity:.45"':'')+'><td style="font-weight:600;font-size:11.5px">'+esc(stageName(id))
-      +(off?' <span class="muted" style="font-size:10px">('+esc(t('life.phaseOff'))+')</span>':'')+'</td>'
-      +[0,1,2,3].map(k=>'<td style="padding:4px 3px">'+cell(id,k)+'</td>').join('')+'</tr>';
+      +(off?' <span class="muted" style="font-size:10px">('+esc(t('life.phaseOff'))+')</span>'
+          :(win?'<div class="muted mono" style="font-size:10px;font-weight:400">'+esc(t('norm.monthRange',{from:win.start+1,to:win.end+1}))+'</div>':''))+'</td>'
+      +[0,1,2,3].map(k=>'<td style="padding:4px 3px">'+cell(id,k,given.length>0&&!given.includes(k))+'</td>').join('')+'</tr>';
   });
   const gaps=planGapPhases();
+  const anyDerived=STAGE_ORDER.some(id=>{ const g=planGivenPoints(id); return g.length>0&&g.length<4; });
   return '<div class="note note-blue" style="margin-bottom:10px">'+ic('info')+'<div>'+t('life.planHint')+'</div></div>'
     +'<div class="tbl-wrap" style="margin-bottom:4px"><table><thead><tr>'
-    +'<th>'+esc(t('life.planPhaseCol'))+'</th><th class="c">Q1</th><th class="c">Q2</th><th class="c">Q3</th><th class="c">Q4</th>'
+    +'<th>'+esc(t('life.planPhaseCol'))+'</th>'
+    +[0,1,2,3].map(k=>'<th class="c">Q'+(k+1)+'</th>').join('')
     +'</tr></thead><tbody>'+rows+'</tbody></table></div>'
+    +(anyDerived?'<div class="fnote">'+ic('info')+' '+esc(t('life.planDerivedNote'))+'</div>':'')
     +(hasPlan()?'':'<div class="fnote" style="color:var(--amber)">'+esc(t('life.planEmpty'))+'</div>')
     +(gaps.length?'<div class="note note-amber" style="margin:8px 0 0">'+ic('alert')+'<div>'
       +esc(t('life.planMissing',{phases:gaps.map(stageName).join(', ')}))+'</div></div>':'');
@@ -2595,7 +2904,15 @@ function renderLifecycle(){
     +'<div class="field"><select class="select" id="demandMode">'
       +'<option value="norm"'+(S.demandMode!=='plan'?' selected':'')+'>'+esc(t('life.modeNorm'))+'</option>'
       +'<option value="plan"'+(S.demandMode==='plan'?' selected':'')+'>'+esc(t('life.modePlan'))+'</option>'
-    +'</select></div>'
+    +'</select>'
+    // выбран «план», но он пустой → считаем по нормам. Раньше это происходило молча.
+    +(S.demandMode==='plan' && !hasPlan()
+      ? '<div class="note note-amber" style="margin:9px 0 0">'+ic('alert')+'<div>'+esc(t('life.planInactive'))+'</div></div>'
+      : '')
+    +(S.demandMode==='plan' && hasPlan()
+      ? '<div class="fnote" style="margin-top:7px;color:var(--primary)">'+ic('check')+' '+esc(t('life.planActiveNote'))+'</div>'
+      : '')
+    +'</div>'
     +(S.demandMode==='plan' ? planEditor() : '')
     +'<div class="divider"></div>'
     +'<div class="field"><label class="flabel">'+esc(t('life.currentStageLabel'))+hint(t('life.currentStageHint'))+'</label>'
@@ -2651,13 +2968,68 @@ function renderLifecycle(){
 /* ============================================================
    ВКЛАДКА 3 — ПРЕДИКТИВНАЯ АНАЛИТИКА (центральная)
    ============================================================ */
+// «Драйверы ни на что не влияют» — на деле влияют, но следствие не показано.
+// Считаем ту же модель с изменённым драйвером и печатаем разницу в людях.
+function driverEffects(M){
+  // Смотрим на две величины: пиковый дефицит (если он есть) и доступный штат в конце
+  // горизонта. Вторая отзывается всегда, поэтому «влияния не видно» больше не бывает.
+  const metric = m => (m.peakDeficitMed>0)
+    ? {v:m.peakDeficitMed, worseIsUp:true}
+    : {v:m.availP50[m.H-1], worseIsUp:false};
+  const baseM = metric(M);
+  const usePeak = M.peakDeficitMed>0;
+  const probe=(key,mult,min,max)=>{
+    const old=S[key];
+    let nv=clamp(+(old*mult).toFixed(3), min, max);
+    if(Math.abs(nv-old)<1e-9){ nv=clamp(+(old/mult).toFixed(3), min, max); }  // уже на границе — пробуем вниз
+    if(Math.abs(nv-old)<1e-9) return null;
+    const up = nv>old;
+    let v;
+    S[key]=nv;
+    try{ v=metric(projectGap()).v; } finally { S[key]=old; }
+    return {up, delta:Math.round(v-baseM.v)};
+  };
+  const rows=[
+    [t('pred.turnoverLabel'), probe('turnover',1.25,0,100)],
+    [t('pred.hireCapLabel'),  probe('hireCap',1.25,0,1e5)],
+    [t('pred.fillDaysLabel'), probe('fillDays',1.25,1,3650)],
+    [t('pred.autoPaceLabel'), probe('autoPace',1.25,0.3,1.6)]
+  ].filter(r=>r[1]);
+  if(!rows.length) return '';
+  const fmtD=d=>(d>0?'+':d<0?'−':'±')+fmtN(Math.abs(d));
+  // красный = хуже для кадровой обеспеченности, зелёный = лучше
+  const color=d=>{ if(!d) return 'var(--t3)';
+    const bad = usePeak ? d>0 : d<0;
+    return bad?'var(--red)':'var(--green)'; };
+  return '<div class="divider"></div>'
+    +'<div class="section-label">'+esc(t('pred.effectTitle'))+hint(t('pred.effectHint'))+'</div>'
+    +'<div class="chain" style="margin:0">'
+    +rows.map(([label,r])=>'<div class="chrow">'
+      +'<span class="chl">'+esc(t(r.up?'pred.effectRow':'pred.effectRowDown',{label:label}))+'</span>'
+      +'<b class="chv" style="color:'+color(r.delta)+'">'+fmtD(r.delta)+'</b></div>').join('')
+    +'</div>'
+    +'<div class="fnote">'+esc(usePeak
+        ? t('pred.effectNote',{peak:fmtN(baseM.v)})
+        : t('pred.effectNoteAvail',{avail:fmtN(Math.round(baseM.v))}))+'</div>';
+}
+// Процент сам по себе бесполезен: 100% и 0% встречаются постоянно и ничего не говорят.
+// Переводим его в вывод, с которым можно что-то делать.
+function probVerdict(M){
+  const p=M.probDeficitAny;
+  if(p>=0.98) return t('pred.verdictCertain',{month:Math.max(1,M.firstDeficit+1),peak:fmtN(M.peakVal)});
+  if(p<=0.02) return t('pred.verdictNone');
+  if(p>=0.5)  return t('pred.verdictLikely',{pct:pct(p),month:Math.max(1,M.firstDeficit+1)});
+  return t('pred.verdictPossible',{pct:pct(p)});
+}
 function renderPredictive(){
   const M=projectGap();
   const auto=automationAnalysis(M.H);
   const bridges=reskillBridges();
   // покрытие дефицита переобучением: доля выполнимых мостов
   const feasibleShare = bridges.length? Math.round(bridges.filter(x=>x.feasible).length/bridges.length*100):0;
-  const turnBenchmark = S.turnover>20?t('pred.benchAbove'):S.turnover>14?t('pred.benchMarket'):t('pred.benchBelow');
+  // границы берём из самого объявленного диапазона 12–18%, иначе 13% попадало в «ниже»
+  const TB_LO=12, TB_HI=18;
+  const turnBenchmark = S.turnover>TB_HI?t('pred.benchAbove'):S.turnover>=TB_LO?t('pred.benchMarket'):t('pred.benchBelow');
   const probColor = M.probDeficitAny>0.6?'var(--red)':M.probDeficitAny>0.3?'var(--amber)':'var(--green)';
   const STATUS_LABEL={reskill:t('pred.statusReskill'),crosstrain:t('pred.statusCrosstrain'),retain:t('pred.statusRetain')};
 
@@ -2674,9 +3046,10 @@ function renderPredictive(){
 
   // KPI лента
   +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+esc(t('pred.kpiProbTitle'))+'</div>'
+    +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+esc(t('pred.kpiProbTitle'))+hint(t('dash.probHint',{thr:fmtN(M.deficitThreshold)}))+'</div>'
       +'<div class="kv" style="color:'+probColor+'">'+pct(M.probDeficitAny)+'%</div>'
-      +'<div class="kd">'+esc(t('pred.kpiProbSub',{runs:M.runs.toLocaleString(curLocale()),thr:fmtN(M.deficitThreshold)}))+'</div></div>'
+      +'<div class="kd"><b>'+esc(probVerdict(M))+'</b></div>'
+      +'<div class="kd" style="margin-top:4px">'+esc(t('pred.kpiProbSub',{runs:M.runs.toLocaleString(curLocale()),thr:fmtN(M.deficitThreshold)}))+'</div></div>'
     +'<div class="kpi" style="border-top:3px solid var(--red)"><div class="kt">'+ic('alert')+esc(t('pred.kpiPeakTitle'))+'</div>'
       +'<div class="kv" style="color:var(--red)">'+fmtN(M.peakDeficitMed)+'</div>'
       +'<div class="kd">'+esc(t('pred.kpiPeakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}))+'</div></div>'
@@ -2696,6 +3069,7 @@ function renderPredictive(){
     +ctrl('sepCap',t('pred.sepCapLabel'),S.sepCap,0,80,1,' '+t('common.person')+'/'+t('work.periodMonth'),t('pred.sepCapHint'))
     +ctrl('autoPace',t('pred.autoPaceLabel'),S.autoPace,0.3,1.6,0.1,'×',t('pred.autoPaceHint'))
     +ctrl('mcRuns',t('pred.mcRunsLabel'),S.mcRuns,100,1200,50,'',t('pred.mcRunsHint'))
+    +driverEffects(M)
     +'<div class="note note-blue" style="margin-top:6px">'+ic('info')+'<div>'+esc(t('pred.modelNote'))+'</div></div>'
   +'</div></div>'
 
@@ -2703,6 +3077,7 @@ function renderPredictive(){
   +'<div class="col-span-8"><div class="grid" style="gap:18px">'
     +'<div class="card"><div class="ctitle">'+ic('trend')+esc(t('pred.fanTitle'))
       +hint(t('pred.fanHint'))+'</div>'
+      +'<div class="note note-blue" style="margin-bottom:12px">'+ic('info')+'<div>'+t('pred.whyMonteCarlo',{runs:M.runs.toLocaleString(curLocale())})+'</div></div>'
       +svgForecast(M)
       +'<div class="legend">'
         +'<span><span class="swatch line" style="background:#c4361b"></span>'+esc(t('pred.legendDemand'))+'</span>'
@@ -2863,23 +3238,28 @@ function renderDictionary(){
       +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('work.thGroup'))+'</th><th class="r">'+esc(t('dir.thSalary'))+'</th>'
       +'<th class="r">'+esc(t('dir.thTrainingBase'))+'</th><th class="r">'+esc(t('dir.thSkillPrice'))+'</th>'
       +'<th class="c">'+esc(t('dir.thHeadcount'))+'</th><th class="c">'+esc(t('dir.thAvgAge'))+'</th><th class="c">'+esc(t('dir.thMarket'))+'</th>'
-      +'<th>'+esc(t('dir.thSkills'))+'</th><th class="c">×</th></tr></thead><tbody>'
+      +'<th>'+esc(t('dir.thSkills'))+hint(t('dir.thSkillsHint'))+'</th>'
+      +'<th class="c">'+esc(t('dir.thTrainCost'))+hint(t('dir.thTrainCostHint'))+'</th>'
+      +'<th class="c">×</th></tr></thead><tbody>'
       +rows.map(p=>{
         const changed=isDirty && JSON.stringify(tempDB[p.id])!==JSON.stringify(profDB[p.id]);
         return '<tr'+(changed?' class="dirty"':'')+' data-row="'+p.id+'">'
-          +'<td><input class="cell-edit" data-f="name" value="'+esc(profName(p))+'"></td>'
+          +'<td class="dname"><input class="cell-edit" data-f="name" value="'+esc(profName(p))+'" title="'+esc(profName(p))+'"></td>'
           +'<td class="c"><select class="cell-edit" data-f="type" style="text-align:center">'
             +['core','aux','mgmt'].map(ty=>'<option value="'+ty+'"'+(p.type===ty?' selected':'')+'>'+esc(t('common.'+ty+'Short'))+'</option>').join('')+'</select></td>'
-          +'<td class="r"><input class="cell-edit mono" data-f="salary" type="number" value="'+p.salary+'" style="text-align:right;color:var(--blue);font-weight:700"></td>'
-          +'<td class="r"><input class="cell-edit mono" data-f="trainingBase" type="number" value="'+p.trainingBase+'" style="text-align:right;color:var(--green);font-weight:700"></td>'
-          +'<td class="r"><input class="cell-edit mono" data-f="skillRate" type="number" value="'+p.skillRate+'" style="text-align:right;color:var(--amber);font-weight:700"></td>'
-          +'<td class="c"><input class="cell-edit mono" data-f="headcount" type="number" value="'+(p.headcount!=null?p.headcount:0)+'" style="text-align:center;width:54px"></td>'
-          +'<td class="c"><input class="cell-edit mono" data-f="avgAge" type="number" value="'+(p.avgAge!=null?p.avgAge:42)+'" style="text-align:center;width:48px"></td>'
-          +'<td class="c"><input class="cell-edit mono" data-f="market" type="number" step="0.05" min="0" max="1" value="'+(p.market!=null?p.market:0.4)+'" style="text-align:center;width:52px"></td>'
-          +'<td><input class="cell-edit mono" data-f="skills" value="'+esc(p.skills)+'" style="font-size:11px"></td>'
+          +'<td class="r dnum"><input class="cell-edit mono" data-f="salary" type="number" value="'+p.salary+'" style="text-align:right;color:var(--blue);font-weight:700"></td>'
+          +'<td class="r dnum"><input class="cell-edit mono" data-f="trainingBase" type="number" value="'+p.trainingBase+'" style="text-align:right;color:var(--green);font-weight:700"></td>'
+          +'<td class="r dnum"><input class="cell-edit mono" data-f="skillRate" type="number" value="'+p.skillRate+'" style="text-align:right;color:var(--amber);font-weight:700"></td>'
+          +'<td class="c dnum"><input class="cell-edit mono" data-f="headcount" type="number" value="'+(p.headcount!=null?p.headcount:0)+'" style="text-align:center;width:54px"></td>'
+          +'<td class="c dnum"><input class="cell-edit mono" data-f="avgAge" type="number" value="'+(p.avgAge!=null?p.avgAge:42)+'" style="text-align:center;width:48px"></td>'
+          +'<td class="c dnum"><input class="cell-edit mono" data-f="market" type="number" step="0.05" min="0" max="1" value="'+(p.market!=null?p.market:0.4)+'" style="text-align:center;width:52px"></td>'
+          +'<td class="dskills"><input class="cell-edit mono" data-f="skills" value="'+esc(p.skills)+'" title="'+esc(p.skills)+'" style="font-size:11px" list="skilllist"></td>'
+          +'<td class="c small muted">'+esc(skillPriceSummary(p))+'</td>'
           +'<td class="c"><button class="xbtn" data-del="'+p.id+'" style="width:30px;height:30px">'+ic('trash')+'</button></td></tr>';
       }).join('')
     +'</tbody></table></div>'
+    +'<datalist id="skilllist">'+Object.keys(SKILL_HAZARD).map(sk=>'<option value="'+esc(sk)+'"></option>').join('')+'</datalist>'
+    +'<div class="fnote" style="padding:12px 22px 16px">'+t('dir.skillsFootnote')+'</div>'
   +'</div></div>';
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
@@ -2992,7 +3372,7 @@ function renderRisks(){
     +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:700;margin-bottom:5px">'
       +'<span class="muted" style="display:flex;align-items:center;gap:4px">'+esc(label)+hint(fdesc[key])+'</span>'
       +'<span class="mono" style="font-weight:800"><span style="color:var(--t3)" title="'+esc(t('risk.sliderPos'))+'">'+S[id]+'</span>&nbsp;→&nbsp;<span style="color:var(--primary)" title="'+esc(t('risk.sliderShare'))+'">'+pct(r.w[key])+'%</span></span></div>'
-    +'<input type="range" min="0" max="40" id="'+id+'" value="'+S[id]+'"></div>';
+    +'<input type="range" min="0" max="100" id="'+id+'" value="'+S[id]+'"></div>';
 
   return '<div class="fadein">'+demoBanner()
   +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('risk.eyebrow'))+'</div>'
@@ -3013,9 +3393,20 @@ function renderRisks(){
     +wslider('wDemo','demo',t('risk.factorDemo'))+wslider('wBus','bus',t('risk.factorBus'))
     +wslider('wSkill','skill',t('risk.factorSkill'))+wslider('wTurn','turn',t('risk.factorTurn'))
     +wslider('wMarket','market',t('risk.factorMarket'))+wslider('wRedund','redund',t('risk.factorRedund'))
+    +'<div class="note note-blue" style="margin-top:4px">'+ic('info')+'<div>'+t('risk.linkedNote')+'</div></div>'
   +'</div></div>'
 
-  +'<div class="col-span-8"><div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('gauge')+esc(t('risk.heatmapTitle'))
+  // откуда берутся шесть чисел — иначе непонятно, что вообще заполнять
+  +'<div class="col-span-8"><div class="card"><div class="ctitle">'+ic('db')+esc(t('risk.sourcesTitle'))+hint(t('risk.sourcesHint'))+'</div>'
+    +'<div class="tbl-wrap"><table><thead><tr>'
+      +'<th>'+esc(t('risk.thFactor'))+'</th><th>'+esc(t('risk.thSource'))+'</th><th>'+esc(t('risk.thWhere'))+'</th>'
+    +'</tr></thead><tbody>'
+    +FAC.map(f=>'<tr><td style="font-weight:700">'+esc(f[1])+'</td>'
+      +'<td class="small">'+esc(t('risk.src_'+f[0]))+'</td>'
+      +'<td class="small muted">'+esc(t('risk.where_'+f[0]))+'</td></tr>').join('')
+    +'</tbody></table></div></div></div>'
+
+  +'<div class="col-span-12"><div class="card flush"><div class="ctitle" style="padding:20px 22px 13px">'+ic('gauge')+esc(t('risk.heatmapTitle'))
     +hint(t('risk.heatmapHint'))+'</div>'
     +'<div style="padding:0 22px 12px">'
       +'<div class="note note-blue" style="margin-bottom:10px">'+ic('info')+'<div>'+t('risk.heatmapNote')+'</div></div>'
@@ -3032,7 +3423,7 @@ function renderRisks(){
       +FAC.map(f=>cell(row.f[f[0]],cellTip(row,f[0]))).join('')
       +'<td class="c fcell" data-tip="'+esc(indexTip(row))+'"><span class="mono" style="font-weight:800;font-size:15px;color:'+light(row.index,40,66)+'">'+row.index+'</span></td>'
       +'<td class="c"><span class="badge '+row.lvl.b+'">'+esc(LEVEL_LABEL[row.lvl.key])+'</span></td>'
-      +'<td class="small">'+esc(ACTION_LABEL[row.actionKey])+'</td></tr>').join('')
+      +'<td class="small recocell">'+esc(ACTION_LABEL[row.actionKey])+'</td></tr>').join('')
     +'</tbody></table></div></div></div>'
   +'</div></div>';
 }
@@ -3124,9 +3515,14 @@ function renderScenarios(){
    ВКЛАДКА — МЕТОДОЛОГИЯ И ДОПУЩЕНИЯ (прозрачность данных)
    ============================================================ */
 function renderMethodology(){
-  const hazardRows=Object.entries(SKILL_HAZARD).sort((a,b)=>b[1]-a[1]).map(([s,v])=>
-    '<tr><td>'+esc(skillLabel(s))+'</td><td class="c">'+hbar(v*100, v>0.6?'var(--red)':v>0.4?'var(--amber)':'var(--green)')+'</td>'
-    +'<td class="c mono" style="font-weight:700">'+pct(v)+'%</td></tr>').join('');
+  const hazardRows=Object.entries(SKILL_HAZARD).sort((a,b)=>b[1]-a[1]).map(([sk,v])=>{
+    const mult=skillCostMult(sk), overridden=(S.skillCostOverrides||{})[sk]!=null;
+    return '<tr><td>'+esc(skillLabel(sk))+'</td>'
+      +'<td class="c">'+hbar(v*100, v>0.6?'var(--red)':v>0.4?'var(--amber)':'var(--green)')+'</td>'
+      +'<td class="c mono" style="font-weight:700">'+pct(v)+'%</td>'
+      +'<td class="c"><input class="cell-edit mono'+(overridden?' pderived':'')+'" data-skillcost="'+esc(sk)+'" type="number" step="0.1" min="0" '
+        +'value="'+(+mult.toFixed(2))+'" style="width:64px;text-align:center"></td></tr>';
+  }).join('');
   const f=(id,label,val,step,suf,note)=>'<div class="field"><label class="flabel">'+esc(label)+'</label>'
     +'<div class="rowflex" style="align-items:center"><input class="input num" type="number" step="'+step+'" id="'+id+'" value="'+val+'" style="max-width:120px">'
     +(suf?'<span class="muted small">'+esc(suf)+'</span>':'')+'</div>'
@@ -3161,7 +3557,13 @@ function renderMethodology(){
   +'</div>'
   +'<div class="card" style="margin-top:18px"><div class="ctitle">'+ic('zap')+esc(t('meth.lexiconTitle'))
     +hint(t('meth.lexiconHint'))+'</div>'
-    +'<div class="tbl-wrap" style="max-height:280px;overflow-y:auto"><table><thead><tr><th>'+esc(t('meth.thSkill'))+'</th><th class="c">'+esc(t('meth.thLevel'))+'</th><th class="c">'+esc(t('meth.thRisk'))+'</th></tr></thead><tbody>'+hazardRows+'</tbody></table></div>'
+    +'<div class="note note-blue" style="margin-bottom:12px">'+ic('info')+'<div>'+t('meth.lexiconOrigin')+'</div></div>'
+    +'<div class="tbl-wrap" style="max-height:320px;overflow-y:auto"><table><thead><tr>'
+      +'<th>'+esc(t('meth.thSkill'))+'</th><th class="c">'+esc(t('meth.thLevel'))+'</th>'
+      +'<th class="c">'+esc(t('meth.thRisk'))+hint(t('meth.thRiskHint'))+'</th>'
+      +'<th class="c">'+esc(t('meth.thCostMult'))+hint(t('meth.thCostMultHint'))+'</th>'
+    +'</tr></thead><tbody>'+hazardRows+'</tbody></table></div>'
+    +'<div class="fnote">'+esc(t('meth.lexiconAiNote'))+'</div>'
   +'</div>'
   +'</div>'
   +'</div></div>';
@@ -3193,6 +3595,7 @@ const NUM_RANGE = {
   durOperation:[0,600], durDecline:[0,600],
   turnover:[0,100], hireCap:[0,1e5], fillDays:[1,3650], sepCap:[0,1e5],
   autoPace:[0,100], mcRuns:[50,5000],
+  wDemo:[0,100], wBus:[0,100], wSkill:[0,100], wTurn:[0,100], wMarket:[0,100], wRedund:[0,100],
   cbaHire:[0,24], cbaSever:[0,24], cbaIdleMonths:[0,36],
   hazardDefault:[0,1], hazardLambda:[0.001,2]
 };
@@ -3266,6 +3669,31 @@ function applyTemplate(key){
     volume:num(tpl.volume,1), unit:tl.unit||t('work.unitDefault'), period:tl.period||t('work.periodMonth'), norm:num(tpl.norm,1), shifts:num(tpl.shifts,1) }];
   render();
   showToast(t('toast.tplApplied',{name:tl.name}));
+}
+// Своя отрасль: нейтральная заготовка под ручное или ИИ-заполнение.
+// Готовые три шаблона — нефтегаз, машиностроение, IT — закрывают не всё.
+function createIndustryTemplate(){
+  const name=(prompt(t('prompt.newIndustryName'),'')||'').trim();
+  if(!name){ render(); return; }   // отменили — вернуть прежний выбор в списке
+  const key='custom_'+Date.now().toString(36);
+  customTemplates[key]={ name,
+    volume:0, unit:'единиц', period:'месяц', norm:1, shifts:1,
+    absCoeff:1.15, actualStaff:0, rCore:60, rAux:30, rMgmt:10,
+    turnover:14, hireCap:10, fillDays:60, sepCap:10, autoPace:1 };
+  S.template=key;
+  Object.keys(customTemplates[key]).forEach(k=>{ if(k!=='name') S[k]=customTemplates[key][k]; });
+  S.works=[];   // отрасль своя — виды работ пользователь задаёт сам
+  render();
+  showToast(t('toast.industryCreated',{name}));
+}
+function deleteCustomTemplate(){
+  const key=S.template;
+  if(!customTemplates[key]) return;
+  const nm=templateLabel(key,customTemplates[key]).name;
+  if(!confirm(t('prompt.deleteTemplate',{name:nm}))) return;
+  delete customTemplates[key];
+  S.template=Object.keys(DEFAULT_TEMPLATES)[0];
+  render(); showToast(t('toast.tplDeleted',{name:nm}));
 }
 function saveCustomTemplate(){
   const name=prompt(t('prompt.newTemplateName'),t('prompt.newTemplateDefault'));
@@ -3598,6 +4026,7 @@ function handleAction(act){
         const f=document.getElementById('aiFile'); if(f) f.click(); },350); break;
     case 'demo-clear': startClean(); break;
     case 'go-dictionary': goToTab('dictionary'); break;
+    case 'del-tpl': deleteCustomTemplate(); break;
     case 'demo-hide': S.demoDismissed=true; render(); break;
     case 'exp-norm': exportJSON('normative',t('exportLabel.normative')); break;
     case 'exp-life': exportJSON('lifecycle',t('exportLabel.lifecycle')); break;
@@ -3701,6 +4130,15 @@ function applyInput(el){
     }
     return true;
   }
+  // цена обучения конкретному навыку (множитель к ставке должности)
+  if(el.dataset && el.dataset.skillcost){
+    const sk=el.dataset.skillcost;
+    if(!S.skillCostOverrides||typeof S.skillCostOverrides!=='object') S.skillCostOverrides={};
+    const v=parseFloat(el.value);
+    if(isNaN(v)) delete S.skillCostOverrides[sk];
+    else S.skillCostOverrides[sk]=Math.max(0,v);
+    return 'skillcost';
+  }
   // редактирование плановой численности по фазам
   if(el.dataset && el.dataset.plan!=null && el.dataset.plan!==''){
     const id=el.dataset.plan, k=+el.dataset.q;
@@ -3716,6 +4154,8 @@ function applyInput(el){
     const f=el.dataset.wf;
     const numFields=['volume','norm','shifts','tNorm','Fsm','kvn','nObjects','serviceNorm','workplaces','loadCoeff'];
     if(numFields.includes(f)){ const v=parseFloat(el.value); w[f]=isNaN(v)?0:v; }
+    else if(f==='unit'){ w.unit=canonUnit(el.value); }
+    else if(f==='period'){ w.period=canonPeriod(el.value); }
     else { w[f]=el.value; }
     // смена методики/группы требует перерисовки набора полей
     return (f==='method'||f==='group')?true:'work';
@@ -3771,7 +4211,7 @@ function bindEvents(){
   // фиксация — перерисовка
   view.addEventListener('change', e=>{
     const el=e.target;
-    if(el.id==='tpl'){ applyTemplate(el.value); return; }
+    if(el.id==='tpl'){ if(el.value==='__new'){ createIndustryTemplate(); } else { applyTemplate(el.value); } return; }
     const r=applyInput(el);
     if(r) render();
   });
@@ -3924,6 +4364,7 @@ const AI_TOOLS = [
   {name:'update_params',description:'Изменить вводные/прогнозные параметры расчёта.',input_schema:{type:'object',properties:{params:{type:'object',description:'Объект {ключ:значение}, например {"turnover":12,"stage":"operation","autoPace":1.3}'}},required:['params']}},
   {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). Используй для проектирования расчёта по ТЭО.',input_schema:{type:'object',properties:{works:{type:'array',items:{type:'object'},description:'Массив объектов work (см. системную подсказку)'}},required:['works']}},
   {name:'add_work',description:'Добавить один вид работ.',input_schema:{type:'object',properties:{work:{type:'object'}},required:['work']}},
+  {name:'set_industry_template',description:'Создать отраслевой шаблон под отрасль заказчика и сделать его активным. Используй, когда отрасль клиента не совпадает ни с одним встроенным шаблоном (нефтегаз / машиностроение / IT-R&D): например горное дело, энергетика, логистика, строительство, агро, металлургия, здравоохранение. Заполняй поля по документу клиента и отраслевым бенчмаркам, а не наугад.',input_schema:{type:'object',properties:{name:{type:'string',description:'Название отрасли, как её назвал бы заказчик'},volume:{type:'number'},unit:{type:'string',description:'Единица измерения объёма: тонн, м³, скважин, заявок…'},period:{type:'string',description:'Период объёма: смена, сутки, месяц, квартал, год'},norm:{type:'number',description:'Норма выработки на 1 человека за период'},shifts:{type:'number'},absCoeff:{type:'number',description:'Коэффициент списочного состава, 1.0…3.0'},actualStaff:{type:'number'},rCore:{type:'number'},rAux:{type:'number'},rMgmt:{type:'number'},turnover:{type:'number',description:'Годовая текучесть, %'},hireCap:{type:'number',description:'Ёмкость найма, чел./мес'},fillDays:{type:'number',description:'Срок закрытия вакансии, дней'},sepCap:{type:'number'},autoPace:{type:'number',description:'Темп автоматизации, 0.3…1.6'}},required:['name']}},
   {name:'set_phase_plan',description:'Задать ПЛАНОВУЮ численность персонала по фазам напрямую из документа заказчика (в людях, а не в множителях) и переключить расчёт в режим «план». Используй, когда в документе есть готовый график численности по месяцам/этапам — тогда потребность берётся из документа, а не выводится из норм.',input_schema:{type:'object',properties:{plan:{type:'object',description:'{design:[q1,q2,q3,q4], construction:[...], commissioning:[...], operation:[...], decline:[...]} — численность в 4 точках каждой фазы (начало→конец). Указывай только те фазы, что есть в проекте.'}},required:['plan']}},
   {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). Используй это при проектировании расчёта по документу заказчика: одним вызовом задай тот набор должностей, который реально нужен объекту.',input_schema:{type:'object',properties:{professions:{type:'array',items:{type:'object'},description:'Массив должностей: {name, type:core|aux|mgmt, salary, trainingBase, skillRate, skills, headcount, avgAge, market}'}},required:['professions']}},
   {name:'upsert_profession',description:'Добавить или обновить ОДНУ должность в справочнике.',input_schema:{type:'object',properties:{profession:{type:'object'}},required:['profession']}},
@@ -3944,6 +4385,7 @@ const GEMINI_TOOLS = [
   {name:'update_params',description:'Изменить вводные/прогнозные параметры. params_json — JSON-строка объекта {ключ:значение}, напр. {"turnover":12,"stage":"operation","autoPace":1.3}.',parameters:{type:'object',properties:{params_json:{type:'string'}},required:['params_json']}},
   {name:'set_works',description:'Полностью задать список видов работ (заменяет текущий). works_json — JSON-строка массива объектов work.',parameters:{type:'object',properties:{works_json:{type:'string'}},required:['works_json']}},
   {name:'add_work',description:'Добавить один вид работ. work_json — JSON-строка объекта work.',parameters:{type:'object',properties:{work_json:{type:'string'}},required:['work_json']}},
+  {name:'set_industry_template',description:'Создать отраслевой шаблон под отрасль заказчика и сделать активным. Используй, когда отрасль не совпадает со встроенными (нефтегаз/машиностроение/IT).',parameters:{type:'object',properties:{name:{type:'string'},volume:{type:'number'},unit:{type:'string'},period:{type:'string'},norm:{type:'number'},shifts:{type:'number'},absCoeff:{type:'number'},actualStaff:{type:'number'},rCore:{type:'number'},rAux:{type:'number'},rMgmt:{type:'number'},turnover:{type:'number'},hireCap:{type:'number'},fillDays:{type:'number'},sepCap:{type:'number'},autoPace:{type:'number'}},required:['name']}},
   {name:'set_phase_plan',description:'Задать плановую численность по фазам из документа (в людях) и включить режим «план». plan_json — JSON-строка {design:[q1,q2,q3,q4], construction:[...], ...}.',parameters:{type:'object',properties:{plan_json:{type:'string'}},required:['plan_json']}},
   {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). professions_json — JSON-строка массива должностей.',parameters:{type:'object',properties:{professions_json:{type:'string'}},required:['professions_json']}},
   {name:'upsert_profession',description:'Добавить/обновить ОДНУ должность. profession_json — JSON-строка объекта должности.',parameters:{type:'object',properties:{profession_json:{type:'string'}},required:['profession_json']}},
@@ -4014,6 +4456,24 @@ function executeAiTool(name,input){
         const w=aiNormalizeWork(input.work); if(!w) return {ok:false,note:t('aiTool.invalidWork'),result:t('aiTool.errorResult')};
         S.works=S.works||[]; S.works.push(w); aiApplyAfterMutation();
         return {ok:true,note:t('aiTool.workAddedNote',{name:w.name}),result:t('aiTool.workAddedResult',{fte:fmtN(workFTE(w))})};
+      }
+      case 'set_industry_template':{
+        const nm=String(input.name||'').trim();
+        if(!nm) return {ok:false,note:t('aiTool.tplNoName'),result:t('aiTool.errorResult')};
+        const key='custom_'+Date.now().toString(36);
+        const numOr=(v,d)=>(v==null||!isFinite(+v))?d:+v;
+        const tpl={ name:nm,
+          volume:numOr(input.volume,0), unit:canonUnit(input.unit||'единиц'), period:canonPeriod(input.period||'месяц'),
+          norm:Math.max(0.0001,numOr(input.norm,1)), shifts:clamp(numOr(input.shifts,1),1,4),
+          absCoeff:clamp(numOr(input.absCoeff,1.15),1,3), actualStaff:Math.max(0,numOr(input.actualStaff,0)),
+          rCore:Math.max(0,numOr(input.rCore,60)), rAux:Math.max(0,numOr(input.rAux,30)), rMgmt:Math.max(0,numOr(input.rMgmt,10)),
+          turnover:clamp(numOr(input.turnover,14),0,100), hireCap:Math.max(0,numOr(input.hireCap,10)),
+          fillDays:clamp(numOr(input.fillDays,60),1,3650), sepCap:Math.max(0,numOr(input.sepCap,10)),
+          autoPace:clamp(numOr(input.autoPace,1),0.3,1.6) };
+        customTemplates[key]=tpl; S.template=key;
+        Object.keys(tpl).forEach(k=>{ if(k!=='name') S[k]=tpl[k]; });
+        aiApplyAfterMutation();
+        return {ok:true,note:t('aiTool.tplSetNote',{name:nm}),result:t('aiTool.tplSetResult',{name:nm,req:fmtN(computeBase().required)})};
       }
       case 'set_phase_plan':{
         const pl=input.plan||{}; const next={}; let n=0;
@@ -4794,6 +5254,31 @@ Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
   var it=g&&g[2]&&g[2].items&&g[2].items[1];
   if(it) it.how=pair[1];
 });
+
+/* ---------- ДОПОЛНЕНИЕ: вывод по вероятности + зачем Монте-Карло ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"verdictCertain": "Тапшылық болмай қоймайды: ол барлық симуляцияда пайда болады. Бірінші құлдырау — {month}-айда, шыңында {peak} адам жетпейді.", "verdictLikely": "Тапшылық болу ықтималдығы болмауынан жоғары (симуляциялардың {pct}%-ы). Бірінші құлдырау {month}-айда күтіледі.", "verdictPossible": "Тапшылық болуы мүмкін, бірақ алдын ала белгіленген емес: ол симуляциялардың {pct}%-ында пайда болады. Шешуші рөлді кету мен жалдау жылдамдығы ойнайды.", "verdictNone": "Тапшылық болжанмайды: барлық симуляцияда штат жетеді. Артықтық пен ұстап қалу құнын қадағалаңыз.", "whyMonteCarlo": "<b>Кездейсоқтық неге қажет.</b> Бір болжам сызығы — алдау: наурызда қанша адам кететінін және қанша вакансияның уақытында жабылатынын ешкім дәл білмейді. Сондықтан болашақ {runs} рет ойнатылады, әр жолы кетудің (±40%), сұраныстың (±5%) және жалдау табыстылығының өз кездейсоқ ауытқуларымен. Осы {runs} нәтижеден дәліз шығады: <b>P50</b> — ортаңғы сценарий, <b>P10–P90</b> — нәтижелердің 80%-ы кіретін аралық. Кең дәліз нәтиже сәттілікке қатты тәуелді екенін білдіреді, оған сүйенуге болмайды; тар дәліз болжам тұрақты екенін көрсетеді."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"verdictCertain": "短缺不可避免：在所有模拟中都会出现。首次缺口出现在第 {month} 个月，峰值时缺 {peak} 人。", "verdictLikely": "出现短缺的可能性大于不出现（{pct}% 的模拟）。首次缺口预计在第 {month} 个月。", "verdictPossible": "短缺有可能但并非必然：在 {pct}% 的模拟中出现。结果取决于流失与招聘速度。", "verdictNone": "预计不会出现短缺：所有模拟中人员都足够。请关注冗余及留人成本。", "whyMonteCarlo": "<b>为什么这里要引入随机性。</b>单一条预测线是一种误导：没人能确知三月会有多少人离职、多少空缺能按期填补。因此系统把未来演算 {runs} 次，每次都带有各自的随机偏差：流失（±40%）、需求（±5%）和招聘成功率。这 {runs} 个结果构成区间带：<b>P50</b> 为中位情形，<b>P10–P90</b> 为涵盖 80% 结果的区间。区间宽说明结果很依赖运气，不可据此下注；区间窄则说明预测稳健。"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"verdictCertain": "El déficit es inevitable: aparece en todas las simulaciones. El primer hueco es en el mes {month} y en el pico faltan {peak} personas.", "verdictLikely": "Es más probable que haya déficit que no ({pct}% de las simulaciones). El primer hueco se espera en el mes {month}.", "verdictPossible": "El déficit es posible pero no está determinado: aparece en el {pct}% de las simulaciones. Lo deciden la rotación y la velocidad de contratación.", "verdictNone": "No se proyecta déficit: la plantilla basta en todas las simulaciones. Vigile el superávit y el coste de retención.", "whyMonteCarlo": "<b>Por qué hay azar aquí.</b> Una única línea de pronóstico engaña: nadie sabe con exactitud cuánta gente se va en marzo ni cuántas vacantes se cubren a tiempo. Por eso el futuro se juega {runs} veces, cada una con sus propias desviaciones aleatorias de rotación (±40%), demanda (±5%) y éxito de contratación. De esos {runs} resultados sale la banda: <b>P50</b> es el escenario mediano y <b>P10-P90</b> el intervalo que contiene el 80% de los resultados. Una banda ancha significa que el resultado depende mucho de la suerte y no se puede apostar por él; una estrecha, que el pronóstico es robusto."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"verdictCertain": "Le déficit est inévitable : il apparaît dans toutes les simulations. Le premier creux survient au mois {month} et, au pic, {peak} personnes manquent.", "verdictLikely": "Le déficit est plus probable qu'improbable ({pct} % des simulations). Le premier creux est attendu au mois {month}.", "verdictPossible": "Le déficit est possible mais pas déterminé : il apparaît dans {pct} % des simulations. Le turnover et la vitesse de recrutement en décident.", "verdictNone": "Aucun déficit n'est prévu : l'effectif suffit dans toutes les simulations. Surveillez plutôt le surplus et le coût de fidélisation.", "whyMonteCarlo": "<b>Pourquoi du hasard ici.</b> Une seule courbe de prévision est trompeuse : personne ne sait exactement combien de personnes partent en mars ni combien de postes sont pourvus à temps. L'avenir est donc rejoué {runs} fois, chaque fois avec ses propres écarts aléatoires de turnover (±40 %), de besoin (±5 %) et de réussite du recrutement. De ces {runs} issues naît la plage : <b>P50</b> est le scénario médian, <b>P10-P90</b> l'intervalle contenant 80 % des issues. Une plage large signifie que le résultat dépend beaucoup de la chance et qu'on ne peut pas s'y fier ; une plage étroite, que la prévision est robuste."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"verdictCertain": "النقص لا مفر منه: فهو يظهر في كل المحاكاات. وأول انخفاض في الشهر {month}، وعند الذروة ينقص {peak} شخصًا.", "verdictLikely": "حدوث النقص أرجح من عدمه ({pct}% من المحاكاات). ويُتوقَّع أول انخفاض في الشهر {month}.", "verdictPossible": "النقص ممكن لكنه غير محتوم: فهو يظهر في {pct}% من المحاكاات. ويحسمه دوران العمالة وسرعة التوظيف.", "verdictNone": "لا يُتوقَّع نقص: فالعدد يكفي في كل المحاكاات. راقب الزيادة عن الحاجة وتكلفة الاستبقاء.", "whyMonteCarlo": "<b>لماذا العشوائية هنا.</b> خط توقُّع واحد مضلِّل: فلا أحد يعرف بدقة كم شخصًا سيغادر في مارس ولا كم وظيفة شاغرة ستُشغل في موعدها. ولذلك يُحتسب المستقبل {runs} مرة، في كل مرة بانحرافات عشوائية خاصة في المغادرة (±40%) والاحتياج (±5%) ونجاح التوظيف. ومن هذه النتائج الـ{runs} ينشأ النطاق: <b>P50</b> هو السيناريو الوسيط، و<b>P10–P90</b> هو المجال الذي يشمل 80% من النتائج. والنطاق الواسع يعني أن النتيجة تعتمد كثيرًا على الحظ ولا يصح الاعتماد عليها؛ أما الضيق فيعني أن التوقع متين."}});
+
+/* ---------- ДОПОЛНЕНИЕ: влияние драйверов ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectRowDown": "{label} 25%-ға төмен →", "effectNoteAvail": "Горизонт соңындағы қолжетімді штаттың өзгеруі (қазір {avail} адам). Горизонтта тапшылық жоқ, сондықтан қамтылуға әсері көрсетілген: жасыл — адам көбірек қалады, қызыл — азырақ."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectRowDown": "{label} 降低 25% →", "effectNoteAvail": "规划期末可用人数的变化（当前 {avail} 人）。规划期内不存在缺口，因此改为显示对人员保障的影响：绿色表示留下的人更多，红色表示更少。"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectRowDown": "{label} un 25% más bajo →", "effectNoteAvail": "Variación de la dotación disponible al final del horizonte (ahora {avail} personas). No hay déficit en el horizonte, así que se muestra el efecto sobre la cobertura: verde significa que queda más gente, rojo que queda menos."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectRowDown": "{label} 25 % plus bas →", "effectNoteAvail": "Variation de l'effectif disponible en fin d'horizon (actuellement {avail} personnes). Il n'y a pas de déficit sur l'horizon, l'effet sur la couverture est donc affiché : le vert signifie qu'il reste plus de personnes, le rouge moins."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectRowDown": "{label} أدنى بنسبة 25% ←", "effectNoteAvail": "تغيّر العدد المتاح في نهاية الأفق الزمني (وهو الآن {avail} شخصًا). لا يوجد نقص خلال الأفق، ولذلك يُعرض الأثر على التغطية: الأخضر يعني بقاء عدد أكبر، والأحمر عددًا أقل."}});
+
+/* ---------- КЛЮЧИ ПО ЗАМЕЧАНИЯМ ПО ВКЛАДКАМ (ar) ---------- */
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"qMonthShort": "الشهر {m}", "monthRange": "الأشهر {from}–{to}", "thWhen": "موعد الحاجة إليهم", "thWhenHint": "أشهر المشروع التي تمتد فيها هذه المرحلة. ويجب أن ينتهي التوظيف قبل بداية الفترة، وإلا وصل الأشخاص متأخرين عن موعد الحاجة إليهم.", "totalRow": "الإجمالي لجميع الوظائف", "qFootnote": "إن Q1–Q4 ليست أرباعًا تقويمية، بل أربع نقاط تحكم داخل المرحلة المختارة: Q1 بدايتها وQ4 نهايتها. والشهر المذكور بجانب كل عنوان هو شهر المشروع. وفي وضع «خطة الأعداد من المستند» تُؤخذ هذه الأرقام من خطتك؛ أما في وضع «وفق المعايير» فتُشتق من منحنى المرحلة ولذلك لا تُحرَّر هنا (حرِّر الخطة في تبويب «دورة الحياة»).", "tplBuiltin": "قطاعات جاهزة", "tplMine": "قطاعاتي", "tplActions": "إجراءات", "tplNewOption": "+ إضافة قطاعي الخاص…", "tplDelete": "حذف هذا القالب", "tplAiNote": "قطاعك غير موجود في القائمة؟ اختر «إضافة قطاعي الخاص» — أو اطلب من مساعد الذكاء الاصطناعي: «أنشئ قالبًا للتعدين من مستندي»، وسيملأ جميع المعامِلات بنفسه."}, "work": {"fmOutput": "الحجم {vol} {unit} ÷ المعيار {norm} = {yav} شخصًا في الوردية", "fmTime": "({vol} × {tn} دقيقة) ÷ ({fsm} دقيقة × {kvn}) = {yav} شخصًا في الوردية", "fmService": "{objs} وحدة ÷ معيار الخدمة {norm} = {yav} شخصًا في الوردية", "fmWorkplace": "{wp} موقع عمل × التحميل {load} = {yav} شخصًا في الوردية", "fmFte": "{yav} × {shifts} ورديات × احتياطي {ksp} = {fte} FTE على الملاك"}, "life": {"planInactive": "وضع «خطة الأعداد» مُختار، لكن لم تُملأ أي مرحلة، ولذلك ما زال الاحتساب يجري <b>وفق المعايير</b> — مع مضاعف المرحلة. أدخل العدد لمرحلة واحدة على الأقل في الجدول أدناه وستسري الخطة فورًا.", "planActiveNote": "الخطة سارية: لا تُطبَّق المعايير ولا مضاعف المرحلة.", "planDerivedNote": "تظهر بالخط المائل الرمادي النقاط التي أكملها النظام بنفسه من بداية المرحلة ونهايتها التي حددتها. أدخل رقمك الخاص لتجاوزها."}, "pred": {"effectTitle": "ما تُحرِّكه هذه المؤشرات فعلًا", "effectHint": "كل صف هو إعادة احتساب حقيقية: يعيد النظام تشغيل نموذج مونت كارلو بالكامل مع رفع العامل بنسبة 25% ويعرض تغيّر ذروة النقص. الأحمر يعني أن الأمر يسوء، والأخضر أنه يتحسن. وبهذا يتبين أي رافعة تعمل فعلًا في مشروعك وأيها لا تكاد تغيّر شيئًا.", "effectRow": "{label} أعلى بنسبة 25% ←", "effectNote": "تغيّر ذروة النقص (وهي الآن {peak} شخصًا) عند رفع العامل بمقدار الربع. والصفر يعني أن العامل يصطدم بقيد آخر في هذه البيانات."}, "dir": {"thSkillsHint": "افصل بفاصلة منقوطة. ابدأ الكتابة فتظهر قائمة المهارات من معجم قابلية الأتمتة (تبويب «المنهجية»). واستخدم تلك الأسماء بالضبط: فمخاطر الأتمتة وتكلفة إعادة التأهيل تُحتسب منها. ويمكن إضافة مهاراتك الخاصة أيضًا — وتحصل على المخاطرة المتوسطة.", "thTrainCost": "تكلفة التأهيل", "thTrainCostHint": "ما يلزم لإيصال الشخص إلى المجموعة الكاملة من مهارات هذه الوظيفة: أساس التعليم المهني المستمر + سعر كل مهارة. سعر المهارة = «سعر المهارة» لهذه الوظيفة × مضاعف الصعوبة من المعجم في «المنهجية». ولذلك يكلّف «تعلّم الآلة» أكثر من «الجولات».", "skillsFootnote": "<b>«سعر المهارة»</b> هو أجرك مقابل إعادة تأهيل مهارة واحدة لهذه الوظيفة. و<b>«أساس التعليم المهني المستمر»</b> هو الجزء الثابت: الدورة نفسها والمستندات والاختبار — ويُدفع مرة واحدة بغض النظر عن عدد المهارات. التكلفة الإجمالية لإعادة التأهيل = الأساس + مجموع المهارات الناقصة، مضروبة كل واحدة بمضاعف صعوبتها (تبويب «المنهجية»)."}, "risk": {"linkedNote": "<b>«المهارات» و«الزيادة عن الحاجة» ليسا الشيء نفسه، لكنهما ينبعان من مصدر واحد.</b> فـ«المهارات» هي نسبة العمليات القابلة للأتمتة في الوظيفة <i>الآن</i>. و«الزيادة عن الحاجة» هي احتمال أن تُستبدل الوظيفة فعلًا خلال أفق المشروع: المقياس نفسه مضروبًا في الزمن وفي وتيرة الأتمتة. وإذا أعطيت كليهما وزنًا كبيرًا، حُسبت المخاطرة الواحدة مرتين — والأصوب إبقاء الوزن على أحدهما.", "sourcesTitle": "من أين تأتي هذه الأرقام الستة", "sourcesHint": "لا يوجد عامل واحد اختلقه النظام: كل عامل مشتق من دليل الوظائف أو من معامِلات التوقع أو من معجم المهارات. وهنا يتبين ما يجب ملؤه وأين.", "thFactor": "العامل", "thSource": "مما يُحتسب", "thWhere": "أين تُحدَّد قيمته", "src_demo": "متوسط العمر في الوظيفة: وكلما اقترب من سن التقاعد ارتفعت مخاطر المغادرة بسبب العمر.", "where_demo": "الدليل ← عمود «متوسط العمر»", "src_bus": "عدد من يملكون الكفاءة. ووجود شخص أو شخصين فقط يعني الاعتماد على فرد بعينه.", "where_bus": "الدليل ← عمود «العدد»", "src_skill": "نسبة العمليات القابلة للأتمتة في مجموعة مهارات الوظيفة، وفق معجم قابلية الأتمتة.", "where_skill": "الدليل ← «المهارات» + المنهجية ← المعجم", "src_turn": "دوران العمالة السنوي على مستوى المنشأة، مضخَّمًا بندرة هذه الوظيفة في السوق.", "where_turn": "التحليل التوقعي ← «الدوران السنوي» + الدليل ← «السوق»", "src_market": "تقديرك الخبير لندرة الوظيفة في سوق العمل (0…1) ومدة إشغال الوظيفة الشاغرة.", "where_market": "الدليل ← «السوق» + التحليل التوقعي ← «مدة الإشغال»", "src_redund": "«المهارات» × وتيرة الأتمتة × مدة المشروع: احتمال الاستبدال خلال الأفق الزمني.", "where_redund": "التحليل التوقعي ← «وتيرة الأتمتة» + مدد المراحل"}, "meth": {"lexiconOrigin": "<b>من أين جاءت هذه الأرقام.</b> هي <i>تقديرات ابتدائية</i>، وليست واقعًا مقيسًا. جُمعت من أبحاث منشورة حول قابلية أتمتة المهن (منهجية Frey &amp; Osborne في «The Future of Employment»، وتقارير معهد ماكنزي العالمي عن إمكانات الأتمتة، وأعمال منظمة العمل الدولية عن المهن الصناعية)، ونُقلت من المهن إلى العمليات المفردة وفق مبدأ واحد: <b>كلما كانت العملية أكثر روتينية وقابلية للرصد والوصف بقواعد، زادت قابليتها للأتمتة</b>. ولهذا تقع الجولات والقياسات عند 85–90%، والتشخيص وأجهزة القياس والتحكم قرب 45–55%، أما التحليلات وتعلّم الآلة فعند 8–10%. <b>ويمكن بل ينبغي تعديل هذه القيم</b> بحسب قطاعك ومستوى تجهيزك: فهي تغذي «المهارات» و«الزيادة عن الحاجة» وتحليل البقاء مباشرةً. وأي مهارة غير موجودة في المعجم تُحتسب بالمخاطرة المتوسطة (معامِل «المخاطرة الافتراضية» أعلاه).", "thRiskHint": "احتمال أتمتة هذه العملية عند التبني الكامل للتقنيات المتاحة اليوم. وهذا إمكان لا جدول زمني: أما موعد حدوثه فتحدده «وتيرة الأتمتة» في تبويب «التحليل التوقعي».", "thCostMult": "× السعر", "thCostMultHint": "مضاعف تكلفة التدريب على هذه المهارة نسبةً إلى أجر الوظيفة. 0.5 توجيه قصير، و1.0 دورة عادية، و2.5 إعادة تأهيل طويلة من الصفر. عدِّله وفق أسعارك الفعلية: وتظهر القيم التي غيّرتها بالخط المائل.", "lexiconAiNote": "يمكنك تكليف المساعد بذلك: «دقِّق قابلية أتمتة المهارات بالاستناد إلى المصادر لقطاع التعدين» — فيبحث عن البيانات ويورد المصادر ويحدِّث الجدول."}, "aiTool": {"tplNoName": "لم يُحدَّد اسم القطاع", "tplSetNote": "أُنشئ قالب قطاعي: {name}", "tplSetResult": "أُنشئ القالب «{name}» وطُبِّق. الاحتياج المحتسب حاليًا: {req} شخصًا. أما أنواع العمل فتُحدَّد على حدة — إذ يحمل القالب المعامِلات الأساسية فقط."}, "toast": {"tplDeleted": "حُذف القالب «{name}»", "industryCreated": "أُنشئ قطاع «{name}». املأ أنواع العمل — أو اطلب من المساعد أن يفعل ذلك من المستند."}, "prompt": {"newIndustryName": "ما اسم قطاعك؟ (مثلًا: التعدين، توليد الكهرباء، الخدمات اللوجستية)", "deleteTemplate": "هل تريد حذف القالب «{name}»؟ تبقى بيانات الحساب، ويُحذف القالب نفسه فقط."}});
+
+/* ---------- КЛЮЧИ ПО ЗАМЕЧАНИЯМ ПО ВКЛАДКАМ (es/fr) ---------- */
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"qMonthShort": "mes {m}", "monthRange": "meses {from}-{to}", "thWhen": "Cuándo se necesitan", "thWhenHint": "Los meses del proyecto en los que transcurre esta fase. La contratación debe cerrarse antes del inicio del intervalo; de lo contrario la gente llegará más tarde de lo necesario.", "totalRow": "Total de todos los puestos", "qFootnote": "Q1-Q4 no son trimestres del calendario, sino cuatro puntos de control dentro de la fase seleccionada: Q1 es su inicio y Q4 su final. El mes junto a cada etiqueta es el mes del proyecto. En el modo «Plan de dotación del documento» estas cifras provienen de su plan; en el modo «por normas» se derivan de la curva de fase y por eso no se editan aquí (edite el plan en la pestaña «Ciclo de vida»).", "tplBuiltin": "Sectores incluidos", "tplMine": "Mis sectores", "tplActions": "Acciones", "tplNewOption": "+ Añadir mi propio sector...", "tplDelete": "Eliminar esta plantilla", "tplAiNote": "¿Su sector no está en la lista? Elija «Añadir mi propio sector» — o pídaselo al asistente de IA: «crea una plantilla para minería a partir de mi documento», y él rellenará todos los parámetros."}, "work": {"fmOutput": "Volumen {vol} {unit} / norma {norm} = {yav} personas por turno", "fmTime": "({vol} × {tn} min) / ({fsm} min × {kvn}) = {yav} personas por turno", "fmService": "{objs} equipos / norma de atención {norm} = {yav} personas por turno", "fmWorkplace": "{wp} puestos × carga {load} = {yav} personas por turno", "fmFte": "{yav} × {shifts} turnos × reserva {ksp} = {fte} FTE en plantilla"}, "life": {"planInactive": "El modo «Plan de dotación» está seleccionado, pero no hay ninguna fase rellenada, así que el cálculo sigue haciéndose <b>por normas</b>, con el multiplicador de fase. Introduzca la dotación de al menos una fase en la tabla de abajo y el plan surtirá efecto de inmediato.", "planActiveNote": "El plan está en vigor: no se aplican las normas ni el multiplicador de fase.", "planDerivedNote": "En cursiva gris se muestran los puntos que el sistema ha completado por su cuenta, a partir del inicio y el final de fase que usted indicó. Escriba su propia cifra para sobrescribirla."}, "pred": {"effectTitle": "Qué mueven realmente estos controles", "effectHint": "Cada fila es un recálculo real: el sistema vuelve a ejecutar todo el modelo de Monte Carlo con el factor aumentado un 25% y muestra cómo cambia el déficit máximo. Rojo significa que empeora; verde, que mejora. Así se ve qué palanca funciona de verdad en su proyecto y cuál apenas cambia nada.", "effectRow": "{label} un 25% más alto →", "effectNote": "Variación del déficit máximo (ahora {peak} personas) cuando el factor sube una cuarta parte. Cero significa que con estos datos el factor choca con otra restricción."}, "dir": {"thSkillsHint": "Separe con punto y coma. Empiece a escribir y aparecerá la lista de competencias del léxico de automatizabilidad (pestaña «Metodología»). Use precisamente esos nombres: el riesgo de automatización y el coste de recapacitación se calculan a partir de ellos. También puede añadir competencias propias: reciben el riesgo medio.", "thTrainCost": "Coste de formar", "thTrainCostHint": "Lo que cuesta llevar a una persona al conjunto completo de competencias de este puesto: base de formación continua + el precio de cada competencia. Precio de la competencia = el «precio de competencia» de este puesto × el multiplicador de dificultad del léxico en «Metodología». Por eso «Aprendizaje automático» cuesta más que «Rondas».", "skillsFootnote": "<b>«Precio de competencia»</b> es su tarifa por una competencia recapacitada para este puesto. <b>«Base de formación continua»</b> es la parte fija: el curso, la documentación, el examen — se paga una sola vez, con independencia del número de competencias. Coste total de recapacitación = base + la suma de las competencias que faltan, cada una multiplicada por su propio multiplicador de dificultad (pestaña «Metodología»)."}, "risk": {"linkedNote": "<b>«Competencias» y «Redundancia» no son lo mismo, pero nacen de la misma fuente.</b> «Competencias» es la proporción de operaciones automatizables del puesto <i>ahora mismo</i>. «Redundancia» es la probabilidad de que el puesto sea realmente desplazado dentro del horizonte del proyecto: la misma medida multiplicada por el tiempo y el ritmo de automatización. Si da un peso alto a ambas, el mismo riesgo se cuenta dos veces; es más sensato dejar el peso en una sola.", "sourcesTitle": "De dónde salen estos seis números", "sourcesHint": "Ningún factor lo inventa el sistema: cada uno se deriva del directorio de puestos, de los parámetros de pronóstico o del léxico de competencias. Aquí se ve qué hay que rellenar y dónde.", "thFactor": "Factor", "thSource": "A partir de qué se calcula", "thWhere": "Dónde configurarlo", "src_demo": "Edad media del puesto: cuanto más cerca de la jubilación, mayor el riesgo de salida por edad.", "where_demo": "Directorio → columna «Edad media»", "src_bus": "Cuántas personas poseen la competencia. Uno o dos portadores implican dependencia de una persona concreta.", "where_bus": "Directorio → columna «Dotación»", "src_skill": "Proporción de operaciones automatizables en el conjunto de competencias del puesto, según el léxico de automatizabilidad.", "where_skill": "Directorio → «Competencias» + Metodología → léxico", "src_turn": "Rotación anual de la empresa, amplificada por la escasez de este puesto en el mercado.", "where_turn": "Análisis predictivo → «Rotación anual» + Directorio → «Mercado»", "src_market": "Su estimación experta de la escasez del puesto en el mercado laboral (0-1) y el plazo de cobertura de la vacante.", "where_market": "Directorio → «Mercado» + Análisis predictivo → «Plazo de cobertura»", "src_redund": "«Competencias» × ritmo de automatización × duración del proyecto: la probabilidad de desplazamiento en el horizonte.", "where_redund": "Análisis predictivo → «Ritmo de automatización» + duración de las fases"}, "meth": {"lexiconOrigin": "<b>De dónde vienen estas cifras.</b> Son <i>estimaciones de partida</i>, no un hecho medido. Se han recopilado a partir de investigación abierta sobre la automatizabilidad de las ocupaciones (la metodología de Frey &amp; Osborne en «The Future of Employment», los informes del McKinsey Global Institute sobre el potencial de automatización y el trabajo de la OIT sobre ocupaciones industriales) y se han trasladado de las ocupaciones a operaciones concretas siguiendo un principio: <b>cuanto más rutinaria, observable y descriptible mediante reglas es una operación, más automatizable resulta</b>. De ahí que rondas y mediciones estén en 85-90%, diagnóstico e instrumentación en torno al 45-55%, y analítica y aprendizaje automático en 8-10%. <b>Las cifras pueden y deben ajustarse</b> a su sector y a su nivel de equipamiento: alimentan directamente «Competencias», «Redundancia» y el análisis de supervivencia. Una competencia ausente del léxico se calcula con el riesgo medio (el parámetro «Riesgo por defecto» de arriba).", "thRiskHint": "La probabilidad de que esta operación se automatice con la adopción plena de la tecnología disponible hoy. Es potencial, no calendario: cuándo ocurre lo fija el «Ritmo de automatización» en la pestaña «Análisis predictivo».", "thCostMult": "× precio", "thCostMultHint": "Multiplicador del coste de formación de esta competencia respecto a la tarifa del puesto. 0.5 es una instrucción breve, 1.0 un curso normal, 2.5 una recapacitación larga desde cero. Ajústelo a sus precios reales: los valores que usted cambió se muestran en cursiva.", "lexiconAiNote": "Puede delegarlo al asistente: «precisa la automatizabilidad de las competencias con fuentes para minería» — buscará los datos, citará las fuentes y actualizará la tabla."}, "aiTool": {"tplNoName": "No se ha indicado el nombre del sector", "tplSetNote": "Plantilla sectorial creada: {name}", "tplSetResult": "La plantilla «{name}» se ha creado y aplicado. Demanda calculada actual: {req} personas. Los tipos de trabajo se definen aparte: la plantilla solo fija los parámetros base."}, "toast": {"tplDeleted": "Plantilla «{name}» eliminada", "industryCreated": "Sector «{name}» creado. Rellene los tipos de trabajo — o pida al asistente que lo haga a partir del documento."}, "prompt": {"newIndustryName": "¿Cómo se llama su sector? (por ejemplo: Minería, Generación eléctrica, Logística)", "deleteTemplate": "¿Eliminar la plantilla «{name}»? Los datos del cálculo se conservan; solo se borra la plantilla."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"qMonthShort": "mois {m}", "monthRange": "mois {from}-{to}", "thWhen": "Quand ils sont nécessaires", "thWhenHint": "Les mois du projet pendant lesquels cette phase se déroule. Le recrutement doit être terminé avant le début de l'intervalle, sinon les personnes arrivent plus tard que nécessaire.", "totalRow": "Total tous postes confondus", "qFootnote": "Q1-Q4 ne sont pas des trimestres calendaires mais quatre points de contrôle à l'intérieur de la phase sélectionnée : Q1 son début, Q4 sa fin. Le mois indiqué à côté de chaque libellé est le mois du projet. En mode « Plan d'effectifs issu du document », ces chiffres proviennent de votre plan ; en mode « selon les normes », ils sont déduits de la courbe de phase et ne sont donc pas modifiables ici (modifiez le plan dans l'onglet « Cycle de vie »).", "tplBuiltin": "Secteurs fournis", "tplMine": "Mes secteurs", "tplActions": "Actions", "tplNewOption": "+ Ajouter mon propre secteur…", "tplDelete": "Supprimer ce modèle", "tplAiNote": "Votre secteur n'est pas dans la liste ? Choisissez « Ajouter mon propre secteur » — ou demandez à l'assistant IA : « crée un modèle pour les mines à partir de mon document », et il renseignera tous les paramètres lui-même."}, "work": {"fmOutput": "Volume {vol} {unit} / norme {norm} = {yav} personnes par poste", "fmTime": "({vol} × {tn} min) / ({fsm} min × {kvn}) = {yav} personnes par poste", "fmService": "{objs} équipements / norme d'entretien {norm} = {yav} personnes par poste", "fmWorkplace": "{wp} postes de travail × charge {load} = {yav} personnes par poste", "fmFte": "{yav} × {shifts} postes × réserve {ksp} = {fte} ETP à l’effectif"}, "life": {"planInactive": "Le mode « Plan d'effectifs » est sélectionné, mais aucune phase n'est renseignée : le calcul se fait donc encore <b>selon les normes</b>, avec le multiplicateur de phase. Saisissez l'effectif d'au moins une phase dans le tableau ci-dessous et le plan prend effet immédiatement.", "planActiveNote": "Le plan est appliqué : ni les normes ni le multiplicateur de phase ne sont utilisés.", "planDerivedNote": "En italique gris figurent les points que le système a complétés lui-même, à partir du début et de la fin de phase que vous avez indiqués. Saisissez votre propre chiffre pour les remplacer."}, "pred": {"effectTitle": "Ce que ces curseurs déplacent réellement", "effectHint": "Chaque ligne est un vrai recalcul : le système relance tout le modèle de Monte-Carlo avec le facteur augmenté de 25 % et affiche la variation du déficit maximal. Le rouge signifie que cela empire, le vert que cela s'améliore. On voit ainsi quel levier fonctionne vraiment sur votre projet et lequel ne change presque rien.", "effectRow": "{label} 25 % plus élevé →", "effectNote": "Variation du déficit maximal (actuellement {peak} personnes) lorsque le facteur augmente d'un quart. Zéro signifie que sur ces données le facteur bute sur une autre contrainte."}, "dir": {"thSkillsHint": "Séparez par des points-virgules. Commencez à saisir : la liste des compétences du lexique d'automatisabilité (onglet « Méthodologie ») apparaît. Utilisez exactement ces noms : le risque d'automatisation et le coût de reconversion en découlent. Vos propres compétences sont acceptées — elles reçoivent le risque moyen.", "thTrainCost": "Coût de formation", "thTrainCostHint": "Ce qu'il coûte d'amener une personne à l'ensemble complet des compétences de ce poste : base de formation continue + le prix de chaque compétence. Prix d'une compétence = le « prix de compétence » de ce poste × le multiplicateur de difficulté du lexique dans « Méthodologie ». C'est pourquoi « Apprentissage automatique » coûte plus que « Rondes ».", "skillsFootnote": "<b>« Prix de compétence »</b> est votre tarif pour une compétence reconvertie sur ce poste. <b>« Base de formation continue »</b> est la part fixe : le cours lui-même, les documents, l'examen — payée une seule fois, quel que soit le nombre de compétences. Coût total de reconversion = base + la somme des compétences manquantes, chacune multipliée par son propre multiplicateur de difficulté (onglet « Méthodologie »)."}, "risk": {"linkedNote": "<b>« Compétences » et « Redondance » ne sont pas la même chose, mais découlent d'une même source.</b> « Compétences » est la part des opérations automatisables du poste <i>aujourd'hui</i>. « Redondance » est la probabilité que le poste soit effectivement remplacé sur l'horizon du projet : la même mesure multipliée par le temps et le rythme d'automatisation. Si vous donnez un poids élevé aux deux, le même risque est compté deux fois — mieux vaut ne pondérer que l'un des deux.", "sourcesTitle": "D'où viennent ces six chiffres", "sourcesHint": "Aucun facteur n'est inventé par le système : chacun découle du référentiel des postes, des paramètres de prévision ou du lexique des compétences. Ce tableau indique quoi renseigner et où.", "thFactor": "Facteur", "thSource": "Calculé à partir de", "thWhere": "Où le renseigner", "src_demo": "Âge moyen du poste : plus on approche de la retraite, plus le risque de départ par l'âge est élevé.", "where_demo": "Référentiel → colonne « Âge moyen »", "src_bus": "Combien de personnes détiennent la compétence. Un ou deux porteurs signifient une dépendance à une personne précise.", "where_bus": "Référentiel → colonne « Effectif »", "src_skill": "Part des opérations automatisables dans l'ensemble des compétences du poste, selon le lexique d'automatisabilité.", "where_skill": "Référentiel → « Compétences » + Méthodologie → lexique", "src_turn": "Turnover annuel de l'entreprise, amplifié par la rareté de ce poste sur le marché.", "where_turn": "Analyse prédictive → « Turnover annuel » + Référentiel → « Marché »", "src_market": "Votre estimation experte de la rareté du poste sur le marché du travail (0-1) et le délai de pourvoi du poste.", "where_market": "Référentiel → « Marché » + Analyse prédictive → « Délai de pourvoi »", "src_redund": "« Compétences » × rythme d'automatisation × durée du projet : la probabilité de remplacement sur l'horizon.", "where_redund": "Analyse prédictive → « Rythme d'automatisation » + durées des phases"}, "meth": {"lexiconOrigin": "<b>D'où viennent ces chiffres.</b> Ce sont des <i>estimations de départ</i>, pas un fait mesuré. Ils sont compilés à partir de travaux publics sur l'automatisabilité des métiers (la méthode de Frey &amp; Osborne dans « The Future of Employment », les rapports du McKinsey Global Institute sur le potentiel d'automatisation, les travaux de l'OIT sur les métiers industriels) et transposés des métiers aux opérations selon un principe : <b>plus une opération est routinière, observable et descriptible par des règles, plus elle est automatisable</b>. D'où les rondes et les mesures à 85-90 %, le diagnostic et l'instrumentation autour de 45-55 %, et l'analytique et l'apprentissage automatique à 8-10 %. <b>Ces valeurs peuvent et doivent être ajustées</b> à votre secteur et à votre niveau d'équipement : elles alimentent directement « Compétences », « Redondance » et l'analyse de survie. Une compétence absente du lexique est calculée au risque moyen (le paramètre « Risque par défaut » ci-dessus).", "thRiskHint": "La probabilité que cette opération soit automatisée avec une adoption complète des technologies disponibles aujourd'hui. C'est un potentiel, pas un calendrier : le moment est fixé par le « Rythme d'automatisation » dans l'onglet « Analyse prédictive ».", "thCostMult": "× prix", "thCostMultHint": "Multiplicateur du coût de formation à cette compétence par rapport au tarif du poste. 0.5 correspond à une instruction courte, 1.0 à un cours normal, 2.5 à une reconversion longue depuis zéro. Ajustez-le à vos prix réels : les valeurs que vous avez modifiées apparaissent en italique.", "lexiconAiNote": "Vous pouvez le déléguer à l'assistant : « précise l'automatisabilité des compétences avec des sources pour les mines » — il cherchera les données, citera les sources et mettra le tableau à jour."}, "aiTool": {"tplNoName": "Nom du secteur non indiqué", "tplSetNote": "Modèle sectoriel créé : {name}", "tplSetResult": "Le modèle « {name} » a été créé et appliqué. Besoin calculé actuel : {req} personnes. Les types de travail se définissent séparément — le modèle ne porte que les paramètres de base."}, "toast": {"tplDeleted": "Modèle « {name} » supprimé", "industryCreated": "Secteur « {name} » créé. Renseignez les types de travail — ou demandez à l'assistant de le faire à partir du document."}, "prompt": {"newIndustryName": "Comment votre secteur se nomme-t-il ? (par exemple : Mines, Production électrique, Logistique)", "deleteTemplate": "Supprimer le modèle « {name} » ? Les données de calcul sont conservées ; seul le modèle est retiré."}});
+
+/* ---------- КЛЮЧИ ПО ЗАМЕЧАНИЯМ ПО ВКЛАДКАМ (kk/zh) ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"qMonthShort": "{m}-ай", "monthRange": "{from}–{to} ай", "thWhen": "Қашан қажет", "thWhenHint": "Осы фаза жүретін жоба айлары. Жалдау интервал басталғанға дейін бітуі керек, әйтпесе адамдар қажет болғаннан кеш шығады.", "totalRow": "Барлық лауазымдар бойынша жиыны", "qFootnote": "Q1–Q4 — күнтізбелік тоқсандар емес, таңдалған фаза ішіндегі төрт бақылау нүктесі: Q1 — басы, Q4 — соңы. Жанындағы ай — жоба айы. «Құжаттағы сан жоспары» режимінде бұл сандар сіздің жоспарыңыздан алынады; «нормалар бойынша» режимінде фаза қисығымен есептеледі, сондықтан қолмен түзетілмейді (жоспарды «Өмірлік цикл» бетінде түзетіңіз).", "tplBuiltin": "Дайын салалар", "tplMine": "Менің салаларым", "tplActions": "Әрекеттер", "tplNewOption": "+ Өз саламды қосу…", "tplDelete": "Осы үлгіні жою", "tplAiNote": "Тізімде сіздің салаңыз жоқ па? «Өз саламды қосу» дегенді таңдаңыз — немесе AI көмекшіден сұраңыз: «құжатым бойынша тау-кен саласына үлгі жаса», ол барлық параметрді өзі толтырады."}, "work": {"fmOutput": "Көлем {vol} {unit} ÷ норма {norm} = ауысымда {yav} адам", "fmTime": "({vol} × {tn} мин) ÷ ({fsm} мин × {kvn}) = ауысымда {yav} адам", "fmService": "{objs} агрегат ÷ қызмет көрсету нормасы {norm} = ауысымда {yav} адам", "fmWorkplace": "{wp} жұмыс орны × жүктеме {load} = ауысымда {yav} адам", "fmFte": "{yav} × {shifts} ауысым × резерв {ksp} = штатта {fte} FTE"}, "life": {"planInactive": "«Сан жоспары» режимі таңдалған, бірақ бірде-бір фаза толтырылмаған, сондықтан есеп әзірге <b>нормалар бойынша</b> — фаза көбейткішімен — жүреді. Төмендегі кестеге кемінде бір фазаның санын енгізіңіз, сонда жоспар бірден күшіне енеді.", "planActiveNote": "Жоспар күшінде: нормалар мен фаза көбейткіші қолданылмайды.", "planDerivedNote": "Сұр көлбеу қаріппен жүйе өзі толтырған нүктелер көрсетілген — сіз берген фаза басы мен соңы бойынша. Өз саныңызды енгізіп, қайта анықтауға болады."}, "pred": {"effectTitle": "Бұл жүгірткілер неге әсер етеді", "effectHint": "Әр жол — нақты қайта есептеудің нәтижесі: жүйе бүкіл Монте-Карло моделін драйвер 25%-ға өсірілген күйде қайта жүргізеді және шыңдағы тапшылықтың қалай өзгеретінін көрсетеді. Қызыл — жағдай нашарлайды, жасыл — жақсарады. Сіздің жобаңызда қай тұтқа шынымен жұмыс істейтіні, қайсысы дерлік ештеңе өзгертпейтіні осылай көрінеді.", "effectRow": "{label} 25%-ға жоғары →", "effectNote": "Драйвер шерекке өскенде шыңдағы тапшылықтың өзгеруі (қазір {peak} адам). Нөл — бұл деректерде драйвер басқа шектеуге тірелгенін білдіреді."}, "dir": {"thSkillsHint": "Нүктелі үтірмен ажыратыңыз. Теруді бастаңыз — автоматтандырылу лексиконындағы («Әдістеме» беті) дағдылар тізімі шығады. Солардың атауын жазыңыз: автоматтандыру тәуекелі мен қайта оқыту құны солар бойынша есептеледі. Өз дағдыларыңызды да жазуға болады — оларға орташа тәуекел беріледі.", "thTrainCost": "Оқыту құны", "thTrainCostHint": "Адамды осы лауазымның толық дағды жиынына жеткізу қанша тұрады: ДПО базасы + әр дағдының бағасы. Дағды бағасы = осы лауазымның «Дағды бағасы» × «Әдістеме» бетіндегі лексиконнан алынған күрделілік көбейткіші. Сондықтан «Машиналық оқыту» «Айналып шығудан» қымбат.", "skillsFootnote": "<b>«Дағды бағасы»</b> — осы лауазым үшін бір дағдыны қайта оқытуға арналған сіздің мөлшерлемеңіз. <b>«ДПО базасы»</b> (қосымша кәсіптік білім) — тұрақты бөлігі: курстың өзі, құжаттар, емтихан — дағды санына қарамастан бір рет төленеді. Қайта даярлаудың қорытынды құны = ДПО базасы + жетіспейтін дағдылар бойынша қосынды, онда әр дағды өз күрделілік көбейткішіне көбейтіледі («Әдістеме» беті)."}, "risk": {"linkedNote": "<b>«Дағдылар» мен «Артықтық» — бір нәрсе емес, бірақ бір көзден өседі.</b> «Дағдылар» — рөлдегі автоматтандырылатын операциялардың <i>қазіргі</i> үлесі. «Артықтық» — жоба горизонтында рөлдің шынымен ығыстырылу ықтималдығы: сол көрсеткіш уақыт пен автоматтандыру қарқынына көбейтілген. Екеуіне де үлкен салмақ берсеңіз, бір тәуекел екі есе ескеріледі — салмақты біреуінде қалдыру дұрысырақ.", "sourcesTitle": "Осы алты сан қайдан алынады", "sourcesHint": "Бірде-бір фактор жүйе ойлап тапқан емес: әрқайсысы лауазымдар анықтамалығынан, болжам параметрлерінен немесе дағдылар лексиконынан шығады. Мұнда нені толтыру керегі және қайда екені көрінеді.", "thFactor": "Фактор", "thSource": "Неден есептеледі", "thWhere": "Қайда енгізу керек", "src_demo": "Лауазым бойынша орташа жас: зейнет жасына жақындаған сайын жас бойынша кету тәуекелі жоғарылайды.", "where_demo": "Анықтамалық → «Орт. жас» бағаны", "src_bus": "Құзыретті қанша адам иеленеді. Бір-екі иеленуші — нақты адамға тәуелділік.", "where_bus": "Анықтамалық → «Саны» бағаны", "src_skill": "Лауазым дағдылары жиынындағы автоматтандырылатын операциялардың үлесі — автоматтандырылу лексиконы бойынша.", "where_skill": "Анықтамалық → «Дағдылар» + Әдістеме → лексикон", "src_turn": "Кәсіпорын бойынша жылдық тұрақтамау, осы рөлдің нарықтағы тапшылығымен күшейтілген.", "where_turn": "Болжамды талдау → «Жылдық тұрақтамау» + Анықтамалық → «Нарық»", "src_market": "Рөлдің еңбек нарығындағы тапшылығына сіздің сараптамалық бағаңыз (0…1) және вакансияны жабу мерзімі.", "where_market": "Анықтамалық → «Нарық» + Болжамды талдау → «Жабу мерзімі»", "src_redund": "«Дағдылар» × автоматтандыру қарқыны × жоба ұзақтығы: горизонтта ығыстырылу ықтималдығы.", "where_redund": "Болжамды талдау → «Автоматтандыру қарқыны» + фазалар ұзақтығы"}, "meth": {"lexiconOrigin": "<b>Бұл сандар қайдан.</b> Бұл — өлшенген факт емес, <i>бастапқы бағалар</i>. Олар кәсіптердің автоматтандырылуы туралы ашық зерттеулер бойынша жинақталған (Frey &amp; Osborne «The Future of Employment» әдістемесі, McKinsey Global Institute автоматтандыру әлеуеті туралы есептері, ILO өнеркәсіп кәсіптері бойынша материалдары) және кәсіптерден жеке операцияларға бір қағида бойынша көшірілген: <b>операция қаншалықты рутинді, бақыланатын және ережелермен сипатталатын болса, соншалықты автоматтандырылады</b>. Сондықтан айналып шығу мен өлшеу — 85–90%, диагностика мен КИПиА — шамамен 45–55%, аналитика мен машиналық оқыту — 8–10%. <b>Сандарды өз саланыңызға және жабдықталу деңгейіңізге қарай түзетуге болады және керек</b>: олар «Дағдылар», «Артықтық» және өмірге қабілеттілік талдауына тікелей әсер етеді. Лексиконда жоқ дағды орташа тәуекелмен есептеледі (жоғарыдағы «Әдепкі тәуекел» параметрі).", "thRiskHint": "Бүгін қолжетімді технологиялар толық енгізілгенде осы операцияның автоматтандырылу ықтималдығы. Бұл — әлеует, мерзім емес: ол нақты қашан болатынын «Болжамды талдау» бетіндегі «Автоматтандыру қарқыны» белгілейді.", "thCostMult": "× баға", "thCostMultHint": "Осы дағдыға оқытудың лауазым мөлшерлемесіне қатысты құн көбейткіші. 0.5 — қысқа нұсқама, 1.0 — қарапайым курс, 2.5 — нөлден ұзақ қайта даярлау. Өз нақты бағаларыңызға түзетіңіз: сіз өзгерткен мәндер көлбеу қаріппен көрсетілген.", "lexiconAiNote": "Көмекшіге тапсыруға болады: «тау-кен саласы үшін дағдылардың автоматтандырылуын дереккөздер бойынша нақтыла» — ол деректерді табады, дереккөздерге сілтеме береді және кестені жаңартады."}, "aiTool": {"tplNoName": "Сала атауы көрсетілмеген", "tplSetNote": "Салалық үлгі жасалды: {name}", "tplSetResult": "«{name}» үлгісі жасалып, қолданылды. Ағымдағы есептік қажеттілік: {req} адам. Жұмыс түрлерін бөлек беріңіз — үлгі тек базалық параметрлерді белгілейді."}, "toast": {"tplDeleted": "«{name}» үлгісі жойылды", "industryCreated": "«{name}» саласы жасалды. Жұмыс түрлерін толтырыңыз — немесе көмекшіден құжат бойынша жасауды сұраңыз."}, "prompt": {"newIndustryName": "Сіздің салаңыз қалай аталады? (мысалы: Тау-кен, Электр энергетикасы, Логистика)", "deleteTemplate": "«{name}» үлгісі жойылсын ба? Есеп деректері қалады, тек үлгінің өзі жойылады."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"qMonthShort": "第 {m} 月", "monthRange": "第 {from}–{to} 月", "thWhen": "何时需要", "thWhenHint": "该阶段所处的项目月份。招聘须在区间开始前完成，否则人员到岗会晚于需要的时间。", "totalRow": "全部岗位合计", "qFootnote": "Q1–Q4 不是日历季度，而是所选阶段内部的四个控制点：Q1 为阶段开始，Q4 为结束。标签旁的月份指项目月份。在「来自文档的人数计划」模式下，这些数字取自您的计划；在「按定额」模式下则由阶段曲线推算，因此不能在此手动修改（请在「生命周期」标签页修改计划）。", "tplBuiltin": "内置行业", "tplMine": "我的行业", "tplActions": "操作", "tplNewOption": "+ 添加我自己的行业…", "tplDelete": "删除此模板", "tplAiNote": "列表中没有您的行业？请选择「添加我自己的行业」——或者请 AI 助手：「根据我的文档为矿业制作模板」，它会自行填好所有参数。"}, "work": {"fmOutput": "工作量 {vol} {unit} ÷ 定额 {norm} = 每班 {yav} 人", "fmTime": "({vol} × {tn} 分钟) ÷ ({fsm} 分钟 × {kvn}) = 每班 {yav} 人", "fmService": "{objs} 台设备 ÷ 看管定额 {norm} = 每班 {yav} 人", "fmWorkplace": "{wp} 个工位 × 负荷 {load} = 每班 {yav} 人", "fmFte": "{yav} × {shifts} 班 × 储备 {ksp} = 编制 {fte} FTE"}, "life": {"planInactive": "已选择「人数计划」模式，但没有填写任何阶段，因此测算目前仍<b>按定额</b>进行——并套用阶段系数。请在下表中至少为一个阶段填写人数，计划便会立即生效。", "planActiveNote": "计划已生效：不套用定额与阶段系数。", "planDerivedNote": "灰色斜体显示的是系统根据您填写的阶段起止值自行补全的节点。输入您自己的数字即可覆盖。"}, "pred": {"effectTitle": "这些滑块究竟影响什么", "effectHint": "每一行都是一次真实的重新计算：系统将该驱动因素提高 25% 后重跑整个蒙特卡洛模型，并显示峰值缺口的变化。红色表示变差，绿色表示变好。这样就能看出在您的项目上哪个杠杆真正有效，哪个几乎没有影响。", "effectRow": "{label} 提高 25% →", "effectNote": "驱动因素提高四分之一时峰值缺口（当前 {peak} 人）的变化。为零说明在当前数据下该因素受到其他约束的限制。"}, "dir": {"thSkillsHint": "用分号分隔。开始输入即会出现自动化可行性词典（「方法论」标签页）中的技能列表。请使用其中的名称：自动化风险和再培训成本正是据此计算的。也可以填写自己的技能——它们将获得平均风险值。", "thTrainCost": "再培训成本", "thTrainCostHint": "把一个人培养到该岗位完整技能组合需要多少费用：继续教育基础费 + 每项技能的价格。技能价格 = 该岗位的「技能价格」× 「方法论」词典中的难度系数。因此「机器学习」比「巡检」更贵。", "skillsFootnote": "<b>「技能价格」</b>是您为该岗位再培训一项技能的费率。<b>「继续教育基础费」</b>是固定部分：课程本身、文件、考试——无论涉及多少技能都只支付一次。再培训总成本 = 继续教育基础费 + 各缺失技能之和，其中每项技能乘以各自的难度系数（「方法论」标签页）。"}, "risk": {"linkedNote": "<b>「技能」与「冗余」并非同一件事，但源自同一处。</b>「技能」是该岗位<i>当前</i>可自动化操作的占比。「冗余」是在项目周期内该岗位真正被取代的概率：即同一指标乘以时间与自动化速度。若同时给两者较大权重，同一风险会被重复计入——更合理的做法是只给其中之一赋权。", "sourcesTitle": "这六个数字从何而来", "sourcesHint": "没有一个因素是系统臆造的：每一项都来自岗位字典、预测参数或技能词典。此处说明需要填写什么、在哪里填写。", "thFactor": "因素", "thSource": "依据什么计算", "thWhere": "在哪里设置", "src_demo": "该岗位的平均年龄：越接近退休年龄，因年龄离职的风险越高。", "where_demo": "字典 → 「平均年龄」列", "src_bus": "掌握该能力的人数。只有一两个人意味着对特定个人的依赖。", "where_bus": "字典 → 「人数」列", "src_skill": "岗位技能组合中可自动化操作的占比——依据自动化可行性词典。", "where_skill": "字典 → 「技能」+ 方法论 → 词典", "src_turn": "全公司年度流失率，并按该岗位的市场稀缺度放大。", "where_turn": "预测分析 → 「年度流失率」+ 字典 → 「市场」", "src_market": "您对该岗位在劳动力市场稀缺度的专家判断（0…1）以及空缺填补周期。", "where_market": "字典 → 「市场」+ 预测分析 → 「填补周期」", "src_redund": "「技能」× 自动化速度 × 项目时长：在整个周期内被取代的概率。", "where_redund": "预测分析 → 「自动化速度」+ 各阶段时长"}, "meth": {"lexiconOrigin": "<b>这些数字的来源。</b>它们是<i>初始估计值</i>，而非实测事实。数据依据关于职业自动化可行性的公开研究汇编而成（Frey &amp; Osborne《The Future of Employment》方法、麦肯锡全球研究院关于自动化潜力的报告、国际劳工组织关于工业职业的研究），并按一个原则从职业层面下推到具体操作：<b>操作越是例行化、可观测、可用规则描述，其自动化可行性就越高</b>。因此巡检与测量为 85–90%，诊断与仪表自动化约为 45–55%，而分析与机器学习仅为 8–10%。<b>这些数值可以且应当</b>按您所处行业与装备水平进行调整：它们直接影响「技能」、「冗余」和存活分析。词典中没有的技能按平均风险计算（上方的「默认风险」参数）。", "thRiskHint": "在当今可用技术充分落地的情况下，该操作被自动化的概率。这是潜力而非时间表：具体何时发生由「预测分析」标签页的「自动化速度」决定。", "thCostMult": "× 价格", "thCostMultHint": "该技能培训成本相对于岗位费率的系数。0.5 为简短培训，1.0 为常规课程，2.5 为从零开始的长期再培训。请按您的实际价格调整：您修改过的数值以斜体显示。", "lexiconAiNote": "也可以交给助手：「请根据资料来源核实矿业技能的自动化可行性」——它会查找数据、给出出处并更新表格。"}, "aiTool": {"tplNoName": "未提供行业名称", "tplSetNote": "已创建行业模板：{name}", "tplSetResult": "模板「{name}」已创建并应用。当前测算需求：{req} 人。作业类型需另行设置——模板只包含基础参数。"}, "toast": {"tplDeleted": "模板「{name}」已删除", "industryCreated": "行业「{name}」已创建。请填写作业类型——或请助手根据文档完成。"}, "prompt": {"newIndustryName": "您的行业叫什么？（例如：矿业、电力、物流）", "deleteTemplate": "要删除模板「{name}」吗？测算数据会保留，仅删除模板本身。"}});
 
 /* ---------- НОВЫЕ КЛЮЧИ ИНТЕРФЕЙСА (демо-полоса, валидация, тупики) ---------- */
 (function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"cba": {"needDirTitle": "Лауазымдар анықтамалығы қажет", "needDirText": "«Жұмыстан шығарып, жаңасын алу» мен «өз қызметкерлерін қайта даярлау» нұсқаларын салыстыру үшін жалақысы мен дағдылары көрсетілген кемінде екі лауазым керек: кімді және кімге қайта оқытамыз. Қазір анықтамалықта олар жеткіліксіз.", "needDirBtn": "Анықтамалықты ашу"}});
