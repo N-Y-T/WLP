@@ -222,6 +222,9 @@ td.c{text-align:center} td.r{text-align:right}
 .chtitle{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:1.6px;
   text-transform:uppercase;color:var(--t3);font-weight:700;margin-bottom:10px}
 .chrow{display:grid;grid-template-columns:20px 1fr auto;align-items:baseline;gap:10px;padding:5px 0;font-size:12.5px;color:var(--t2)}
+/* строка без номера: две колонки, иначе подпись попадает в 20px и рвётся по словам */
+.chrow.chrow-2{grid-template-columns:1fr auto}
+.chrow .chl{min-width:0;overflow-wrap:anywhere;line-height:1.45}
 .chrow .chn{font-family:var(--mono);font-size:10px;color:var(--t3)}
 .chrow .chv{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;color:var(--t1);white-space:nowrap}
 .chrow.chsum{border-top:1px dashed var(--line);margin-top:3px;padding-top:8px;color:var(--ink);font-weight:700}
@@ -270,6 +273,18 @@ input.pderived{color:var(--t3);font-style:italic;background:var(--surface2)}
 .dskills input{width:100%;text-overflow:ellipsis}
 /* числовые колонки справочника держим узкими, чтобы текстовым осталась ширина */
 .dnum{width:1%;white-space:nowrap}
+/* навык, добавленный пользователем в лексикон */
+tr.lex-custom td{background:var(--primary-l)}
+/* выбор фазы для «Детализации по должностям» */
+.chip-btn{cursor:pointer;padding:7px 12px;font-size:11.5px;border:1px solid var(--line2);
+  background:var(--surface);color:var(--t1);transition:.15s}
+.chip-btn:hover{border-color:var(--primary);color:var(--primary-d);background:var(--primary-l)}
+.chip-btn.on{background:var(--primary);color:#fff;border-color:var(--primary);
+  box-shadow:0 3px 9px -3px rgba(15,118,110,.55)}
+.chip-btn.on .muted{color:rgba(255,255,255,.78)!important}
+/* численность, вписанная руками, отличается от расчётной */
+input.posmanual{background:var(--primary-l);border-color:var(--primary);font-weight:700;color:var(--primary-d)}
+tr.posrow-manual td:first-child{box-shadow:inset 3px 0 0 var(--primary)}
 /* на ноутбуках поуже отдаём текстовым колонкам ровно столько, чтобы таблица влезла целиком */
 @media(max-width:1320px){
   .dname{min-width:210px}
@@ -680,9 +695,13 @@ Object.assign(I18N.ru, { norm:{
   needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
   detailTitle:'Детализация по должностям', detailHint:'Потребность из блока «Сводный результат» делится между должностями справочника: сначала по группам (Основной / ТОиР / ИТР), затем поровну между должностями внутри группы. Столбцы Q1–Q4 показывают, как эта потребность меняется <b>внутри выбранной фазы</b> — от её начала (Q1) к концу (Q4).',
   qMonthShort:'мес. {m}', monthRange:'мес. {from}–{to}',
+  detailPlanGap:'Включён режим «План численности», но для фазы «{stage}» численность в плане не задана — поэтому здесь нули, а не расчёт по нормам. Впишите численность этой фазы на вкладке «Жизненный цикл» или задайте её здесь по должностям вручную.',
+  detailPhaseLabel:'Фаза для детализации', detailPhaseHint:'Таблица ниже показывает одну фазу целиком. Переключите фазу, чтобы увидеть, сколько людей и каких нужно на проектировании, на СМР, на ПНР и так далее. Показаны только фазы с ненулевой длительностью — остальных в проекте нет.',
+  detailHowNote:'<b>Как распределены люди.</b> Потребность фазы «{stage}» (мес. {from}–{to}) сначала делится по группам в пропорции из блока «Структура штата», затем поровну между должностями внутри каждой группы — система не знает, кого у вас больше. Любую ячейку можно <b>вписать вручную</b>: серым показан расчёт, введённое число подсвечивается и заменяет его. «FTE цель» — среднее по четырём точкам этой же строки.',
+  posResetBtn:'Сбросить ручные правки',
   thWhen:'Когда нужны', thWhenHint:'Месяцы проекта, в которые эта фаза идёт. Набор должен быть закрыт к началу интервала, иначе люди выйдут позже, чем понадобятся.',
   totalRow:'Итого по всем должностям',
-  qFootnote:'Q1–Q4 — не календарные кварталы, а четыре контрольные точки внутри выбранной фазы: Q1 — её начало, Q4 — конец. Месяц рядом с подписью — это месяц проекта. В режиме «План численности из документа» эти числа берутся из вашего плана; в режиме «по нормам» — считаются по кривой фазы, поэтому вручную не правятся (правьте план на вкладке «Жизненный цикл»).',
+  qFootnote:'Q1–Q4 — не календарные кварталы, а четыре контрольные точки внутри выбранной фазы: Q1 — её начало, Q4 — конец. Месяц рядом с подписью — это месяц проекта. Серым в ячейках показан расчёт: в режиме «по нормам» — по кривой фазы, в режиме «План численности из документа» — из вашего плана. Любое число можно вписать поверх расчёта: оно сохраняется за этой должностью и этой фазой, а «Итого» и «FTE цель» пересчитываются по фактическим значениям.',
   tplBuiltin:'Готовые отрасли', tplMine:'Мои отрасли', tplActions:'Действия',
   tplNewOption:'+ Добавить свою отрасль…', tplDelete:'Удалить этот шаблон',
   tplAiNote:'Нет вашей отрасли в списке? Выберите «Добавить свою отрасль» — или попросите ИИ-ассистента: «сделай шаблон под горнодобычу по моему документу», и он заполнит все параметры сам.',
@@ -779,7 +798,7 @@ life:{
   verdictNone:'Дефицит не прогнозируется: во всех симуляциях штата хватает. Следите за профицитом и стоимостью удержания.',
   whyMonteCarlo:'<b>Зачем здесь случайность.</b> Одна линия прогноза — это обман: никто не знает точно, сколько людей уйдёт в марте и сколько вакансий закроется в срок. Поэтому будущее проигрывается {runs} раз, каждый раз со своими случайными отклонениями оттока (±40%), спроса (±5%) и успешности найма. Из этих {runs} исходов и получается коридор: <b>P50</b> — срединный сценарий, <b>P10–P90</b> — интервал, в который попадает 80% исходов. Широкий коридор означает, что результат сильно зависит от везения, и на него нельзя закладываться; узкий — что прогноз устойчив.',
   effectRow:'{label} выше на 25% →', effectRowDown:'{label} ниже на 25% →',
-  effectNoteAvail:'Изменение доступного штата к концу горизонта (сейчас {avail} чел.). Дефицита на горизонте нет, поэтому показано влияние на обеспеченность: зелёное — людей останется больше, красное — меньше.',
+  effectNoteAvail:'Изменение среднего доступного штата за горизонт (сейчас {avail} чел.). Дефицита на горизонте нет, поэтому показано влияние на обеспеченность: зелёное — людей в среднем останется больше, красное — меньше.',
   effectNote:'Изменение пикового дефицита (сейчас {peak} чел.) при росте драйвера на четверть. Ноль означает, что на этих данных драйвер упирается в другое ограничение.',
 
   benchAbove:'выше нормы', benchMarket:'на уровне рынка', benchBelow:'ниже рынка',
@@ -952,6 +971,12 @@ life:{
   lexiconOrigin:'<b>Откуда эти числа.</b> Это <i>стартовые оценки</i>, а не измеренный факт. Они собраны по открытым исследованиям автоматизируемости профессий (методика Frey &amp; Osborne «The Future of Employment», отчёты McKinsey Global Institute о потенциале автоматизации и ILO по промышленным профессиям) и переложены с профессий на отдельные операции по одному принципу: <b>чем более операция рутинна, наблюдаема и описывается правилами, тем выше её автоматизируемость</b>. Поэтому обход и замеры — 85–90%, диагностика и КИПиА — около 45–55%, а аналитика и машинное обучение — 8–10%. <b>Числа можно и нужно править</b> под вашу отрасль и уровень оснащённости: они прямо влияют на «Навыки», «Избыточность» и анализ дожития. Навык, которого в лексиконе нет, считается со средним риском (параметр «Риск по умолчанию» выше).',
   thRiskHint:'Вероятность, что эта операция будет автоматизирована при полном внедрении доступных сегодня технологий. Это потенциал, а не срок: когда именно это произойдёт, задаёт «Темп автоматизации» на вкладке «Предиктивный анализ».',
   thCostMult:'× цена', thCostMultHint:'Множитель стоимости обучения этому навыку относительно ставки должности. 0.5 — короткий инструктаж, 1.0 — обычный курс, 2.5 — длительная переподготовка с нуля. Правьте под ваши реальные расценки: курсивом показаны значения, которые вы изменили.',
+  lexAdded:'добавлен', lexUnused:'не используется',
+  lexDelete:'Удалить навык из лексикона', lexReset:'Вернуть заводское значение',
+  lexNewPh:'Название навыка — например «Сварка» или «SCADA»',
+  lexAddBtn:'Добавить навык',
+  lexMissing:'<b>В справочнике используются навыки, которых нет в лексиконе:</b> {list}. Пока их здесь нет, они считаются со средним риском («Риск по умолчанию»), то есть их вклад в «Навыки» и «Избыточность» — приблизительный. Добавьте их и задайте уровень.',
+  lexAddMissingBtn:'Добавить все ({n}) со средним уровнем',
   lexiconAiNote:'Можно поручить ассистенту: «уточни автоматизируемость навыков по источникам для горнодобычи» — он найдёт данные, сошлётся на источники и обновит таблицу.',
   lexiconHint:'Вероятность того, что задача навыка автоматизируема. Питает анализ дожития и компетентностный риск.',
   thSkill:'Навык', thLevel:'Уровень', thRisk:'Риск'
@@ -1018,9 +1043,13 @@ Object.assign(I18N.en, { norm:{
   needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
   detailTitle:'Breakdown by Position', detailHint:'The demand from the Summary Result block is split across directory positions: first by group (Core / Maintenance / Engineering), then evenly among the positions within each group. The Q1-Q4 columns show how that demand changes <b>within the selected phase</b> — from its start (Q1) to its end (Q4).',
   qMonthShort:'mo. {m}', monthRange:'mo. {from}-{to}',
+  detailPlanGap:'"Headcount plan" mode is on, but no headcount is set for the "{stage}" phase — hence the zeros here rather than a calculation from norms. Enter this phase on the Lifecycle tab, or set it here per position by hand.',
+  detailPhaseLabel:'Phase to break down', detailPhaseHint:'The table below shows one phase in full. Switch the phase to see how many people, and of which kind, are needed during design, construction, commissioning and so on. Only phases with a non-zero duration appear — the others are not in the project.',
+  detailHowNote:'<b>How the people are distributed.</b> The demand of the "{stage}" phase (months {from}-{to}) is first split across groups in the proportion from the "Staff structure" block, then evenly among the positions inside each group — the system does not know which of them you have more of. Any cell can be <b>typed in by hand</b>: grey shows the computed value, and a number you enter is highlighted and replaces it. "Target FTE" is the average of the four points in that same row.',
+  posResetBtn:'Reset manual edits',
   thWhen:'When needed', thWhenHint:'The project months this phase runs. Hiring must be finished by the start of the interval, otherwise people arrive later than they are needed.',
   totalRow:'Total across all positions',
-  qFootnote:'Q1-Q4 are not calendar quarters but four control points inside the selected phase: Q1 is its start, Q4 its end. The month beside each label is the project month. In "Headcount plan from the document" mode these figures come from your plan; in "from norms" mode they are derived from the phase curve and so are not editable here (edit the plan on the Lifecycle tab).',
+  qFootnote:'Q1-Q4 are not calendar quarters but four control points inside the selected phase: Q1 is its start, Q4 its end. The month beside each label is the project month. Grey cells show the computed value: from the phase curve in "from norms" mode, from your plan in "Headcount plan from the document" mode. Any figure can be typed over the computation: it is stored against that position and that phase, and the totals and "Target FTE" are recalculated from the actual values.',
   tplBuiltin:'Built-in industries', tplMine:'My industries', tplActions:'Actions',
   tplNewOption:'+ Add my own industry...', tplDelete:'Delete this template',
   tplAiNote:'Your industry not in the list? Pick "Add my own industry" — or ask the AI assistant: "build a template for mining from my document", and it will fill in every parameter itself.',
@@ -1117,7 +1146,7 @@ life:{
   verdictNone:'No shortage is projected: headcount suffices in every simulation. Watch the surplus and the cost of retention instead.',
   whyMonteCarlo:'<b>Why randomness is here.</b> A single forecast line is a deception: nobody knows exactly how many people leave in March or how many vacancies close on time. So the future is played out {runs} times, each with its own random deviations in attrition (±40%), demand (±5%) and hiring success. Those {runs} outcomes produce the band: <b>P50</b> is the median scenario, <b>P10-P90</b> the interval holding 80% of outcomes. A wide band means the result depends heavily on luck and cannot be relied on; a narrow one means the forecast is robust.',
   effectRow:'{label} 25% higher →', effectRowDown:'{label} 25% lower →',
-  effectNoteAvail:'Change in available headcount by the end of the horizon (currently {avail} people). There is no shortage over the horizon, so the effect on staffing is shown instead: green means more people remain, red means fewer.',
+  effectNoteAvail:'Change in the average available headcount over the horizon (currently {avail} people). There is no shortage over the horizon, so the effect on staffing is shown instead: green means more people remain on average, red means fewer.',
   effectNote:'Change in peak shortage (currently {peak} people) when the driver rises by a quarter. Zero means that on this data the driver is blocked by another constraint.',
 
   benchAbove:'above the norm', benchMarket:'at market level', benchBelow:'below the norm',
@@ -1289,6 +1318,12 @@ life:{
   lexiconOrigin:'<b>Where these numbers come from.</b> These are <i>starting estimates</i>, not measured fact. They are compiled from open research on occupational automatability (the Frey &amp; Osborne "The Future of Employment" method, McKinsey Global Institute automation-potential reports, and ILO work on industrial occupations) and carried over from occupations to individual operations on one principle: <b>the more routine, observable and rule-describable an operation is, the more automatable it is</b>. Hence patrols and measurements sit at 85-90%, diagnostics and instrumentation around 45-55%, and analytics and machine learning at 8-10%. <b>These figures can and should be edited</b> for your industry and level of equipment: they feed "Skills", "Redundancy" and the survival analysis directly. A skill absent from the lexicon is scored at the average risk (the "Default risk" parameter above).',
   thRiskHint:'The probability that this operation gets automated under full adoption of technology available today. This is potential, not timing: when it actually happens is set by "Pace of automation" on the Predictive tab.',
   thCostMult:'x cost', thCostMultHint:'Training-cost multiplier for this skill relative to the position rate. 0.5 is a short briefing, 1.0 a normal course, 2.5 a long retraining from scratch. Adjust to your real prices: values you changed are shown in italics.',
+  lexAdded:'added', lexUnused:'unused',
+  lexDelete:'Remove the skill from the lexicon', lexReset:'Restore the built-in value',
+  lexNewPh:'Skill name — for example "Welding" or "SCADA"',
+  lexAddBtn:'Add skill',
+  lexMissing:'<b>The directory uses skills that are not in the lexicon:</b> {list}. While they are absent here they are scored at the average risk ("Default risk"), so their contribution to "Skills" and "Redundancy" is only approximate. Add them and set a level.',
+  lexAddMissingBtn:'Add all ({n}) at the average level',
   lexiconAiNote:'You can delegate this: ask the assistant to "refine skill automatability from sources for mining" — it will find the data, cite the sources and update the table.',
   lexiconHint:'The probability that a skill\'s task is automatable. Feeds the survival analysis and the competency risk factor.',
   thSkill:'Skill', thLevel:'Level', thRisk:'Risk'
@@ -1341,6 +1376,13 @@ Object.assign(I18N.ru, { toast:{
   clamped:'«{label}»: допустимы значения от {min} до {max} — поправил на ближайшее.',
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
   tplDeleted:'Шаблон «{name}» удалён',
+  posReset:'Ручные правки численности по должностям сброшены',
+  lexNoName:'Введите название навыка',
+  lexExists:'Навык «{name}» уже есть в лексиконе',
+  lexAdded:'Навык «{name}» добавлен в лексикон',
+  lexAddedMany:'Добавлено навыков: {n}. Задайте им уровни.',
+  lexDeleted:'Навык «{name}» удалён из лексикона',
+  lexReset:'«{name}» возвращён к заводскому значению',
   industryCreated:'Отрасль «{name}» создана. Заполните виды работ — или попросите ассистента сделать это по документу.',
   dataExported:'{label} выгружены в JSON', defaultDataLabel:'Данные',
   dictExportedCsv:'Справочник выгружен в CSV', csvEmpty:'CSV пуст или не распознан',
@@ -1365,6 +1407,13 @@ Object.assign(I18N.en, { toast:{
   clamped:'"{label}": allowed range is {min} to {max} — adjusted to the nearest valid value.',
   tplApplied:'Template "{name}" applied', tplSaved:'Template "{name}" saved',
   tplDeleted:'Template "{name}" deleted',
+  posReset:'Manual per-position headcount edits were reset',
+  lexNoName:'Enter a skill name',
+  lexExists:'The skill "{name}" is already in the lexicon',
+  lexAdded:'The skill "{name}" was added to the lexicon',
+  lexAddedMany:'{n} skills added. Set their levels.',
+  lexDeleted:'The skill "{name}" was removed from the lexicon',
+  lexReset:'"{name}" was restored to its built-in value',
   industryCreated:'Industry "{name}" created. Fill in the work types — or ask the assistant to do it from your document.',
   dataExported:'{label} exported to JSON', defaultDataLabel:'Data',
   dictExportedCsv:'Directory exported to CSV', csvEmpty:'CSV is empty or unrecognized',
@@ -1630,7 +1679,12 @@ function activeStage(){
 // Пользователь обычно знает только начало и/или конец фазы. Пустые середины
 // достраиваем линейно, а не считаем нулями: 0 в середине искажал бы всю кривую.
 function fillPlanGaps(raw){
-  const v=[0,1,2,3].map(k=>{ const x=raw[k]; return (x===''||x==null||!isFinite(+x))?null:Math.max(0,+x); });
+  // 0 в середине фазы почти всегда означает «поле не заполнено», а не «людей ноль»:
+  // крайние точки при этом могут быть законным нулём (фаза начинается/заканчивается пустой).
+  const v=[0,1,2,3].map(k=>{ const x=raw[k];
+    if(x===''||x==null||!isFinite(+x)) return null;
+    if(+x===0 && k>0 && k<3) return null;
+    return Math.max(0,+x); });
   const known=v.map((x,i)=>x!=null?i:-1).filter(i=>i>=0);
   if(!known.length) return null;
   if(known.length===1){ const only=v[known[0]]; return [only,only,only,only]; }
@@ -1648,7 +1702,10 @@ function fillPlanGaps(raw){
 // какие точки фазы пользователь задал сам (остальные достроены)
 function planGivenPoints(id){
   const p=(S.phasePlan||{})[id]; if(!Array.isArray(p)) return [];
-  return [0,1,2,3].filter(k=>{ const x=p[k]; return !(x===''||x==null||!isFinite(+x)) && +x>0; });
+  return [0,1,2,3].filter(k=>{ const x=p[k];
+    if(x===''||x==null||!isFinite(+x)) return false;
+    return +x>0 || k===0 || k===3;   // 0 на краю фазы — осмысленное значение
+  });
 }
 function planFor(id){
   const p=(S.phasePlan||{})[id];
@@ -1697,6 +1754,17 @@ const SKILL_COST_MULT = {
   'Механика':1.0,'Электробезопасность':0.8,'Схемы':0.9,'КИПиА':1.3,'Датчики':1.1,
   'Телеметрия':1.3,'Сети':1.2,'Python':1.8,'Машинное обучение':2.5,'SQL':1.0
 };
+// Действующий лексикон: заводские значения + правки пользователя + добавленные им навыки.
+// Раньше SKILL_HAZARD читался напрямую, поэтому изменить риск было невозможно.
+function skillHazardMap(){
+  return Object.assign({}, SKILL_HAZARD, S.skillHazardOverrides||{});
+}
+function skillHazard(skill){
+  const m=skillHazardMap();
+  return m[skill]!==undefined ? m[skill] : null;   // null = навыка нет в лексиконе
+}
+function skillIsCustom(skill){ return SKILL_HAZARD[skill]===undefined; }
+function skillIsEdited(skill){ return (S.skillHazardOverrides||{})[skill]!==undefined && !skillIsCustom(skill); }
 function skillCostMult(skill){
   const ov=(S.skillCostOverrides||{})[skill];
   if(ov!=null && isFinite(+ov)) return Math.max(0,+ov);
@@ -1756,6 +1824,9 @@ const S = {
   // --- ИСТОЧНИК ПОТРЕБНОСТИ ---
   // 'norm' — считать из видов работ и кривой фазы (по умолчанию)
   // 'plan' — использовать численность, заданную в документе заказчика (абсолютные значения)
+  detailStage:'',         // какую фазу показывает «Детализация по должностям»
+  positionPlan:{},        // ручная численность по должностям: {фаза:{должность:[q1..q4]}}
+  skillHazardOverrides:{},// свой уровень автоматизируемости навыка (и добавленные навыки)
   skillCostOverrides:{},  // своя цена обучения по навыку (множитель к ставке должности)
   demoDismissed:false,   // пользователь закрыл/принял полосу «это демо-пример»
   demandMode:'norm',
@@ -2077,7 +2148,7 @@ function professionHazard(p){
   const def = num(S.hazardDefault, HAZARD_DEFAULT);
   const sk = String(p.skills||'').split(';').map(s=>s.trim()).filter(Boolean);
   if(!sk.length) return def;
-  let sum=0; sk.forEach(s=>{ sum += (SKILL_HAZARD[s]!==undefined?SKILL_HAZARD[s]:def); });
+  let sum=0; sk.forEach(s=>{ const h=skillHazard(s); sum += (h!==null?h:def); });
   return sum/sk.length;
 }
 // Разбор «риска навыков»: какие именно навыки и с какими весами дали среднее.
@@ -2089,7 +2160,7 @@ function hazardBreakdown(p){
   if(!sk.length) return {list:'—',avg:def,unknown:0};
   let sum=0,unknown=0;
   const parts=sk.map(x=>{
-    const known=SKILL_HAZARD[x]!==undefined, v=known?SKILL_HAZARD[x]:def;
+    const h=skillHazard(x), known=h!==null, v=known?h:def;
     if(!known) unknown++;
     sum+=v;
     return esc(skillLabel(x))+' '+pct(v)+'%'+(known?'':'*');
@@ -2365,7 +2436,8 @@ function svgForecast(M){
 }
 
 function svgGap(gap){
-  const W=780,H=170,pl=52,pr=18,pt=14,pb=34;
+  // левое поле шире обычного: в нём подписи «дефицит» / «профицит»
+  const W=780,H=190,pl=92,pr=18,pt=18,pb=36;
   const n=gap.length, iw=W-pl-pr, ih=H-pt-pb;
   let mx=1; gap.forEach(g=>mx=Math.max(mx,Math.abs(g)));
   const zeroY=pt+ih/2;
@@ -2385,9 +2457,9 @@ function svgGap(gap){
     +'<rect class="ch-hit" x="'+pl+'" y="'+pt+'" width="'+iw+'" height="'+ih+'" fill="transparent" style="cursor:crosshair"/>';
   return '<svg class="chart" data-chart="'+cid+'" viewBox="0 0 '+W+' '+H+'">'
     +'<line x1="'+pl+'" y1="'+zeroY+'" x2="'+(W-pr)+'" y2="'+zeroY+'" stroke="#c9c2b3" stroke-width="1.2"/>'
-    // подписи внутри области графика: слева за осью они обрезались краем SVG
-    +'<text x="'+(pl+4)+'" y="'+(pt+10)+'" text-anchor="start" class="axislbl" style="fill:#c4361b">'+esc(t('chart.deficitAxis'))+'</text>'
-    +'<text x="'+(pl+4)+'" y="'+(H-pb+2)+'" text-anchor="start" class="axislbl" style="fill:#117a5b">'+esc(t('chart.surplusAxis'))+'</text>'
+    // подписи в собственном левом поле: не обрезаются краем SVG и не налезают на столбики
+    +'<text x="'+(pl-10)+'" y="'+(pt+9)+'" text-anchor="end" class="axislbl" style="fill:#c4361b">'+esc(t('chart.deficitAxis'))+'</text>'
+    +'<text x="'+(pl-10)+'" y="'+(H-pb+6)+'" text-anchor="end" class="axislbl" style="fill:#117a5b">'+esc(t('chart.surplusAxis'))+'</text>'
     +bars+hover+'</svg>';
 }
 
@@ -2646,34 +2718,75 @@ function qColLabel(k,win){
   const base='Q'+(k+1);
   return win ? base+' · '+t('norm.qMonthShort',{m:win.months[k]+1}) : base;
 }
+// Какую фазу показывает «Детализация по должностям». По умолчанию — текущая,
+// но пользователь может посмотреть любую из существующих в проекте.
+function detailStage(){
+  const {phases}=buildPhases();
+  if(!phases.length) return activeStage();
+  if(S.detailStage && phases.some(p=>p.id===S.detailStage)) return S.detailStage;
+  const act=activeStage();
+  return phases.some(p=>p.id===act) ? act : phases[0].id;
+}
+// Абсолютная потребность фазы в 4 точках — для любой фазы, не только текущей.
+function stageQAbs(stageId){
+  const b=computeBase();
+  return phaseQAbs(stageId, b.baseOperational);
+}
+// Ручная правка численности по должности: {stageId:{profId:[q1,q2,q3,q4]}}
+function hasPosOverrides(){
+  const m=S.positionPlan||{};
+  return Object.keys(m).some(st=>Object.keys(m[st]||{}).some(id=>
+    (m[st][id]||[]).some(v=>!(v===''||v==null||!isFinite(+v)))));
+}
+function resetPosOverrides(){
+  S.positionPlan={}; render(); showToast(t('toast.posReset'));
+}
+function posOverride(stageId,profId){
+  const m=((S.positionPlan||{})[stageId]||{})[profId];
+  return Array.isArray(m)?m:null;
+}
+function posValue(stageId,profId,k,computed){
+  const ov=posOverride(stageId,profId);
+  const v=ov?ov[k]:null;
+  return (v===''||v==null||!isFinite(+v)) ? {v:computed,manual:false} : {v:Math.max(0,+v),manual:true};
+}
 function renderNormative(){
   const b=computeBase();
-  const win=phaseWindow(b.stageId);
+  const dStage=detailStage();
+  const win=phaseWindow(dStage);
+  const dQ=stageQAbs(dStage);
+  const dDist=b.dist;
   const allT={...DEFAULT_TEMPLATES,...customTemplates};
   const list=Object.values(profDB);
   const groups={core:list.filter(p=>p.type==='core'),aux:list.filter(p=>p.type==='aux'),mgmt:list.filter(p=>p.type==='mgmt')};
-  const q=b.stage.qTrend, baseQ=b.baseOperational;
+  const q=(STAGES[dStage]||STAGES.operation).qTrend, baseQ=b.baseOperational;
   // в режиме плана Q1–Q4 — это числа из документа, а не доли базового уровня
-  const qTip = b.usingPlan
-    ? t('norm.qHintPlan',{stage:stageName(b.stageId), q:b.qAbs.map(v=>fmtN(Math.round(v))).join(' · ')})
-    : t('norm.qHint',{stage:stageName(b.stageId), q1:q[0],q2:q[1],q3:q[2],q4:q[3]});
+  const qTip = (planActive() && planFor(dStage))
+    ? t('norm.qHintPlan',{stage:stageName(dStage), q:dQ.map(v=>fmtN(Math.round(v))).join(' · ')})
+    : t('norm.qHint',{stage:stageName(dStage), q1:q[0],q2:q[1],q3:q[2],q4:q[3]});
 
   const NCOL=8;
   const TOT={req:0,q:[0,0,0,0]};   // итоги по всей таблице — их не хватало
   const groupRows=(arr,type,label,bcls,clr)=>{
     const n=arr.length;
-    let h='<tr class="grouprow"><td colspan="'+NCOL+'">'+esc(label)+' · '+pct(b.dist[type])+'% · '+fmtN(b.staff[type])+' '+esc(t('common.person'))+'</td></tr>';
+    const groupTotal=Math.round((dQ.reduce((a,x)=>a+x,0)/4)*dDist[type]);
+    let h='<tr class="grouprow"><td colspan="'+NCOL+'">'+esc(label)+' · '+pct(dDist[type])+'% · '+fmtN(groupTotal)+' '+esc(t('common.person'))+'</td></tr>';
     if(!n){h+='<tr><td colspan="'+NCOL+'" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
     arr.forEach(p=>{
-      const req=Math.round(b.staff[type]/n);
-      const perQ=k=>Math.round(b.qAbs[k]*b.dist[type]/n);
-      TOT.req+=req; [0,1,2,3].forEach(k=>{ TOT.q[k]+=perQ(k); });
-      h+='<tr><td class="pname" style="font-weight:700">'+esc(profName(p))+'</td>'
+      const calcQ=k=>Math.round(dQ[k]*dDist[type]/n);
+      const cells=[0,1,2,3].map(k=>posValue(dStage,p.id,k,calcQ(k)));
+      const req=Math.round(cells.reduce((a,c)=>a+c.v,0)/4);
+      TOT.req+=req; [0,1,2,3].forEach(k=>{ TOT.q[k]+=cells[k].v; });
+      const anyManual=cells.some(c=>c.manual);
+      h+='<tr'+(anyManual?' class="posrow-manual"':'')+'><td class="pname" style="font-weight:700">'+esc(profName(p))+'</td>'
         +'<td class="c"><span class="badge '+bcls+'">'+esc(t('common.'+type+'Short'))+'</span></td>'
         +'<td class="c mono muted small">'+(win?esc(t('norm.monthRange',{from:win.start+1,to:win.end+1})):'—')+'</td>'
-        +'<td class="c mono" style="font-weight:800;color:'+clr+'">'+req+'</td>'
-        +'<td class="c mono muted">'+perQ(0)+'</td><td class="c mono muted">'+perQ(1)+'</td>'
-        +'<td class="c mono muted">'+perQ(2)+'</td><td class="c mono" style="font-weight:700;color:'+clr+'">'+perQ(3)+'</td></tr>';
+        +'<td class="c mono" style="font-weight:800;color:'+clr+'">'+fmtN(req)+'</td>'
+        +[0,1,2,3].map(k=>'<td class="c" style="padding:4px 3px">'
+          +'<input class="cell-edit mono'+(cells[k].manual?' posmanual':'')+'" data-pos="'+esc(p.id)+'" data-posq="'+k+'" '
+          +'type="number" min="0" value="'+(cells[k].manual?cells[k].v:'')+'" placeholder="'+calcQ(k)+'" '
+          +'style="width:100%;min-width:54px;text-align:center'+(k===3?';font-weight:700':'')+'"></td>').join('')
+        +'</tr>';
     });
     return h;
   };
@@ -2745,9 +2858,25 @@ function renderNormative(){
 
   +'<div class="col-span-12">'
     +'<div class="card"><div class="ctitle">'+ic('layers')+esc(t('norm.detailTitle'))
-      +hint(t('norm.detailHint'))+'</div>'
+      +hint(t('norm.detailHint'))
+      +'<span class="sp"></span>'
+      +(hasPosOverrides()?'<button class="tool red" data-act="pos-reset" style="padding:6px 11px">'+ic('arrow')+esc(t('norm.posResetBtn'))+'</button>':'')
+      +'</div>'
+      +(()=>{ const ph=buildPhases().phases;
+        if(ph.length<=1) return '';
+        // без этого таблица всегда показывала одну фазу и казалось, что добавленные фазы игнорируются
+        return '<div class="section-label" style="margin-top:0">'+esc(t('norm.detailPhaseLabel'))+hint(t('norm.detailPhaseHint'))+'</div>'
+          +'<div class="chips" style="margin-bottom:14px">'+ph.map(x=>
+            '<button class="chip chip-btn'+(x.id===dStage?' on':'')+'" data-dstage="'+x.id+'">'
+            +esc(stageName(x.id))+' <span class="muted mono" style="font-size:10px">'+esc(t('norm.monthRange',{from:x.start+1,to:x.end}))+'</span></button>').join('')+'</div>';
+      })()
       +(worksAreCustom()&&isDemoDirectory()
         ? '<div class="note note-amber" style="margin-bottom:14px">'+ic('alert')+'<div>'+t('norm.demoDirWarn')+'</div></div>' : '')
+      +(planActive() && !planFor(dStage)
+        ? '<div class="note note-amber" style="margin-bottom:14px">'+ic('alert')+'<div>'
+          +t('norm.detailPlanGap',{stage:esc(stageName(dStage))})+'</div></div>'
+        : '<div class="note note-blue" style="margin-bottom:14px">'+ic('info')+'<div>'+t('norm.detailHowNote',{stage:esc(stageName(dStage)),
+          from:win?win.start+1:1, to:win?win.end+1:1})+'</div></div>')
       +'<div class="tbl-wrap"><table><thead><tr>'
         +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('norm.thRole'))+'</th>'
         +'<th class="c">'+esc(t('norm.thWhen'))+hint(t('norm.thWhenHint'))+'</th>'
@@ -2859,7 +2988,7 @@ function planEditor(){
     const given=planGivenPoints(id);
     const win=phaseWindow(id);
     rows+='<tr'+(off?' style="opacity:.45"':'')+'><td style="font-weight:600;font-size:11.5px">'+esc(stageName(id))
-      +(off?' <span class="muted" style="font-size:10px">('+esc(t('life.phaseOff'))+')</span>'
+      +(off?' <span class="muted" style="font-size:10px">'+esc(t('life.phaseOff'))+'</span>'
           :(win?'<div class="muted mono" style="font-size:10px;font-weight:400">'+esc(t('norm.monthRange',{from:win.start+1,to:win.end+1}))+'</div>':''))+'</td>'
       +[0,1,2,3].map(k=>'<td style="padding:4px 3px">'+cell(id,k,given.length>0&&!given.includes(k))+'</td>').join('')+'</tr>';
   });
@@ -2973,9 +3102,10 @@ function renderLifecycle(){
 function driverEffects(M){
   // Смотрим на две величины: пиковый дефицит (если он есть) и доступный штат в конце
   // горизонта. Вторая отзывается всегда, поэтому «влияния не видно» больше не бывает.
+  const meanAvail = m => m.availP50.reduce((a,x)=>a+x,0)/Math.max(1,m.H);
   const metric = m => (m.peakDeficitMed>0)
     ? {v:m.peakDeficitMed, worseIsUp:true}
-    : {v:m.availP50[m.H-1], worseIsUp:false};
+    : {v:meanAvail(m), worseIsUp:false};
   const baseM = metric(M);
   const usePeak = M.peakDeficitMed>0;
   const probe=(key,mult,min,max)=>{
@@ -3004,7 +3134,7 @@ function driverEffects(M){
   return '<div class="divider"></div>'
     +'<div class="section-label">'+esc(t('pred.effectTitle'))+hint(t('pred.effectHint'))+'</div>'
     +'<div class="chain" style="margin:0">'
-    +rows.map(([label,r])=>'<div class="chrow">'
+    +rows.map(([label,r])=>'<div class="chrow chrow-2">'
       +'<span class="chl">'+esc(t(r.up?'pred.effectRow':'pred.effectRowDown',{label:label}))+'</span>'
       +'<b class="chv" style="color:'+color(r.delta)+'">'+fmtD(r.delta)+'</b></div>').join('')
     +'</div>'
@@ -3258,7 +3388,7 @@ function renderDictionary(){
           +'<td class="c"><button class="xbtn" data-del="'+p.id+'" style="width:30px;height:30px">'+ic('trash')+'</button></td></tr>';
       }).join('')
     +'</tbody></table></div>'
-    +'<datalist id="skilllist">'+Object.keys(SKILL_HAZARD).map(sk=>'<option value="'+esc(sk)+'"></option>').join('')+'</datalist>'
+    +'<datalist id="skilllist">'+Object.keys(skillHazardMap()).sort().map(sk=>'<option value="'+esc(sk)+'"></option>').join('')+'</datalist>'
     +'<div class="fnote" style="padding:12px 22px 16px">'+t('dir.skillsFootnote')+'</div>'
   +'</div></div>';
 }
@@ -3515,13 +3645,28 @@ function renderScenarios(){
    ВКЛАДКА — МЕТОДОЛОГИЯ И ДОПУЩЕНИЯ (прозрачность данных)
    ============================================================ */
 function renderMethodology(){
-  const hazardRows=Object.entries(SKILL_HAZARD).sort((a,b)=>b[1]-a[1]).map(([sk,v])=>{
-    const mult=skillCostMult(sk), overridden=(S.skillCostOverrides||{})[sk]!=null;
-    return '<tr><td>'+esc(skillLabel(sk))+'</td>'
+  // навыки, которые уже используются в справочнике, но в лексиконе отсутствуют —
+  // им нужен уровень, иначе они молча считаются «средними»
+  const usedSkills=new Set();
+  Object.values(profDB).forEach(pr=>String(pr.skills||'').split(';')
+    .map(x=>x.trim()).filter(Boolean).forEach(x=>usedSkills.add(x)));
+  const lexMap=skillHazardMap();
+  const missingSkills=[...usedSkills].filter(sk=>lexMap[sk]===undefined).sort();
+  const hazardRows=Object.entries(lexMap).sort((a,b)=>b[1]-a[1]).map(([sk,v])=>{
+    const mult=skillCostMult(sk), costOv=(S.skillCostOverrides||{})[sk]!=null;
+    const custom=skillIsCustom(sk), edited=skillIsEdited(sk);
+    return '<tr'+(custom?' class="lex-custom"':'')+'><td style="font-weight:600">'+esc(skillLabel(sk))
+      +(custom?' <span class="badge b-blue" style="font-size:9px">'+esc(t('meth.lexAdded'))+'</span>':'')
+      +(usedSkills.has(sk)?'':' <span class="muted" style="font-size:10px">'+esc(t('meth.lexUnused'))+'</span>')+'</td>'
       +'<td class="c">'+hbar(v*100, v>0.6?'var(--red)':v>0.4?'var(--amber)':'var(--green)')+'</td>'
-      +'<td class="c mono" style="font-weight:700">'+pct(v)+'%</td>'
-      +'<td class="c"><input class="cell-edit mono'+(overridden?' pderived':'')+'" data-skillcost="'+esc(sk)+'" type="number" step="0.1" min="0" '
-        +'value="'+(+mult.toFixed(2))+'" style="width:64px;text-align:center"></td></tr>';
+      +'<td class="c"><input class="cell-edit mono'+(edited?' pderived':'')+'" data-skillrisk="'+esc(sk)+'" type="number" step="1" min="0" max="100" '
+        +'value="'+Math.round(v*100)+'" style="width:60px;text-align:center"></td>'
+      +'<td class="c"><input class="cell-edit mono'+(costOv?' pderived':'')+'" data-skillcost="'+esc(sk)+'" type="number" step="0.1" min="0" '
+        +'value="'+(+mult.toFixed(2))+'" style="width:60px;text-align:center"></td>'
+      +'<td class="c">'+(custom
+        ? '<button class="xbtn" data-delskill="'+esc(sk)+'" title="'+esc(t('meth.lexDelete'))+'" style="width:26px;height:26px">'+ic('trash')+'</button>'
+        : (edited||costOv ? '<button class="xbtn" data-resetskill="'+esc(sk)+'" title="'+esc(t('meth.lexReset'))+'" style="width:26px;height:26px">'+ic('arrow')+'</button>' : ''))
+      +'</td></tr>';
   }).join('');
   const f=(id,label,val,step,suf,note)=>'<div class="field"><label class="flabel">'+esc(label)+'</label>'
     +'<div class="rowflex" style="align-items:center"><input class="input num" type="number" step="'+step+'" id="'+id+'" value="'+val+'" style="max-width:120px">'
@@ -3554,18 +3699,28 @@ function renderMethodology(){
     +f('hazardDefault',t('meth.hazardDefLabel'),S.hazardDefault,'0.05',t('meth.hazardDefSuf'),t('meth.hazardDefNote'))
     +f('hazardLambda',t('meth.hazardLambdaLabel'),S.hazardLambda,'0.05',t('meth.hazardLambdaSuf'),t('meth.hazardLambdaNote'))
     +'<div class="note note-amber" style="margin-top:6px">'+ic('info')+'<div>'+esc(t('meth.confirmNote'))+'</div></div>'
-  +'</div>'
-  +'<div class="card" style="margin-top:18px"><div class="ctitle">'+ic('zap')+esc(t('meth.lexiconTitle'))
+  +'</div></div>'
+  +'<div class="col-span-12"><div class="card"><div class="ctitle">'+ic('zap')+esc(t('meth.lexiconTitle'))
     +hint(t('meth.lexiconHint'))+'</div>'
     +'<div class="note note-blue" style="margin-bottom:12px">'+ic('info')+'<div>'+t('meth.lexiconOrigin')+'</div></div>'
-    +'<div class="tbl-wrap" style="max-height:320px;overflow-y:auto"><table><thead><tr>'
+    +(missingSkills.length
+      ? '<div class="note note-amber" style="margin-bottom:12px">'+ic('alert')+'<div>'
+        +t('meth.lexMissing',{list:missingSkills.map(esc).join(', ')})
+        +'<div style="margin-top:9px"><button class="tool" data-act="lex-add-missing">'+ic('plus')
+        +esc(t('meth.lexAddMissingBtn',{n:missingSkills.length}))+'</button></div></div></div>' : '')
+    +'<div class="tbl-wrap" style="max-height:340px;overflow-y:auto"><table><thead><tr>'
       +'<th>'+esc(t('meth.thSkill'))+'</th><th class="c">'+esc(t('meth.thLevel'))+'</th>'
-      +'<th class="c">'+esc(t('meth.thRisk'))+hint(t('meth.thRiskHint'))+'</th>'
+      +'<th class="c">'+esc(t('meth.thRisk'))+', %'+hint(t('meth.thRiskHint'))+'</th>'
       +'<th class="c">'+esc(t('meth.thCostMult'))+hint(t('meth.thCostMultHint'))+'</th>'
+      +'<th class="c">×</th>'
     +'</tr></thead><tbody>'+hazardRows+'</tbody></table></div>'
+    +'<div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">'
+      +'<input class="input" id="newSkillName" placeholder="'+esc(t('meth.lexNewPh'))+'" style="flex:1;min-width:170px">'
+      +'<input class="input num" id="newSkillRisk" type="number" min="0" max="100" step="1" value="40" style="max-width:84px" title="'+esc(t('meth.thRisk'))+', %">'
+      +'<button class="tool" data-act="lex-add" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('plus')+esc(t('meth.lexAddBtn'))+'</button>'
+    +'</div>'
     +'<div class="fnote">'+esc(t('meth.lexiconAiNote'))+'</div>'
-  +'</div>'
-  +'</div>'
+  +'</div></div>'
   +'</div></div>';
 }
 
@@ -3694,6 +3849,43 @@ function deleteCustomTemplate(){
   delete customTemplates[key];
   S.template=Object.keys(DEFAULT_TEMPLATES)[0];
   render(); showToast(t('toast.tplDeleted',{name:nm}));
+}
+// Пополнение лексикона: без этого навык вне списка молча считался «средним»,
+// а уровень для него задать было негде.
+function addLexiconSkill(){
+  const el=document.getElementById('newSkillName');
+  const name=(el?el.value:'').trim();
+  if(!name){ showToast(t('toast.lexNoName'),'warn'); return; }
+  const cur=skillHazardMap();
+  if(cur[name]!==undefined){ showToast(t('toast.lexExists',{name}),'warn'); return; }
+  const riskEl=document.getElementById('newSkillRisk');
+  const risk=clamp(num(riskEl?riskEl.value:40, 40),0,100)/100;
+  if(!S.skillHazardOverrides||typeof S.skillHazardOverrides!=='object') S.skillHazardOverrides={};
+  S.skillHazardOverrides[name]=risk;
+  render(); showToast(t('toast.lexAdded',{name}));
+}
+function addMissingLexiconSkills(){
+  const used=new Set();
+  Object.values(profDB).forEach(pr=>String(pr.skills||'').split(';')
+    .map(x=>x.trim()).filter(Boolean).forEach(x=>used.add(x)));
+  const cur=skillHazardMap();
+  const missing=[...used].filter(sk=>cur[sk]===undefined);
+  if(!missing.length) return;
+  if(!S.skillHazardOverrides||typeof S.skillHazardOverrides!=='object') S.skillHazardOverrides={};
+  const def=num(S.hazardDefault,HAZARD_DEFAULT);
+  missing.forEach(sk=>{ S.skillHazardOverrides[sk]=def; });
+  render(); showToast(t('toast.lexAddedMany',{n:missing.length}));
+}
+function deleteLexiconSkill(sk){
+  if(!S.skillHazardOverrides) return;
+  delete S.skillHazardOverrides[sk];
+  if(S.skillCostOverrides) delete S.skillCostOverrides[sk];
+  render(); showToast(t('toast.lexDeleted',{name:sk}));
+}
+function resetLexiconSkill(sk){
+  if(S.skillHazardOverrides) delete S.skillHazardOverrides[sk];
+  if(S.skillCostOverrides) delete S.skillCostOverrides[sk];
+  render(); showToast(t('toast.lexReset',{name:sk}));
 }
 function saveCustomTemplate(){
   const name=prompt(t('prompt.newTemplateName'),t('prompt.newTemplateDefault'));
@@ -4027,6 +4219,9 @@ function handleAction(act){
     case 'demo-clear': startClean(); break;
     case 'go-dictionary': goToTab('dictionary'); break;
     case 'del-tpl': deleteCustomTemplate(); break;
+    case 'lex-add': addLexiconSkill(); break;
+    case 'pos-reset': resetPosOverrides(); break;
+    case 'lex-add-missing': addMissingLexiconSkills(); break;
     case 'demo-hide': S.demoDismissed=true; render(); break;
     case 'exp-norm': exportJSON('normative',t('exportLabel.normative')); break;
     case 'exp-life': exportJSON('lifecycle',t('exportLabel.lifecycle')); break;
@@ -4130,6 +4325,28 @@ function applyInput(el){
     }
     return true;
   }
+  // ручная численность по должности в выбранной фазе
+  if(el.dataset && el.dataset.pos!=null && el.dataset.pos!==''){
+    const st=detailStage(), id=el.dataset.pos, k=+el.dataset.posq;
+    if(!S.positionPlan||typeof S.positionPlan!=='object') S.positionPlan={};
+    if(!S.positionPlan[st]) S.positionPlan[st]={};
+    const arr=(S.positionPlan[st][id]&&S.positionPlan[st][id].length===4)
+      ? S.positionPlan[st][id].slice() : [null,null,null,null];
+    const raw=String(el.value).trim();
+    arr[k] = raw==='' ? null : Math.max(0, num(raw,0));
+    if(arr.every(v=>v===null)) delete S.positionPlan[st][id];
+    else S.positionPlan[st][id]=arr;
+    return 'pos';
+  }
+  // уровень автоматизируемости навыка (проценты в поле → доля в модели)
+  if(el.dataset && el.dataset.skillrisk){
+    const sk=el.dataset.skillrisk;
+    if(!S.skillHazardOverrides||typeof S.skillHazardOverrides!=='object') S.skillHazardOverrides={};
+    const v=parseFloat(el.value);
+    if(isNaN(v)){ if(SKILL_HAZARD[sk]!==undefined) delete S.skillHazardOverrides[sk]; }
+    else S.skillHazardOverrides[sk]=clamp(v,0,100)/100;
+    return 'skillrisk';
+  }
   // цена обучения конкретному навыку (множитель к ставке должности)
   if(el.dataset && el.dataset.skillcost){
     const sk=el.dataset.skillcost;
@@ -4143,8 +4360,11 @@ function applyInput(el){
   if(el.dataset && el.dataset.plan!=null && el.dataset.plan!==''){
     const id=el.dataset.plan, k=+el.dataset.q;
     if(!S.phasePlan||typeof S.phasePlan!=='object') S.phasePlan={};
-    const arr=(S.phasePlan[id]&&S.phasePlan[id].length===4)?S.phasePlan[id].slice():[0,0,0,0];
-    const v=parseFloat(el.value); arr[k]=isNaN(v)?0:Math.max(0,v);
+    const arr=(S.phasePlan[id]&&S.phasePlan[id].length===4)?S.phasePlan[id].slice():[null,null,null,null];
+    // Пустое поле — это «не знаю», а не «ноль человек»: иначе середины фазы
+    // фиксировались нулями и линейная достройка не срабатывала.
+    const raw=String(el.value).trim();
+    arr[k] = raw==='' ? null : Math.max(0, num(raw, 0));
     S.phasePlan[id]=arr;
     return 'plan';
   }
@@ -4204,13 +4424,14 @@ function bindEvents(){
   // живое обновление значения без перерисовки (плавные ползунки, без скачков курсора)
   view.addEventListener('input', e=>{
     const el=e.target;
-    if(el.id==='saveTpl'||el.id==='tpl') return;
+    if(el.id==='saveTpl'||el.id==='tpl'||el.id==='newSkillName'||el.id==='newSkillRisk') return;
     applyInput(el);
   });
 
   // фиксация — перерисовка
   view.addEventListener('change', e=>{
     const el=e.target;
+    if(el.id==='newSkillName'||el.id==='newSkillRisk') return;   // применяется кнопкой «Добавить»
     if(el.id==='tpl'){ if(el.value==='__new'){ createIndustryTemplate(); } else { applyTemplate(el.value); } return; }
     const r=applyInput(el);
     if(r) render();
@@ -4229,6 +4450,12 @@ function bindEvents(){
     }
     const delw=e.target.closest('[data-delwork]');
     if(delw){ delWork(delw.dataset.delwork); return; }
+    const ds=e.target.closest('[data-dstage]');
+    if(ds){ S.detailStage=ds.dataset.dstage; render(); return; }
+    const delsk=e.target.closest('[data-delskill]');
+    if(delsk){ deleteLexiconSkill(delsk.dataset.delskill); return; }
+    const rstsk=e.target.closest('[data-resetskill]');
+    if(rstsk){ resetLexiconSkill(rstsk.dataset.resetskill); return; }
     // операции со сценариями
     const loadSc=e.target.closest('[data-load-sc]');
     if(loadSc){ loadScenario(loadSc.dataset.loadSc); return; }
@@ -5254,6 +5481,27 @@ Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
   var it=g&&g[2]&&g[2].items&&g[2].items[1];
   if(it) it.how=pair[1];
 });
+
+/* ---------- ДОПОЛНЕНИЕ: средний доступный штат в оценке драйверов ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectNoteAvail": "Горизонт бойындағы орташа қолжетімді штаттың өзгеруі (қазір {avail} адам). Горизонтта тапшылық жоқ, сондықтан қамтылуға әсері көрсетілген: жасыл — орташа алғанда адам көбірек қалады, қызыл — азырақ."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectNoteAvail": "规划期内平均可用人数的变化（当前 {avail} 人）。规划期内不存在缺口，因此改为显示对人员保障的影响：绿色表示平均留下的人更多，红色表示更少。"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectNoteAvail": "Variación de la dotación disponible media a lo largo del horizonte (ahora {avail} personas). No hay déficit en el horizonte, así que se muestra el efecto sobre la cobertura: verde significa que en promedio queda más gente, rojo que queda menos."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectNoteAvail": "Variation de l'effectif disponible moyen sur l'horizon (actuellement {avail} personnes). Il n'y a pas de déficit sur l'horizon, l'effet sur la couverture est donc affiché : le vert signifie qu'il reste en moyenne plus de personnes, le rouge moins."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectNoteAvail": "تغيّر متوسط العدد المتاح على مدى الأفق الزمني (وهو الآن {avail} شخصًا). لا يوجد نقص خلال الأفق، ولذلك يُعرض الأثر على التغطية: الأخضر يعني بقاء عدد أكبر في المتوسط، والأحمر عددًا أقل."}});
+
+/* ---------- ДОПОЛНЕНИЕ: пробел плана в детализации ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPlanGap": "«Сан жоспары» режимі қосулы, бірақ «{stage}» фазасы үшін жоспарда сан берілмеген — сондықтан мұнда нөлдер, нормалар бойынша есеп емес. Бұл фазаның санын «Өмірлік цикл» бетінде енгізіңіз немесе осында лауазымдар бойынша қолмен қойыңыз."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPlanGap": "已启用「人数计划」模式，但未为「{stage}」阶段设置人数——因此这里显示为零，而不是按定额测算。请在「生命周期」标签页填写该阶段，或在此按岗位手动填写。"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPlanGap": "El modo «Plan de dotación» está activo, pero no hay dotación definida para la fase «{stage}»: de ahí los ceros aquí en lugar de un cálculo por normas. Introduzca esta fase en la pestaña «Ciclo de vida» o defínala aquí a mano por puesto."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPlanGap": "Le mode « Plan d'effectifs » est actif, mais aucun effectif n'est défini pour la phase « {stage} » : d'où les zéros ici plutôt qu'un calcul selon les normes. Renseignez cette phase dans l'onglet « Cycle de vie » ou saisissez-la ici poste par poste."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPlanGap": "وضع «خطة الأعداد» مفعَّل، لكن لم يُحدَّد عدد لمرحلة «{stage}» — ولذلك تظهر هنا أصفار بدلًا من احتساب وفق المعايير. أدخل هذه المرحلة في تبويب «دورة الحياة» أو حدِّدها هنا يدويًا حسب الوظيفة."}});
+
+/* ---------- ДОПОЛНЕНИЕ: детализация по фазам + редактируемый лексикон ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPhaseLabel": "Талдау фазасы", "detailPhaseHint": "Төмендегі кесте бір фазаны толық көрсетеді. Жобалауда, ҚМЖ-да, пусконаладкада және т.б. қанша және қандай адам қажет екенін көру үшін фазаны ауыстырыңыз. Ұзақтығы нөлден жоғары фазалар ғана көрсетілген — қалғандары жобада жоқ.", "detailHowNote": "<b>Адамдар қалай бөлінген.</b> «{stage}» фазасының қажеттілігі ({from}–{to} ай) әуелі «Штат құрылымы» блогындағы үлеспен топтарға бөлінеді, содан кейін әр топтың ішіндегі лауазымдар арасында теңдей бөлінеді — жүйе кімнің көп екенін білмейді. Кез келген ұяшықты <b>қолмен жазуға</b> болады: сұрғылт түспен есеп көрсетілген, енгізілген сан белгіленіп, оны ауыстырады. «FTE мақсат» — осы жолдың төрт нүктесінің орташасы.", "posResetBtn": "Қолмен түзетулерді тастау"}, "meth": {"lexAdded": "қосылды", "lexUnused": "қолданылмайды", "lexDelete": "Дағдыны лексиконнан жою", "lexReset": "Зауыттық мәнге қайтару", "lexNewPh": "Дағды атауы — мысалы «Дәнекерлеу» немесе «SCADA»", "lexAddBtn": "Дағды қосу", "lexMissing": "<b>Анықтамалықта лексиконда жоқ дағдылар қолданылады:</b> {list}. Олар мұнда жоқ болғанда орташа тәуекелмен («Әдепкі тәуекел») есептеледі, яғни «Дағдылар» мен «Артықтыққа» қосатын үлесі шамамен. Оларды қосып, деңгейін көрсетіңіз.", "lexAddMissingBtn": "Барлығын ({n}) орташа деңгеймен қосу"}, "toast": {"posReset": "Лауазымдар бойынша қолмен түзетулер тасталды", "lexNoName": "Дағды атауын енгізіңіз", "lexExists": "«{name}» дағдысы лексиконда бар", "lexAdded": "«{name}» дағдысы лексиконға қосылды", "lexAddedMany": "Қосылған дағды саны: {n}. Оларға деңгей беріңіз.", "lexDeleted": "«{name}» дағдысы лексиконнан жойылды", "lexReset": "«{name}» зауыттық мәніне қайтарылды"}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPhaseLabel": "要拆解的阶段", "detailPhaseHint": "下表完整展示一个阶段。切换阶段即可查看设计、施工、试运行等各阶段分别需要多少人、需要哪类人。只显示时长非零的阶段——其余阶段项目中并不存在。", "detailHowNote": "<b>人员是如何分配的。</b>「{stage}」阶段（第 {from}–{to} 月）的需求先按「编制结构」板块中的比例在各组之间划分，再在每组内部的岗位之间平均分配——系统并不知道您哪类岗位更多。任意单元格都可以<b>手动填写</b>：灰色为测算值，您输入的数字会高亮并取代它。「FTE 目标」是同一行四个节点的平均值。", "posResetBtn": "清除手动修改"}, "meth": {"lexAdded": "已添加", "lexUnused": "未使用", "lexDelete": "从词典中删除该技能", "lexReset": "恢复内置数值", "lexNewPh": "技能名称——例如「焊接」或「SCADA」", "lexAddBtn": "添加技能", "lexMissing": "<b>字典中用到了词典里没有的技能：</b>{list}。在补入之前，它们按平均风险（「默认风险」）计算，因此它们对「技能」和「冗余」的贡献只是近似值。请添加并设定等级。", "lexAddMissingBtn": "全部添加（{n} 项）并使用平均等级"}, "toast": {"posReset": "已清除按岗位手动填写的人数", "lexNoName": "请输入技能名称", "lexExists": "技能「{name}」已在词典中", "lexAdded": "技能「{name}」已加入词典", "lexAddedMany": "已添加 {n} 项技能，请为其设定等级。", "lexDeleted": "技能「{name}」已从词典中删除", "lexReset": "「{name}」已恢复为内置数值"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPhaseLabel": "Fase que se detalla", "detailPhaseHint": "La tabla de abajo muestra una fase completa. Cambie de fase para ver cuántas personas, y de qué tipo, hacen falta en el diseño, en la construcción, en la puesta en marcha, etc. Solo aparecen las fases con duración distinta de cero: las demás no existen en el proyecto.", "detailHowNote": "<b>Cómo se reparte la gente.</b> La demanda de la fase «{stage}» (meses {from}-{to}) se divide primero entre los grupos en la proporción del bloque «Estructura de plantilla» y después a partes iguales entre los puestos de cada grupo: el sistema no sabe de cuáles tiene usted más. Cualquier celda puede <b>escribirse a mano</b>: en gris aparece el cálculo, y la cifra que introduzca se resalta y lo sustituye. «FTE objetivo» es la media de los cuatro puntos de esa misma fila.", "posResetBtn": "Descartar ediciones manuales"}, "meth": {"lexAdded": "añadida", "lexUnused": "sin usar", "lexDelete": "Quitar la competencia del léxico", "lexReset": "Restaurar el valor original", "lexNewPh": "Nombre de la competencia — por ejemplo «Soldadura» o «SCADA»", "lexAddBtn": "Añadir competencia", "lexMissing": "<b>El directorio usa competencias que no están en el léxico:</b> {list}. Mientras falten aquí se calculan con el riesgo medio («Riesgo por defecto»), así que su aporte a «Competencias» y «Redundancia» es solo aproximado. Añádalas e indique su nivel.", "lexAddMissingBtn": "Añadir todas ({n}) con el nivel medio"}, "toast": {"posReset": "Se descartaron las ediciones manuales de dotación por puesto", "lexNoName": "Introduzca un nombre de competencia", "lexExists": "La competencia «{name}» ya está en el léxico", "lexAdded": "La competencia «{name}» se añadió al léxico", "lexAddedMany": "Se añadieron {n} competencias. Indique sus niveles.", "lexDeleted": "La competencia «{name}» se quitó del léxico", "lexReset": "«{name}» volvió a su valor original"}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPhaseLabel": "Phase détaillée", "detailPhaseHint": "Le tableau ci-dessous montre une phase entière. Changez de phase pour voir combien de personnes, et de quel type, sont nécessaires en conception, en construction, en mise en service, etc. Seules les phases de durée non nulle apparaissent : les autres n'existent pas dans le projet.", "detailHowNote": "<b>Comment les personnes sont réparties.</b> Le besoin de la phase « {stage} » (mois {from}-{to}) est d'abord réparti entre les groupes selon la proportion du bloc « Structure des effectifs », puis à parts égales entre les postes de chaque groupe — le système ne sait pas desquels vous avez le plus. Toute cellule peut être <b>saisie à la main</b> : le gris correspond au calcul, et le chiffre que vous entrez est mis en évidence et le remplace. « FTE cible » est la moyenne des quatre points de cette même ligne.", "posResetBtn": "Annuler les saisies manuelles"}, "meth": {"lexAdded": "ajoutée", "lexUnused": "non utilisée", "lexDelete": "Retirer la compétence du lexique", "lexReset": "Rétablir la valeur d'origine", "lexNewPh": "Nom de la compétence — par exemple « Soudage » ou « SCADA »", "lexAddBtn": "Ajouter une compétence", "lexMissing": "<b>Le référentiel utilise des compétences absentes du lexique :</b> {list}. Tant qu'elles manquent ici, elles sont calculées au risque moyen (« Risque par défaut »), et leur contribution à « Compétences » et « Redondance » n'est donc qu'approximative. Ajoutez-les et fixez leur niveau.", "lexAddMissingBtn": "Ajouter toutes ({n}) au niveau moyen"}, "toast": {"posReset": "Les saisies manuelles par poste ont été annulées", "lexNoName": "Saisissez un nom de compétence", "lexExists": "La compétence « {name} » figure déjà dans le lexique", "lexAdded": "La compétence « {name} » a été ajoutée au lexique", "lexAddedMany": "{n} compétences ajoutées. Fixez leurs niveaux.", "lexDeleted": "La compétence « {name} » a été retirée du lexique", "lexReset": "« {name} » a retrouvé sa valeur d’origine"}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"detailPhaseLabel": "المرحلة المفصَّلة", "detailPhaseHint": "يعرض الجدول أدناه مرحلة واحدة كاملة. بدِّل المرحلة لترى كم شخصًا ومن أي نوع يلزم في التصميم والإنشاء والتشغيل التجريبي وما إلى ذلك. ولا تظهر إلا المراحل التي مدتها غير صفرية — أما غيرها فليست موجودة في المشروع.", "detailHowNote": "<b>كيف يُوزَّع الأشخاص.</b> يُقسَّم احتياج مرحلة «{stage}» (الأشهر {from}–{to}) أولًا على المجموعات بالنسبة الواردة في قسم «هيكل الملاك»، ثم بالتساوي بين الوظائف داخل كل مجموعة — إذ لا يعرف النظام أي الوظائف أكثر عددًا لديك. ويمكن <b>كتابة أي خلية يدويًا</b>: يظهر الاحتساب بالرمادي، أما الرقم الذي تُدخله فيُبرَز ويحل مكانه. و«FTE المستهدف» هو متوسط النقاط الأربع في الصف نفسه.", "posResetBtn": "إلغاء التعديلات اليدوية"}, "meth": {"lexAdded": "مضافة", "lexUnused": "غير مستخدمة", "lexDelete": "إزالة المهارة من المعجم", "lexReset": "استعادة القيمة الأصلية", "lexNewPh": "اسم المهارة — مثلًا «اللحام» أو «SCADA»", "lexAddBtn": "إضافة مهارة", "lexMissing": "<b>يستخدم الدليل مهارات غير موجودة في المعجم:</b> {list}. وما دامت غائبة هنا فإنها تُحتسب بالمخاطرة المتوسطة («المخاطرة الافتراضية»)، ولذلك تكون مساهمتها في «المهارات» و«الزيادة عن الحاجة» تقريبية فقط. أضفها وحدِّد مستواها.", "lexAddMissingBtn": "إضافة الكل ({n}) بالمستوى المتوسط"}, "toast": {"posReset": "أُلغيت التعديلات اليدوية للأعداد حسب الوظيفة", "lexNoName": "أدخل اسم المهارة", "lexExists": "المهارة «{name}» موجودة في المعجم بالفعل", "lexAdded": "أُضيفت المهارة «{name}» إلى المعجم", "lexAddedMany": "أُضيفت {n} مهارة. حدِّد مستوياتها.", "lexDeleted": "أُزيلت المهارة «{name}» من المعجم", "lexReset": "أُعيدت «{name}» إلى قيمتها الأصلية"}});
 
 /* ---------- ДОПОЛНЕНИЕ: вывод по вероятности + зачем Монте-Карло ---------- */
 (function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"verdictCertain": "Тапшылық болмай қоймайды: ол барлық симуляцияда пайда болады. Бірінші құлдырау — {month}-айда, шыңында {peak} адам жетпейді.", "verdictLikely": "Тапшылық болу ықтималдығы болмауынан жоғары (симуляциялардың {pct}%-ы). Бірінші құлдырау {month}-айда күтіледі.", "verdictPossible": "Тапшылық болуы мүмкін, бірақ алдын ала белгіленген емес: ол симуляциялардың {pct}%-ында пайда болады. Шешуші рөлді кету мен жалдау жылдамдығы ойнайды.", "verdictNone": "Тапшылық болжанмайды: барлық симуляцияда штат жетеді. Артықтық пен ұстап қалу құнын қадағалаңыз.", "whyMonteCarlo": "<b>Кездейсоқтық неге қажет.</b> Бір болжам сызығы — алдау: наурызда қанша адам кететінін және қанша вакансияның уақытында жабылатынын ешкім дәл білмейді. Сондықтан болашақ {runs} рет ойнатылады, әр жолы кетудің (±40%), сұраныстың (±5%) және жалдау табыстылығының өз кездейсоқ ауытқуларымен. Осы {runs} нәтижеден дәліз шығады: <b>P50</b> — ортаңғы сценарий, <b>P10–P90</b> — нәтижелердің 80%-ы кіретін аралық. Кең дәліз нәтиже сәттілікке қатты тәуелді екенін білдіреді, оған сүйенуге болмайды; тар дәліз болжам тұрақты екенін көрсетеді."}});
