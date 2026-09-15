@@ -695,6 +695,10 @@ Object.assign(I18N.ru, { norm:{
   needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
   detailTitle:'Детализация по должностям', detailHint:'Потребность из блока «Сводный результат» делится между должностями справочника: сначала по группам (Основной / ТОиР / ИТР), затем поровну между должностями внутри группы. Столбцы Q1–Q4 показывают, как эта потребность меняется <b>внутри выбранной фазы</b> — от её начала (Q1) к концу (Q4).',
   qMonthShort:'мес. {m}', monthRange:'мес. {from}–{to}',
+  distModeLabel:'Откуда доли оргструктуры', distModeHint:'По умолчанию доли «Основной / ТОиР / ИТР» выводятся из групп, назначенных видам работ. Это верно, пока виды работ покрывают весь персонал объекта: если описан только основной процесс, вспомогательная и инженерная группы получат 0%, а их должности — ноль людей во всех модулях, включая анализ автоматизации и кадровые риски. Если описывать все работы вы пока не готовы, переключитесь на ручные доли.',
+  distFromWorks:'Из видов работ (по назначенным группам)', distManual:'Задать вручную (в процентах)',
+  starvedWarn:'<b>Группы {groups} получили 0%</b>, потому что среди видов работ нет ни одной с такой группой. В справочнике при этом {n} должн. этих групп, и они показываются с нулевой численностью на всех вкладках: {list}. Расчёт формально верен — нет работ, нет и потребности, — но это вряд ли то, что вы имели в виду.',
+  starvedManualBtn:'Задать доли вручную',
   detailPlanGap:'Включён режим «План численности», но для фазы «{stage}» численность в плане не задана — поэтому здесь нули, а не расчёт по нормам. Впишите численность этой фазы на вкладке «Жизненный цикл» или задайте её здесь по должностям вручную.',
   detailPhaseLabel:'Фаза для детализации', detailPhaseHint:'Таблица ниже показывает одну фазу целиком. Переключите фазу, чтобы увидеть, сколько людей и каких нужно на проектировании, на СМР, на ПНР и так далее. Показаны только фазы с ненулевой длительностью — остальных в проекте нет.',
   detailHowNote:'<b>Как распределены люди.</b> Потребность фазы «{stage}» (мес. {from}–{to}) сначала делится по группам в пропорции из блока «Структура штата», затем поровну между должностями внутри каждой группы — система не знает, кого у вас больше. Любую ячейку можно <b>вписать вручную</b>: серым показан расчёт, введённое число подсвечивается и заменяет его. «FTE цель» — среднее по четырём точкам этой же строки.',
@@ -776,7 +780,8 @@ life:{
   structureHorizon:'Структура на горизонте', structCore:'Основной', structAux:'ТОиР', structMgmt:'ИТР',
   curveTitle:'Кривая потребности и комплектования',
   curveHint:'Красная линия — расчётная потребность (FTE) по фазам. Зелёная — прогноз доступной численности с учётом найма и оттока (медиана Монте-Карло), коридор — P10–P90.',
-  legendDemandPlan:'Потребность (план)', legendAvailForecast:'Доступно — прогноз (медиана)', legendBand:'Коридор P10–P90',
+  legendDemandPlan:'Потребность (план)', legendAvailForecast:'Доступно — прогноз (медиана)',
+  legendBand:'Коридор P10–P90 (доступно)', legendReqBand:'Коридор P10–P90 (потребность)',
   horizonNote:'Горизонт планирования: <b>{h} мес.</b> ({years} г.). Пиковая потребность приходится на фазу с максимумом кривой. Модель найма: до {hireCap} чел/мес при реализуемости {hireEff}% (срок закрытия вакансии {fillDays} дн.).',
   balanceTitle:'Баланс по месяцам (профицит ↔ дефицит)',
   balanceHint:'Разрыв = Потребность − Доступно по каждому месяцу (медианный сценарий). Красное — дефицит (нужен найм), зелёное — профицит (переобучение / высвобождение).'
@@ -810,12 +815,14 @@ life:{
   modelNote:'Модель учитывает случайные колебания оттока (±40%), спроса (±5%) и успешности найма. Результат — коридор вероятных исходов, а не одна цифра.',
   fanTitle:'Вероятностный прогноз численности (веер Монте-Карло)',
   fanHint:'P50 — срединный прогноз доступной численности. Коридор P10–P90 показывает диапазон, в который попадает 80% исходов. Расхождение с красной линией потребности = зона риска.',
-  legendDemand:'Потребность', legendAvailP50:'Доступно P50', legendBand:'P10–P90',
+  legendDemand:'Потребность', legendAvailP50:'Доступно P50',
+  legendBand:'P10–P90 (доступно)', legendReqBand:'P10–P90 (потребность)',
   deficitBold:'Кадровый разрыв прогнозируется с {month}-го месяца.', deficitText:'Без усиления найма ({hireCap} чел/мес) пик дефицита достигнет ~{peak} чел. Рекомендуется опережающий рекрутинг и план переобучения.',
   noDeficitBold:'Устойчивого дефицита не прогнозируется.', noDeficitText:'Текущая ёмкость найма покрывает потребность по медианному сценарию на всём горизонте.',
   survivalTitle:'Анализ дожития профессий (риск автоматизации)',
   survivalHint:'Survival Analysis: S(t)=exp(−λt). Риск λ выводится из вектора навыков должности (рутинные операции = высокий риск; аналитика, ML, сети = низкий), масштабируется темпом автоматизации.',
-  thProfession:'Профессия', thSkillRisk:'Риск навыков', thDispProb:'Вероятность вытеснения', thFteRisk:'FTE под риском', thRecommendation:'Рекомендация',
+  thProfession:'Профессия', thSkillRisk:'Риск навыков', thDispProb:'Индекс вытеснения', thFteRisk:'FTE под риском', thRecommendation:'Рекомендация',
+  dispProbHint:'<b>Это индекс, а не вероятность в статистическом смысле.</b> Считается как 1−e^(−λ·t), где λ = (доля автоматизируемых операций по лексикону) × (темп автоматизации) × (масштаб дожития), t — горизонт проекта в годах. Все три сомножителя — экспертные допущения с вкладки «Методология», а не наблюдённая частота вытеснения ролей: никто не измерял, как часто эта профессия действительно исчезала. Поэтому <b>число корректно сравнивать между ролями и следить, как его двигают допущения, но нельзя читать как «шанс 88%»</b>. Поменяйте «Темп автоматизации» и «Масштаб дожития», чтобы увидеть, насколько вывод устойчив.',
   survivalFoot:'Расчёт за горизонт {years} г. при темпе автоматизации ×{pace}. «FTE под риском» = численность роли × вероятность вытеснения.',
   statusReskill:'Рескиллинг', statusCrosstrain:'Кросс-тренинг', statusRetain:'Удержание',
   bridgesTitle:'Рекомендуемые мосты переобучения',
@@ -965,6 +972,17 @@ life:{
   cbaSeverLabel:'Стоимость высвобождения', cbaSeverSuf:'окладов', cbaSeverNote:'Выходные обязательства. ТК РК/РФ: ориентир до 3 средних заработков.',
   cbaIdleLabel:'Простой на переобучение', cbaIdleSuf:'мес.', cbaIdleNote:'Оплачиваемое время вне производства во время обучения.',
   hazardDefLabel:'Риск навыка по умолчанию', hazardDefSuf:'0…1', hazardDefNote:'Применяется к навыкам вне лексикона автоматизации.',
+  limitsTitle:'Чего эта модель не знает',
+  limit1:'<b>Коридор P10–P90 не покрывает всё, что может пойти не так.</b> Он отражает разброс оттока, успешности найма и заявленную вами неопределённость плана — но не аварии, не остановку стройки, не смену подрядчика и не срыв поставок. Реальный интервал шире расчётного; относитесь к нему как к нижней границе неопределённости, а не к полной.',
+  limit2:'<b>«Индекс вытеснения» — не вероятность.</b> Он выведен из экспертных оценок автоматизируемости, а не из наблюдённой частоты исчезновения профессий. Годится для сравнения ролей между собой и для проверки чувствительности к допущениям; не годится как «шанс в процентах».',
+  limit3:'<b>Распределение внутри группы — пропорция, а не факт.</b> Потребность делится между должностями по колонке «Числ.» справочника. Если реальное соотношение другое (например, на объекте нужны не операторы, а наладчики), впишите числа вручную в «Детализации по должностям» — система не может этого знать.',
+  limit4:'<b>Нормы и лексикон навыков — ваши, а не отраслевой стандарт.</b> Заводские значения взяты из открытых исследований и служат стартовой точкой. Пока вы их не подтвердили под свою отрасль, все производные показатели — оценка порядка величины, а не расчёт по утверждённым нормативам.',
+  demandSigmaLabel:'Неопределённость плана потребности', demandSigmaSuf:'% (систематическая)',
+  demandSigmaNote:'Насколько может ошибаться сам план: объёмы, нормы и сроки известны неточно. В отличие от помесячного шума эта ошибка НЕ усредняется за горизонт — она смещает всю траекторию, поэтому в Монте-Карло каждый прогон получает свой множитель плана. Именно этот параметр определяет реальную ширину коридора P10–P90. 0% означает «план считаю точным» — тогда коридор покажет только разброс оттока и найма и будет выглядеть подозрительно узким.',
+  busScaleLabel:'Масштаб зависимости от носителя', busScaleSuf:'чел.',
+  busScaleNote:'При каком числе носителей компетенции зависимость от конкретного человека падает примерно вдвое. 12 означает: 1 человек — максимальный риск, 12 — половина, 140 — около 8%. Риск затухает быстро, но никогда не обнуляется полностью: даже в большой группе уход ключевого носителя ощутим.',
+  ageSpreadLabel:'Разброс возрастов в должности', ageSpreadSuf:'лет (σ)',
+  ageSpreadNote:'Стандартное отклонение возраста внутри должности. Демографический риск считается не по одному среднему возрасту, а как ожидаемая доля людей, которая достигнет пенсионного возраста за горизонт проекта. Поэтому при среднем 44 года и горизонте 8 лет риск не нулевой: часть коллектива старше среднего. 0 означало бы, что все ровесники.',
   hazardLambdaLabel:'Масштаб дожития (λ)', hazardLambdaSuf:'—', hazardLambdaNote:'Калибровка скорости вытеснения ролей технологиями.',
   confirmNote:'Под конкретную юрисдикцию и отрасль эти значения следует подтвердить у заказчика. ИИ-ассистент может подобрать их по источникам (set_methodology).',
   lexiconTitle:'Лексикон автоматизируемости навыков',
@@ -1043,6 +1061,10 @@ Object.assign(I18N.en, { norm:{
   needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
   detailTitle:'Breakdown by Position', detailHint:'The demand from the Summary Result block is split across directory positions: first by group (Core / Maintenance / Engineering), then evenly among the positions within each group. The Q1-Q4 columns show how that demand changes <b>within the selected phase</b> — from its start (Q1) to its end (Q4).',
   qMonthShort:'mo. {m}', monthRange:'mo. {from}-{to}',
+  distModeLabel:'Source of the org-structure split', distModeHint:'By default the core / maintenance / engineering shares are derived from the groups assigned to work types. That is correct as long as the work types cover the whole site: if only the core process is described, the auxiliary and engineering groups get 0%, and their positions get zero people in every module, including automation analysis and workforce risks. If you are not ready to describe all the work yet, switch to manual shares.',
+  distFromWorks:'From work types (by assigned group)', distManual:'Set manually (in percent)',
+  starvedWarn:'<b>Groups {groups} got 0%</b> because no work type carries that group. Meanwhile the directory holds {n} position(s) in those groups, and they show zero headcount on every tab: {list}. The calculation is formally correct - no work, no demand - but it is unlikely to be what you meant.',
+  starvedManualBtn:'Set shares manually',
   detailPlanGap:'"Headcount plan" mode is on, but no headcount is set for the "{stage}" phase — hence the zeros here rather than a calculation from norms. Enter this phase on the Lifecycle tab, or set it here per position by hand.',
   detailPhaseLabel:'Phase to break down', detailPhaseHint:'The table below shows one phase in full. Switch the phase to see how many people, and of which kind, are needed during design, construction, commissioning and so on. Only phases with a non-zero duration appear — the others are not in the project.',
   detailHowNote:'<b>How the people are distributed.</b> The demand of the "{stage}" phase (months {from}-{to}) is first split across groups in the proportion from the "Staff structure" block, then evenly among the positions inside each group — the system does not know which of them you have more of. Any cell can be <b>typed in by hand</b>: grey shows the computed value, and a number you enter is highlighted and replaces it. "Target FTE" is the average of the four points in that same row.',
@@ -1124,7 +1146,8 @@ life:{
   structureHorizon:'Structure over the Horizon', structCore:'Core', structAux:'Maintenance', structMgmt:'Engineering',
   curveTitle:'Demand and Staffing Curve',
   curveHint:'The red line is the calculated demand (FTE) across phases. Green is the forecast of available headcount accounting for hiring and attrition (Monte Carlo median), with a P10-P90 band.',
-  legendDemandPlan:'Demand (plan)', legendAvailForecast:'Available — forecast (median)', legendBand:'P10-P90 band',
+  legendDemandPlan:'Demand (plan)', legendAvailForecast:'Available — forecast (median)',
+  legendBand:'P10-P90 band (available)', legendReqBand:'P10-P90 band (demand)',
   horizonNote:'Planning horizon: <b>{h} mo.</b> ({years} yr). Peak demand occurs at the phase with the curve\'s maximum. Hiring model: up to {hireCap} people/mo at {hireEff}% realizability (time-to-fill {fillDays} days).',
   balanceTitle:'Monthly Balance (surplus <-> shortage)',
   balanceHint:'Gap = Demand - Available for each month (median scenario). Red is a shortage (hiring needed), green is a surplus (reskilling / release).'
@@ -1158,12 +1181,14 @@ life:{
   modelNote:'The model accounts for random fluctuations in attrition (+/-40%), demand (+/-5%), and hiring success. The result is a band of likely outcomes, not a single number.',
   fanTitle:'Probabilistic Headcount Forecast (Monte Carlo Fan)',
   fanHint:'P50 is the median forecast of available headcount. The P10-P90 band shows the range containing 80% of outcomes. Divergence from the red demand line is the risk zone.',
-  legendDemand:'Demand', legendAvailP50:'Available P50', legendBand:'P10-P90',
+  legendDemand:'Demand', legendAvailP50:'Available P50',
+  legendBand:'P10-P90 (available)', legendReqBand:'P10-P90 (demand)',
   deficitBold:'A workforce gap is projected starting month {month}.', deficitText:'Without additional hiring ({hireCap} people/mo) the peak shortage will reach ~{peak} people. Proactive recruiting and a reskilling plan are recommended.',
   noDeficitBold:'No sustained shortage is projected.', noDeficitText:'Current hiring capacity covers demand under the median scenario across the entire horizon.',
   survivalTitle:'Profession Survival Analysis (Automation Risk)',
   survivalHint:'Survival Analysis: S(t)=exp(-λt). Risk λ is derived from the role\'s skill vector (routine operations = high risk; analytics, ML, networks = low), scaled by the automation pace.',
-  thProfession:'Profession', thSkillRisk:'Skill Risk', thDispProb:'Displacement Probability', thFteRisk:'FTE at Risk', thRecommendation:'Recommendation',
+  thProfession:'Profession', thSkillRisk:'Skill Risk', thDispProb:'Displacement index', thFteRisk:'FTE at Risk', thRecommendation:'Recommendation',
+  dispProbHint:'<b>This is an index, not a probability in the statistical sense.</b> It is computed as 1-e^(-lambda*t), where lambda = (share of automatable operations from the lexicon) x (pace of automation) x (survival scale), and t is the project horizon in years. All three factors are expert assumptions from the Methodology tab, not an observed frequency of role displacement: nobody measured how often this profession actually disappeared. So <b>the figure is valid for comparing roles and for watching how assumptions move it, but must not be read as "an 88% chance"</b>. Change the pace of automation and the survival scale to see how robust the conclusion is.',
   survivalFoot:'Calculated over a {years}-yr horizon at an automation pace of x{pace}. "FTE at risk" = role headcount x displacement probability.',
   statusReskill:'Reskill', statusCrosstrain:'Cross-train', statusRetain:'Retain',
   bridgesTitle:'Recommended Reskilling Bridges',
@@ -1312,6 +1337,17 @@ life:{
   cbaSeverLabel:'Release Cost', cbaSeverSuf:'salaries', cbaSeverNote:'Severance obligations. KZ/RU labor code benchmark up to 3 average salaries.',
   cbaIdleLabel:'Reskilling Downtime', cbaIdleSuf:'mo.', cbaIdleNote:'Paid time off production during training.',
   hazardDefLabel:'Default Skill Risk', hazardDefSuf:'0...1', hazardDefNote:'Applied to skills outside the automation lexicon.',
+  limitsTitle:'What this model does not know',
+  limit1:'<b>The P10-P90 band does not cover everything that can go wrong.</b> It reflects the scatter in attrition, hiring success and the plan uncertainty you declared - but not accidents, a halted construction site, a change of contractor or a supply failure. The real interval is wider than the computed one; treat it as a lower bound on uncertainty, not the whole of it.',
+  limit2:'<b>The "displacement index" is not a probability.</b> It is derived from expert automatability estimates, not from an observed frequency of professions disappearing. It is fit for comparing roles with each other and for testing sensitivity to assumptions; it is not fit to be read as a percentage chance.',
+  limit3:'<b>The split inside a group is a proportion, not a fact.</b> Demand is divided among positions by the "Headcount" column of the directory. If the real ratio differs (say the site needs commissioning engineers rather than operators), type the figures in by hand in the breakdown by position - the system cannot know this.',
+  limit4:'<b>The norms and the skills lexicon are yours, not an industry standard.</b> The built-in values come from open research and serve as a starting point. Until you have confirmed them for your own industry, every derived figure is an order-of-magnitude estimate, not a calculation against approved standards.',
+  demandSigmaLabel:'Demand-plan uncertainty', demandSigmaSuf:'% (systematic)',
+  demandSigmaNote:'How wrong the plan itself may be: volumes, norms and schedules are known only approximately. Unlike month-to-month noise this error does NOT average out over the horizon - it shifts the whole trajectory, which is why each Monte Carlo run gets its own plan multiplier. This parameter is what sets the real width of the P10-P90 band. 0% means "I treat the plan as exact" - the band then reflects only attrition and hiring scatter and looks suspiciously narrow.',
+  busScaleLabel:'Key-person dependence scale', busScaleSuf:'people',
+  busScaleNote:'At how many carriers of a competence the dependence on one specific person falls by about half. 12 means: 1 person is maximum risk, 12 is half of it, 140 is around 8%. The risk decays quickly but never reaches exactly zero: even in a large group, losing a key carrier is felt.',
+  ageSpreadLabel:'Age spread within a position', ageSpreadSuf:'years (sigma)',
+  ageSpreadNote:'Standard deviation of age inside a position. Demographic risk is computed not from a single average age but as the expected share of people who will reach retirement age within the project horizon. That is why an average of 44 with an 8-year horizon is not zero risk: part of the team is older than the average. Zero would mean everyone is the same age.',
   hazardLambdaLabel:'Survival Scale (λ)', hazardLambdaSuf:'—', hazardLambdaNote:'Calibrates the speed at which technology displaces roles.',
   confirmNote:'For a specific jurisdiction and industry, these values should be confirmed with the client. The AI assistant can tune them from sources (set_methodology).',
   lexiconTitle:'Skill Automatability Lexicon',
@@ -1826,6 +1862,10 @@ const S = {
   // 'plan' — использовать численность, заданную в документе заказчика (абсолютные значения)
   detailStage:'',         // какую фазу показывает «Детализация по должностям»
   positionPlan:{},        // ручная численность по должностям: {фаза:{должность:[q1..q4]}}
+  distMode:'works',       // откуда доли оргструктуры: 'works' (из видов работ) или 'manual' (ползунки)
+  busScale:12,            // при скольких носителях зависимость от одного человека падает вдвое
+  ageSpread:8,            // разброс возрастов внутри должности, лет (для демографического риска)
+  demandSigma:15,         // систематическая неопределённость потребности, % (Монте-Карло)
   skillHazardOverrides:{},// свой уровень автоматизируемости навыка (и добавленные навыки)
   skillCostOverrides:{},  // своя цена обучения по навыку (множитель к ставке должности)
   demoDismissed:false,   // пользователь закрыл/принял полосу «это демо-пример»
@@ -1977,9 +2017,10 @@ function computeBase(){
   const totalR = S.rCore+S.rAux+S.rMgmt || 1;
   const wt = worksTotals();
   // структура распределения: из видов работ (по группам), иначе — из ползунков оргструктуры
-  const dist0 = wt.total>0
+  const manualDist = {core:S.rCore/totalR, aux:S.rAux/totalR, mgmt:S.rMgmt/totalR};
+  const dist0 = (wt.total>0 && S.distMode!=='manual')
     ? {core:wt.grp.core/wt.total, aux:wt.grp.aux/wt.total, mgmt:wt.grp.mgmt/wt.total}
-    : {core:S.rCore/totalR, aux:S.rAux/totalR, mgmt:S.rMgmt/totalR};
+    : manualDist;
   const baseOperational = wt.total>0 ? wt.total : (S.volume/Math.max(1,S.norm))*S.shifts*S.absCoeff;
   const stageId = activeStage();
   const stage = STAGES[stageId];
@@ -2086,39 +2127,50 @@ function projectGap(){
   const seed = stateSeed();
   const availSamples = Array.from({length:H},()=>[]);
   const gapSamples = Array.from({length:H},()=>[]);
+  const reqSamples = Array.from({length:H},()=>[]);
   const peakDef=[]; let deficitAtEnd=0;
+  // систематическая неопределённость самого плана потребности: объёмы, нормы и сроки
+  // known-unknown, и ошибка в них НЕ усредняется по месяцам — она смещает весь горизонт
+  const sigma = clamp(num(S.demandSigma,15),0,60)/100;
   for(let r=0;r<runs;r++){
     const rng = mulberry32(seed + r*2654435761);
+    // приближение нормали суммой равномерных (теорема Ирвина–Холла), одна на прогон
+    const gauss = ((rng()+rng()+rng()+rng()+rng()+rng())-3)/1.0;
+    const bias = Math.max(0.2, 1 + sigma*gauss);                  // множитель плана на весь прогон
     let av=S.actualStaff; let pk=-1e9;
     for(let t=0;t<H;t++){
+      // потребность этого прогона: систематический сдвиг + небольшой помесячный шум
+      const reqRun = Math.max(0, required[t]*bias*(1 + (rng()*0.10-0.05)));
       availSamples[t].push(av);
-      const g = required[t]-av;
+      reqSamples[t].push(reqRun);
+      const g = reqRun-av;                                         // разрыв против РЕАЛИЗОВАВШЕЙСЯ потребности
       gapSamples[t].push(g);
       if(g>pk) pk=g;
       // переход
       const attrNoise = monthlyAttr*(1 + (rng()*0.8-0.4));         // ±40% к оттоку
       const leavers = av*Math.max(0,attrNoise);
       const afterLeave = av-leavers;
-      const reqNoise = required[t]*(1 + (rng()*0.10-0.05));        // ±5% к спросу
       let next = afterLeave;
-      const short = reqNoise-afterLeave;
+      const short = reqRun-afterLeave;
       if(short>0){
         const realized = hireEff*(0.65+0.7*rng());                 // переменная успешность найма
         next += Math.min(short, S.hireCap*clamp(realized,0,1.4));
       } else {
-        const sur=afterLeave-reqNoise; if(sur>0) next -= Math.min(sur, S.sepCap*(0.7+0.6*rng()));
+        const sur=afterLeave-reqRun; if(sur>0) next -= Math.min(sur, S.sepCap*(0.7+0.6*rng()));
       }
       av = Math.max(0,next);
     }
     peakDef.push(pk);
-    if(required[H-1]-av > 0) deficitAtEnd++;
+    if(reqSamples[H-1][r]-av > 0) deficitAtEnd++;
   }
-  const availP10=[],availP50=[],availP90=[],gapP50=[];
+  const availP10=[],availP50=[],availP90=[],gapP50=[],reqP10=[],reqP90=[];
   for(let t=0;t<H;t++){
     const sa=availSamples[t].slice().sort((x,y)=>x-y);
     availP10.push(percentile(sa,0.10)); availP50.push(percentile(sa,0.50)); availP90.push(percentile(sa,0.90));
     const sg=gapSamples[t].slice().sort((x,y)=>x-y);
     gapP50.push(percentile(sg,0.50));
+    const sr=reqSamples[t].slice().sort((x,y)=>x-y);
+    reqP10.push(percentile(sr,0.10)); reqP90.push(percentile(sr,0.90));
   }
   const peakSorted = peakDef.slice().sort((x,y)=>x-y);
   // момент пикового дефицита по медиане gap
@@ -2133,7 +2185,7 @@ function projectGap(){
   // давал 0% даже при огромном дефиците на пике стройки.
   const deficitAny = peakDef.reduce((c,p)=>c+(p>thr?1:0),0);
 
-  return {traj,H,required,availDet,availP10,availP50,availP90,gapP50,
+  return {traj,H,required,reqP10,reqP90,availDet,availP10,availP50,availP90,gapP50,
     monthlyAttr,hireEff,runs,deficitThreshold:Math.round(thr),
     probDeficitAny:deficitAny/runs,
     probDeficitEnd:deficitAtEnd/runs,
@@ -2178,8 +2230,8 @@ function automationAnalysis(horizonMonths){
     const lambda = hz * S.autoPace * num(S.hazardLambda,0.35);  // годовой hazard
     const surv = Math.exp(-lambda*years);            // вероятность «дожития» роли
     const dispProb = 1-surv;                          // вероятность вытеснения за горизонт
-    const peers = byType[p.type] ? byType[p.type].length : 1;
-    const fteRole = peers>0 ? Math.round(b.staff[p.type]/peers) : 0;
+    const peers = byType[p.type] || [];
+    const fteRole = Math.round(b.staff[p.type] * groupShare(peers, p));
     const dispFTE = fteRole*dispProb;
     totalAtRisk += dispFTE;
     let status,bcls;
@@ -2249,11 +2301,60 @@ function riskWeights(){
   return w;
 }
 // демографический риск: близость среднего возраста к пенсионному (старт ~45 лет)
-function demoRisk(age){ return clamp((Number(age||42)-45)/(PENSION_AGE-45),0,1); }
+// Распределение потребности группы между её должностями — ОДНО правило для всех вкладок.
+// Доли берём из «Числ.» справочника: 520 операторов и 12 аналитиков не могут делить
+// потребность поровну. Если численность нигде не задана — делим поровну (иного основания нет).
+// Группы, в которых есть должности справочника, но доля оргструктуры нулевая:
+// такие должности получают 0 FTE в автоматизации, рисках и детализации — молча.
+function starvedGroups(){
+  const b = computeBase();
+  const out=[];
+  ['core','aux','mgmt'].forEach(g=>{
+    const pos = Object.values(profDB).filter(p=>p.type===g);
+    if(pos.length && !(b.dist[g]>0)) out.push({group:g, positions:pos.map(p=>profName(p))});
+  });
+  return out;
+}
+function allocateGroup(positions, groupTotal){
+  const hc = positions.map(p=>Math.max(0, Number(p.headcount||0)));
+  const sum = hc.reduce((a,x)=>a+x,0);
+  const n = positions.length || 1;
+  if(sum<=0) return positions.map(()=>groupTotal/n);
+  return hc.map(x=>groupTotal*x/sum);
+}
+// доля потребности группы, приходящаяся на одну должность
+function groupShare(positions, prof){
+  const hc = positions.map(p=>Math.max(0, Number(p.headcount||0)));
+  const sum = hc.reduce((a,x)=>a+x,0);
+  if(sum<=0) return 1/Math.max(1, positions.length);
+  return Math.max(0, Number(prof.headcount||0))/sum;
+}
+
+// Нормальное распределение: нужно, чтобы демографический риск считался по РАСПРЕДЕЛЕНИЮ
+// возрастов, а не по одному среднему. Приближение Абрамовица–Стиган.
+function normCdf(z){
+  const t = 1/(1+0.2316419*Math.abs(z));
+  const d = 0.3989422804014327*Math.exp(-z*z/2);
+  const prob = d*t*(0.319381530 + t*(-0.356563782 + t*(1.781477937 + t*(-1.821255978 + t*1.330274429))));
+  return z>0 ? 1-prob : prob;
+}
+// Демографический риск = ожидаемая доля людей должности, которая достигнет пенсионного
+// возраста за горизонт планирования. Старая формула обнулялась при среднем возрасте ≤45,
+// то есть на реальном справочнике половина строк была ровно нулём и фактор не различал роли.
+function demoRisk(age, horizonYears){
+  const avg = Number(age||42);
+  const sd  = Math.max(1, num(S.ageSpread, 8));         // разброс возрастов внутри должности
+  const yrs = Math.max(0.5, horizonYears!=null ? horizonYears : Math.max(0.5, buildPhases().horizon/12));
+  return clamp(normCdf((avg + yrs - PENSION_AGE)/sd), 0, 1);
+}
 // риск ключевого специалиста: мало носителей × критичность роли
+// Зависимость от носителя компетенции. Линейная формула обрывалась в ноль на 41 человеке,
+// поэтому на реальном справочнике почти все строки были ровно нулевыми. Гипербола
+// затухает быстро, но не обнуляется: 1 чел. → 1.00, 12 → 0.52, 140 → 0.08, 520 → 0.02.
 function busRisk(p){
   const hc=Math.max(1,Number(p.headcount||1));
-  return clamp(1-(hc-1)/40,0,1) * (TYPE_CRIT[p.type]||0.8);
+  const k=Math.max(1, num(S.busScale, 12));
+  return clamp(1/(1+(hc-1)/k), 0, 1) * (TYPE_CRIT[p.type]||0.8);
 }
 function riskAnalysis(){
   const w=riskWeights();
@@ -2261,10 +2362,10 @@ function riskAnalysis(){
   const list=Object.values(profDB);
   const rows=list.map(p=>{
     const hz=professionHazard(p);                                  // обсолесценция навыков
-    const lambda=hz*S.autoPace*0.35;
+    const lambda=hz*S.autoPace*num(S.hazardLambda,0.35);   // тот же параметр, что и в анализе дожития
     const redund=clamp(1-Math.exp(-lambda*years),0,1);             // риск избыточности (дожитие роли)
     const f={
-      demo:  demoRisk(p.avgAge),
+      demo:  demoRisk(p.avgAge, years),
       bus:   busRisk(p),
       skill: hz,                                                    // доля навыков с высокой автоматизируемостью
       turn:  clamp((S.turnover/45)*(0.7+0.6*Number(p.market||0.4)),0,1),
@@ -2318,7 +2419,7 @@ function actionPlan(){
     const months=Math.max(2, Math.ceil(qty/Math.max(1,S.sepCap)));
     acts.push({type:'release',cls:'b-purple',target:profName(r.p),qty,
       cost:qty*Number(r.p.salary||avgSalary)*num(S.cbaSever,3), months, priority:3,
-      note:t('act.releaseNote',{prob:pct(r.dispProb),years:auto.years.toFixed(1)})});
+      note:t('act.releaseNote',{prob:pct(r.dispProb),years:auto.years.toFixed(1)})});   // prob — индекс, не вероятность
   });
   acts.sort((a,b)=>a.priority-b.priority || b.cost-a.cost);
   const total=acts.reduce((s,a)=>s+a.cost,0);
@@ -2389,8 +2490,9 @@ function resetCharts(){ CHARTS={}; chartSeq=0; }
 function svgForecast(M){
   const W=780,H=340,pl=52,pr=18,pt=26,pb=46;
   const n=M.H, iw=W-pl-pr, ih=H-pt-pb;
+  const rq10=M.reqP10||M.required, rq90=M.reqP90||M.required;
   let maxV=0;
-  for(let i=0;i<n;i++){ maxV=Math.max(maxV,M.required[i],M.availP90[i],M.availDet[i]); }
+  for(let i=0;i<n;i++){ maxV=Math.max(maxV,M.required[i],rq90[i],M.availP90[i],M.availDet[i]); }
   maxV=Math.max(maxV,S.actualStaff)*1.12||10;
   const X=i=> pl + iw*(n>1? i/(n-1):0);
   const Y=v=> pt+ih - ih*(v/maxV);
@@ -2400,6 +2502,11 @@ function svgForecast(M){
   for(let i=1;i<n;i++) band+=' L'+X(i).toFixed(1)+' '+Y(M.availP90[i]).toFixed(1);
   for(let i=n-1;i>=0;i--) band+=' L'+X(i).toFixed(1)+' '+Y(M.availP10[i]).toFixed(1);
   band+=' Z';
+  // коридор потребности: план тоже не точен, и это должно быть видно
+  let dband='M'+X(0)+' '+Y(rq90[0]);
+  for(let i=1;i<n;i++) dband+=' L'+X(i).toFixed(1)+' '+Y(rq90[i]).toFixed(1);
+  for(let i=n-1;i>=0;i--) dband+=' L'+X(i).toFixed(1)+' '+Y(rq10[i]).toFixed(1);
+  dband+=' Z';
   // фазовые полосы
   let bands='';
   M.traj.phases.forEach((ph,k)=>{
@@ -2428,6 +2535,7 @@ function svgForecast(M){
     +'<rect class="ch-hit" x="'+pl+'" y="'+pt+'" width="'+iw+'" height="'+ih+'" fill="transparent" style="cursor:crosshair"/>';
   return '<svg class="chart" data-chart="'+cid+'" viewBox="0 0 '+W+' '+H+'">'
     +bands+grid
+    +'<path d="'+dband+'" fill="#c4361b" opacity="0.10"/>'
     +'<path d="'+band+'" fill="#0f766e" opacity="0.12"/>'
     +'<path d="'+path(M.required)+'" fill="none" stroke="#c4361b" stroke-width="2.4"/>'
     +'<path d="'+path(M.availP50)+'" fill="none" stroke="#0f766e" stroke-width="2.4"/>'
@@ -2773,7 +2881,8 @@ function renderNormative(){
     let h='<tr class="grouprow"><td colspan="'+NCOL+'">'+esc(label)+' · '+pct(dDist[type])+'% · '+fmtN(groupTotal)+' '+esc(t('common.person'))+'</td></tr>';
     if(!n){h+='<tr><td colspan="'+NCOL+'" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
     arr.forEach(p=>{
-      const calcQ=k=>Math.round(dQ[k]*dDist[type]/n);
+      const share=groupShare(arr,p);
+      const calcQ=k=>Math.round(dQ[k]*dDist[type]*share);
       const cells=[0,1,2,3].map(k=>posValue(dStage,p.id,k,calcQ(k)));
       const req=Math.round(cells.reduce((a,c)=>a+c.v,0)/4);
       TOT.req+=req; [0,1,2,3].forEach(k=>{ TOT.q[k]+=cells[k].v; });
@@ -2836,6 +2945,29 @@ function renderNormative(){
       +'<span class="chip" style="border-color:var(--line);background:var(--green-l);color:var(--green)">'+esc(t('common.auxShort'))+' '+pct(b.dist.aux)+'% · '+fmtN(b.staff.aux)+'</span>'
       +'<span class="chip" style="border-color:var(--line);background:var(--purple-l);color:var(--purple)">'+esc(t('common.mgmtShort'))+' '+pct(b.dist.mgmt)+'% · '+fmtN(b.staff.mgmt)+'</span>'
     +'</div>'
+    +'<div class="field" style="margin-top:12px"><label class="flabel">'+esc(t('norm.distModeLabel'))+hint(t('norm.distModeHint'))+'</label>'
+      +'<select class="select" id="distMode">'
+        +'<option value="works"'+(S.distMode!=='manual'?' selected':'')+'>'+esc(t('norm.distFromWorks'))+'</option>'
+        +'<option value="manual"'+(S.distMode==='manual'?' selected':'')+'>'+esc(t('norm.distManual'))+'</option>'
+      +'</select></div>'
+    +(S.distMode==='manual'
+      ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">'
+        +[['rCore',t('common.coreShort')],['rAux',t('common.auxShort')],['rMgmt',t('common.mgmtShort')]].map(([id,lb])=>
+          '<div><label class="flabel" style="font-size:11px;justify-content:center">'+esc(lb)+'</label>'
+          +'<input class="input num" type="number" min="0" id="'+id+'" value="'+S[id]+'" style="text-align:center;padding:8px"></div>').join('')
+        +'</div>'
+      : (()=>{ const st=starvedGroups();
+          if(!st.length) return '';
+          // молчаливые нули: должности есть, а доля группы нулевая
+          return '<div class="note note-amber" style="margin-top:12px">'+ic('alert')+'<div>'
+            +t('norm.starvedWarn',{groups:st.map(g=>esc(t('common.'+g.group+'Short'))).join(', '),
+                n:st.reduce((a,g)=>a+g.positions.length,0),
+                list:st.map(g=>esc(g.positions.join(', '))).join('; ')})
+            +'<div style="margin-top:9px;display:flex;gap:8px;flex-wrap:wrap">'
+              +'<button class="tool" data-act="dist-manual">'+ic('sliders')+esc(t('norm.starvedManualBtn'))+'</button>'
+              +'<button class="tool" data-act="add-work">'+ic('plus')+esc(t('work.addBtn'))+'</button>'
+            +'</div></div></div>';
+        })())
     +'<div class="note note-blue" style="margin-top:14px">'+ic('info')+'<div>'+esc(t('norm.noteVolume'))+'</div></div>'
   +'</div></div>'
 
@@ -3081,6 +3213,7 @@ function renderLifecycle(){
       +'<div class="legend">'
         +'<span><span class="swatch line" style="background:#c4361b"></span>'+esc(t('life.legendDemandPlan'))+'</span>'
         +'<span><span class="swatch line" style="background:#0f766e"></span>'+esc(t('life.legendAvailForecast'))+'</span>'
+        +'<span><span class="swatch" style="background:#c4361b;opacity:.10"></span>'+esc(t('life.legendReqBand'))+'</span>'
         +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>'+esc(t('life.legendBand'))+'</span>'
       +'</div>'
       +'<div class="fnote">'+t('life.horizonNote',{h:M.H,years:(M.H/12).toFixed(1),hireCap:S.hireCap,hireEff:pct(M.hireEff),fillDays:S.fillDays})+'</div>'
@@ -3212,6 +3345,7 @@ function renderPredictive(){
       +'<div class="legend">'
         +'<span><span class="swatch line" style="background:#c4361b"></span>'+esc(t('pred.legendDemand'))+'</span>'
         +'<span><span class="swatch line" style="background:#0f766e"></span>'+esc(t('pred.legendAvailP50'))+'</span>'
+        +'<span><span class="swatch" style="background:#c4361b;opacity:.10"></span>'+esc(t('pred.legendReqBand'))+'</span>'
         +'<span><span class="swatch" style="background:#0f766e;opacity:.12"></span>'+esc(t('pred.legendBand'))+'</span>'
       +'</div>'
       +(M.firstDeficit>=0
@@ -3222,7 +3356,7 @@ function renderPredictive(){
     +'<div class="card"><div class="ctitle">'+ic('zap')+esc(t('pred.survivalTitle'))
       +hint(t('pred.survivalHint'))+'</div>'
       +'<div class="tbl-wrap"><table><thead><tr>'
-        +'<th>'+esc(t('pred.thProfession'))+'</th><th class="c">'+esc(t('pred.thSkillRisk'))+hint(t('risk.skillColHint'))+'</th><th class="c">'+esc(t('pred.thDispProb'))+'</th>'
+        +'<th>'+esc(t('pred.thProfession'))+'</th><th class="c">'+esc(t('pred.thSkillRisk'))+hint(t('risk.skillColHint'))+'</th><th class="c">'+esc(t('pred.thDispProb'))+hint(t('pred.dispProbHint'))+'</th>'
         +'<th class="c">'+esc(t('pred.thFteRisk'))+'</th><th class="c">'+esc(t('pred.thRecommendation'))+'</th></tr></thead><tbody>'
         +auto.rows.map(r=>'<tr><td style="font-weight:700">'+esc(profName(r.p))+'</td>'
           +'<td class="c fcell" data-tip="'+esc(t('risk.cellSkill',{val:pct(r.hz),list:hazardBreakdown(r.p).list,def:pct(num(S.hazardDefault,HAZARD_DEFAULT))}))+'">'
@@ -3689,6 +3823,12 @@ function renderMethodology(){
     +block(t('meth.block5Title'), t('meth.block5Text'))
     +block(t('meth.block6Title'), t('meth.block6Text',{age:PENSION_AGE}))
     +block(t('meth.block7Title'), t('meth.block7Text'))
+    +'<div class="divider"></div>'
+    +'<div class="note note-amber" style="margin:0">'+ic('alert')+'<div>'
+      +'<b>'+esc(t('meth.limitsTitle'))+'</b>'
+      +'<ul style="margin:8px 0 0;padding-inline-start:18px;line-height:1.6">'
+      +[1,2,3,4].map(i=>'<li>'+t('meth.limit'+i)+'</li>').join('')
+      +'</ul></div></div>'
   +'</div></div>'
 
   +'<div class="col-span-5"><div class="card accent-g"><div class="ctitle">'+ic('sliders')+esc(t('meth.assumptionsTitle'))
@@ -3698,6 +3838,9 @@ function renderMethodology(){
     +f('cbaIdleMonths',t('meth.cbaIdleLabel'),S.cbaIdleMonths,'0.5',t('meth.cbaIdleSuf'),t('meth.cbaIdleNote'))
     +f('hazardDefault',t('meth.hazardDefLabel'),S.hazardDefault,'0.05',t('meth.hazardDefSuf'),t('meth.hazardDefNote'))
     +f('hazardLambda',t('meth.hazardLambdaLabel'),S.hazardLambda,'0.05',t('meth.hazardLambdaSuf'),t('meth.hazardLambdaNote'))
+    +f('demandSigma',t('meth.demandSigmaLabel'),S.demandSigma,'1',t('meth.demandSigmaSuf'),t('meth.demandSigmaNote'))
+    +f('busScale',t('meth.busScaleLabel'),S.busScale,'1',t('meth.busScaleSuf'),t('meth.busScaleNote'))
+    +f('ageSpread',t('meth.ageSpreadLabel'),S.ageSpread,'1',t('meth.ageSpreadSuf'),t('meth.ageSpreadNote'))
     +'<div class="note note-amber" style="margin-top:6px">'+ic('info')+'<div>'+esc(t('meth.confirmNote'))+'</div></div>'
   +'</div></div>'
   +'<div class="col-span-12"><div class="card"><div class="ctitle">'+ic('zap')+esc(t('meth.lexiconTitle'))
@@ -3751,6 +3894,7 @@ const NUM_RANGE = {
   turnover:[0,100], hireCap:[0,1e5], fillDays:[1,3650], sepCap:[0,1e5],
   autoPace:[0,100], mcRuns:[50,5000],
   wDemo:[0,100], wBus:[0,100], wSkill:[0,100], wTurn:[0,100], wMarket:[0,100], wRedund:[0,100],
+  busScale:[1,200], ageSpread:[1,25], demandSigma:[0,60],
   cbaHire:[0,24], cbaSever:[0,24], cbaIdleMonths:[0,36],
   hazardDefault:[0,1], hazardLambda:[0.001,2]
 };
@@ -3758,7 +3902,8 @@ const NUM_KEYS = new Set(['volume','norm','absCoeff','actualStaff','shifts',
   'rCore','rAux','rMgmt','durDesign','durConstruction','durCommissioning','durOperation','durDecline',
   'turnover','hireCap','fillDays','sepCap','autoPace','mcRuns',
   'wDemo','wBus','wSkill','wTurn','wMarket','wRedund',
-  'cbaHire','cbaSever','cbaIdleMonths','hazardDefault','hazardLambda']);
+  'cbaHire','cbaSever','cbaIdleMonths','hazardDefault','hazardLambda',
+  'busScale','ageSpread','demandSigma']);
 
 /* ---------- ВКЛАДКИ ---------- */
 function buildTabs(){
@@ -4070,17 +4215,17 @@ const GUIDE_I18N = { ru: [
   ]},
   {section:'5. Анализ дожития профессий (риск автоматизации)', items:[
     {t:'Риск навыков', why:'Насколько задачи роли автоматизируемы.', how:'Среднее по навыкам должности из лексикона (вкладка «Методология»); неизвестный навык = hazardDefault.'},
-    {t:'Вероятность вытеснения', why:'Шанс, что роль будет вытеснена технологиями за горизонт.', how:'1−S(t), где S(t)=exp(−λt), λ = Риск навыков × Темп автоматизации × hazardLambda.'},
+    {t:'Индекс вытеснения', why:'Сравнительная подверженность роли вытеснению технологиями за горизонт. <b>Это не вероятность:</b> λ выведена из экспертных оценок автоматизируемости, а не из наблюдённой частоты исчезновения профессий.', how:'1−S(t), где S(t)=exp(−λt), λ = Риск навыков × Темп автоматизации × Масштаб дожития. Годится для сравнения ролей и проверки чувствительности к допущениям; читать как «шанс в процентах» нельзя.'},
     {t:'FTE под риском', why:'Ожидаемое число позиций к высвобождению.', how:'Численность роли × Вероятность вытеснения.'}
   ]},
   {section:'6. Кадровые риски (вкладка «Кадровые риски»)', items:[
     {t:'Индекс риска роли (0–100)', why:'Сводная приоритизация ролей по риску.', how:'Взвешенная сумма 6 факторов (каждый в 0..1) ×100; веса нормируются к сумме.'},
-    {t:'Демографический фактор', why:'«Обрыв» компетенций при массовом выходе на пенсию.', how:'От среднего возраста роли к пенсионному (63): clamp((возраст−45)/(63−45); 0..1).'},
-    {t:'Ключевой специалист (bus-factor)', why:'Зависимость от единственного носителя компетенции.', how:'clamp(1−(носители−1)/40; 0..1) × критичность роли (Mgmt 1.0 / Core 0.9 / Aux 0.6).'},
+    {t:'Демографический фактор', why:'«Обрыв» компетенций при массовом выходе на пенсию.', how:'Ожидаемая доля людей должности, которая достигнет пенсионного возраста (63) за горизонт проекта: Φ((ср.возраст + горизонт_лет − 63) ÷ σ), где σ — «Разброс возрастов в должности» с вкладки «Методология». Считается по распределению, а не по одному среднему, поэтому зависит от длительности проекта и не обнуляется при среднем возрасте ниже пенсионного.'},
+    {t:'Ключевой специалист (bus-factor)', why:'Зависимость от единственного носителя компетенции.', how:'1 ÷ (1 + (носители−1)/k) × критичность роли (Mgmt 1.0 / Core 0.9 / Aux 0.6), где k — «Масштаб зависимости от носителя» (по умолчанию 12). Затухает быстро, но никогда не обнуляется полностью: 1 чел. → 1.00, 12 → 0.52, 140 → 0.08, 520 → 0.02.'},
     {t:'Компетентностный (навыки)', why:'Обсолесценция компетенций при смене технологий.', how:'Средняя автоматизируемость навыков роли.'},
     {t:'Текучесть', why:'Риск ухода по роли/подразделению.', how:'clamp((текучесть/45) × (0.7+0.6×рыночная_дефицитность); 0..1).'},
     {t:'Внешний рыночный', why:'Дефицитность профессии и долгие вакансии.', how:'clamp(рыночная_дефицитность × (0.5+срок_вакансии/180); 0..1).'},
-    {t:'Избыточность', why:'Риск высвобождения при автоматизации.', how:'Вероятность вытеснения из анализа дожития (п.5).'},
+    {t:'Избыточность', why:'Риск высвобождения при автоматизации.', how:'Тот же индекс вытеснения, что и в анализе дожития (п.5), с тем же параметром «Масштаб дожития». Обратите внимание: «Навыки» и «Избыточность» растут из одного источника — первый показывает автоматизируемость сейчас, второй проецирует её на горизонт. Большой вес обоим означает двойной учёт одного риска.'},
     {t:'Веса факторов', why:'Приоритеты конкретного предприятия.', how:'Задаются ползунками; система нормирует к сумме.'},
     {t:'Портфельный индекс', why:'Риск всего объекта одним числом.', how:'Индексы ролей, взвешенные по их численности.'}
   ]},
@@ -4221,6 +4366,7 @@ function handleAction(act){
     case 'del-tpl': deleteCustomTemplate(); break;
     case 'lex-add': addLexiconSkill(); break;
     case 'pos-reset': resetPosOverrides(); break;
+    case 'dist-manual': S.distMode='manual'; render(); showToast(t('toast.distManual')); break;
     case 'lex-add-missing': addMissingLexiconSkills(); break;
     case 'demo-hide': S.demoDismissed=true; render(); break;
     case 'exp-norm': exportJSON('normative',t('exportLabel.normative')); break;
@@ -5481,6 +5627,41 @@ Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
   var it=g&&g[2]&&g[2].items&&g[2].items[1];
   if(it) it.how=pair[1];
 });
+
+/* ---------- «Руководство»: формулы должны совпадать с кодом во ВСЕХ языках ---------- */
+/* В ru добавлен раздел «С чего начать», поэтому в остальных языках индексы разделов
+   смещены на 1. Правим те же четыре пункта, что и в русской версии. */
+(function(P){
+  Object.keys(P).forEach(function(lang){
+    var g=GUIDE_I18N[lang]; if(!g) return;
+    var off = (lang==='ru') ? 0 : -1;            // смещение разделов
+    var d=P[lang];
+    var demo = g[6+off] && g[6+off].items && g[6+off].items[1];
+    if(demo) demo.how = d.demo;
+    var bus  = g[6+off] && g[6+off].items && g[6+off].items[2];
+    if(bus) bus.how = d.bus;
+    var red  = g[6+off] && g[6+off].items && g[6+off].items[6];
+    if(red) red.how = d.redund;
+    var disp = g[5+off] && g[5+off].items && g[5+off].items[1];
+    if(disp){ disp.t = d.dispT; disp.why = d.dispW; disp.how = d.dispH; }
+  });
+})({"en": {"demo": "The expected share of people in the position who will reach retirement age (63) within the project horizon: F((avg age + horizon years - 63) / sigma), where sigma is \"Age spread within a position\" on the Methodology tab. It is computed from the distribution rather than from a single average, so it depends on project length and does not fall to zero when the average age is below retirement.", "bus": "1 / (1 + (carriers - 1) / k) x role criticality (Mgmt 1.0 / Core 0.9 / Aux 0.6), where k is the \"Key-person dependence scale\" (12 by default). It decays fast but never reaches exactly zero: 1 person -> 1.00, 12 -> 0.52, 140 -> 0.08, 520 -> 0.02.", "dispT": "Displacement index", "dispW": "Comparative exposure of a role to technological displacement over the horizon. <b>This is not a probability:</b> lambda is derived from expert automatability estimates, not from an observed frequency of professions disappearing.", "dispH": "1-S(t), where S(t)=exp(-lambda*t), lambda = Skill risk x Pace of automation x Survival scale. Valid for comparing roles and testing sensitivity to assumptions; it must not be read as a percentage chance.", "redund": "The same displacement index as in the survival analysis (item 5), with the same \"Survival scale\" parameter. Note that \"Skills\" and \"Redundancy\" grow from one source - the first shows automatability now, the second projects it onto the horizon. A large weight on both means counting one risk twice."}, "kk": {"demo": "Лауазымдағы адамдардың жоба горизонтында зейнет жасына (63) жететін күтілетін үлесі: Φ((орташа жас + горизонт_жыл − 63) ÷ σ), мұндағы σ — «Әдістеме» бетіндегі «Лауазымдағы жас шашырауы». Бір орташа мән бойынша емес, таралым бойынша есептеледі, сондықтан жоба ұзақтығына тәуелді және орташа жас зейнеттен төмен болғанда нөлге айналмайды.", "bus": "1 ÷ (1 + (тасымалдаушылар − 1)/k) × рөл маңыздылығы (Басқару 1.0 / Негізгі 0.9 / Көмекші 0.6), мұндағы k — «Тасымалдаушыға тәуелділік ауқымы» (әдепкі 12). Тез бәсеңдейді, бірақ ешқашан дәл нөлге жетпейді: 1 адам → 1.00, 12 → 0.52, 140 → 0.08, 520 → 0.02.", "dispT": "Ығыстыру индексі", "dispW": "Рөлдің горизонт ішінде технологиялармен ығыстырылуға салыстырмалы ұшырауы. <b>Бұл ықтималдық емес:</b> λ автоматтандырылу туралы сараптамалық бағалардан шыққан, кәсіптердің жоғалуының байқалған жиілігінен емес.", "dispH": "1−S(t), мұндағы S(t)=exp(−λt), λ = Дағдылар тәуекелі × Автоматтандыру қарқыны × Өмірге қабілеттілік ауқымы. Рөлдерді салыстыруға және болжамдарға сезімталдықты тексеруге жарайды; пайызбен берілген мүмкіндік ретінде оқуға болмайды.", "redund": "Өмірге қабілеттілік талдауындағы (5-т.) сол ығыстыру индексі, сол «Өмірге қабілеттілік ауқымы» параметрімен. Назар аударыңыз: «Дағдылар» мен «Артықтық» бір көзден өседі — біріншісі қазіргі автоматтандырылуды көрсетеді, екіншісі оны горизонтқа жобалайды. Екеуіне де үлкен салмақ беру — бір тәуекелді екі рет есептеу."}, "zh": {"demo": "该岗位人员在项目周期内达到退休年龄（63 岁）的预期占比：Φ((平均年龄 + 周期年数 − 63) ÷ σ)，其中 σ 为「方法论」标签页上的「岗位内年龄离散度」。它按分布而非单一平均值计算，因此取决于项目时长，且在平均年龄低于退休年龄时不会归零。", "bus": "1 ÷ (1 + (掌握者人数 − 1)/k) × 岗位关键度（管理 1.0 / 主体 0.9 / 辅助 0.6），其中 k 为「关键人员依赖尺度」（默认 12）。衰减很快但绝不会正好归零：1 人 → 1.00，12 → 0.52，140 → 0.08，520 → 0.02。", "dispT": "取代指数", "dispW": "岗位在规划期内被技术取代的相对暴露度。<b>这不是概率：</b>λ 源自关于自动化可行性的专家估计，而非观测到的职业消失频率。", "dispH": "1−S(t)，其中 S(t)=exp(−λt)，λ = 技能风险 × 自动化速度 × 存活尺度。适合岗位之间的比较和假设敏感性检验；不可当作百分比机率来读。", "redund": "与存活分析（第 5 项）中相同的取代指数，使用同一个「存活尺度」参数。请注意：「技能」与「冗余」源自同一处——前者反映当前的自动化可行性，后者将其投射到整个周期。同时给两者较大权重意味着把同一风险计入两次。"}, "es": {"demo": "La proporción esperada de personas del puesto que alcanzarán la edad de jubilación (63) dentro del horizonte del proyecto: F((edad media + años de horizonte - 63) / sigma), donde sigma es «Dispersión de edades en el puesto» en la pestaña Metodología. Se calcula a partir de la distribución y no de una única media, por lo que depende de la duración del proyecto y no se anula cuando la edad media está por debajo de la jubilación.", "bus": "1 / (1 + (portadores - 1) / k) x criticidad del puesto (Gestión 1.0 / Núcleo 0.9 / Aux. 0.6), donde k es la «Escala de dependencia del titular» (12 por defecto). Decae rápido pero nunca llega exactamente a cero: 1 persona -> 1.00, 12 -> 0.52, 140 -> 0.08, 520 -> 0.02.", "dispT": "Índice de desplazamiento", "dispW": "Exposición comparativa de un puesto al desplazamiento tecnológico a lo largo del horizonte. <b>No es una probabilidad:</b> lambda procede de estimaciones expertas de automatizabilidad, no de una frecuencia observada de desaparición de profesiones.", "dispH": "1-S(t), donde S(t)=exp(-lambda*t), lambda = Riesgo de competencias x Ritmo de automatización x Escala de supervivencia. Sirve para comparar puestos y probar la sensibilidad a los supuestos; no debe leerse como un porcentaje de probabilidad.", "redund": "El mismo índice de desplazamiento que en el análisis de supervivencia (punto 5), con el mismo parámetro «Escala de supervivencia». Observe que «Competencias» y «Redundancia» nacen de una misma fuente: la primera muestra la automatizabilidad actual, la segunda la proyecta sobre el horizonte. Dar mucho peso a ambas es contar un mismo riesgo dos veces."}, "fr": {"demo": "La part attendue des personnes du poste qui atteindront l'âge de la retraite (63 ans) sur l'horizon du projet : F((âge moyen + années d'horizon - 63) / sigma), où sigma est « Dispersion des âges dans le poste » dans l'onglet Méthodologie. Le calcul part de la distribution et non d'une moyenne unique : il dépend donc de la durée du projet et ne s'annule pas lorsque l'âge moyen est inférieur à celui de la retraite.", "bus": "1 / (1 + (détenteurs - 1) / k) x criticité du poste (Gestion 1.0 / Cœur 0.9 / Aux. 0.6), où k est l'« Échelle de dépendance au détenteur » (12 par défaut). La décroissance est rapide mais n'atteint jamais exactement zéro : 1 personne -> 1,00, 12 -> 0,52, 140 -> 0,08, 520 -> 0,02.", "dispT": "Indice de remplacement", "dispW": "Exposition comparative d'un poste au remplacement technologique sur l'horizon. <b>Ce n'est pas une probabilité :</b> lambda découle d'estimations d'experts sur l'automatisabilité, et non d'une fréquence observée de disparition des métiers.", "dispH": "1-S(t), où S(t)=exp(-lambda*t), lambda = Risque de compétences x Rythme d'automatisation x Échelle de survie. Convient pour comparer les postes et tester la sensibilité aux hypothèses ; ne doit pas se lire comme un pourcentage de chances.", "redund": "Le même indice de remplacement que dans l'analyse de survie (point 5), avec le même paramètre « Échelle de survie ». Notez que « Compétences » et « Redondance » découlent d'une même source : la première montre l'automatisabilité actuelle, la seconde la projette sur l'horizon. Pondérer fortement les deux revient à compter un même risque deux fois."}, "ar": {"demo": "النسبة المتوقعة من العاملين في الوظيفة الذين سيبلغون سن التقاعد (63) خلال أفق المشروع: Φ((متوسط العمر + سنوات الأفق − 63) ÷ σ)، حيث σ هي «تشتت الأعمار داخل الوظيفة» في تبويب المنهجية. وتُحتسب من التوزيع لا من متوسط واحد، ولذلك تعتمد على مدة المشروع ولا تؤول إلى الصفر عندما يقل متوسط العمر عن سن التقاعد.", "bus": "1 ÷ (1 + (عدد الحاملين − 1)/k) × أهمية الدور (إدارة 1.0 / أساسي 0.9 / مساند 0.6)، حيث k هو «مقياس الاعتماد على حامل الكفاءة» (12 افتراضيًا). يتراجع سريعًا لكنه لا يبلغ الصفر تمامًا أبدًا: شخص واحد ← 1.00، و12 ← 0.52، و140 ← 0.08، و520 ← 0.02.", "dispT": "مؤشر الاستبدال", "dispW": "التعرّض النسبي للوظيفة للاستبدال التقني على مدى الأفق الزمني. <b>وهذا ليس احتمالًا:</b> فـλ مشتقة من تقديرات خبيرة لقابلية الأتمتة، لا من تكرار مرصود لاختفاء المهن.", "dispH": "1−S(t)، حيث S(t)=exp(−λt)، وλ = مخاطر المهارات × وتيرة الأتمتة × مقياس البقاء. يصلح للمقارنة بين الوظائف ولاختبار الحساسية تجاه الافتراضات؛ ولا يجوز قراءته كنسبة مئوية من الفرص.", "redund": "المؤشر نفسه المستخدم في تحليل البقاء (البند 5)، وبالمعامِل نفسه «مقياس البقاء». ولاحظ أن «المهارات» و«الزيادة عن الحاجة» تنبعان من مصدر واحد — فالأولى تُظهر قابلية الأتمتة الآن، والثانية تُسقطها على الأفق الزمني. وإعطاء وزن كبير لكلتيهما يعني احتساب المخاطرة الواحدة مرتين."}});
+
+/* ---------- ДОПОЛНЕНИЕ: границы применимости модели ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"meth": {"limitsTitle": "Бұл модель нені білмейді", "limit1": "<b>P10–P90 дәлізі дұрыс кетпеуі мүмкін нәрсенің бәрін қамтымайды.</b> Ол кетудің, жалдау табыстылығының шашырауын және сіз көрсеткен жоспар белгісіздігін ғана көрсетеді — авариялар, құрылыстың тоқтауы, мердігердің ауысуы мен жеткізілім үзілісі оған кірмейді. Нақты аралық есептелгеннен кең; оны белгісіздіктің төменгі шекарасы деп қараңыз, толық шамасы деп емес.", "limit2": "<b>«Ығыстыру индексі» — ықтималдық емес.</b> Ол автоматтандырылу туралы сараптамалық бағалардан шыққан, кәсіптердің жоғалуының байқалған жиілігінен емес. Рөлдерді өзара салыстыруға және болжамдарға сезімталдықты тексеруге жарайды; «пайызбен берілген мүмкіндік» ретінде жарамайды.", "limit3": "<b>Топ ішіндегі бөліну — пропорция, факт емес.</b> Қажеттілік лауазымдар арасында анықтамалықтың «Саны» бағаны бойынша бөлінеді. Нақты арақатынас өзгеше болса (мысалы, нысанға оператор емес, баптаушы керек болса), «Лауазымдар бойынша талдауда» сандарды қолмен енгізіңіз — жүйе мұны біле алмайды.", "limit4": "<b>Нормалар мен дағдылар лексиконы — сіздікі, салалық стандарт емес.</b> Зауыттық мәндер ашық зерттеулерден алынған және бастапқы нүкте ретінде қызмет етеді. Оларды өз салаңызға растамайынша, барлық туынды көрсеткіштер — бекітілген нормативтер бойынша есеп емес, шаманың реті бойынша бағалау."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"meth": {"limitsTitle": "这个模型不知道什么", "limit1": "<b>P10–P90 区间并未涵盖所有可能出错的情况。</b>它只反映流失、招聘成功率的离散度以及您声明的计划不确定性——不包括事故、工地停工、承包商更换或供应中断。真实区间比测算结果更宽；请把它当作不确定性的下界，而非全部。", "limit2": "<b>「取代指数」不是概率。</b>它源自关于自动化可行性的专家估计，而非观测到的职业消失频率。它适合用于岗位之间的比较和对假设的敏感性检验；不适合当作百分比机率来读。", "limit3": "<b>组内的分配是比例，不是事实。</b>需求按字典「人数」列在各岗位之间划分。若实际比例不同（例如现场需要的是调试工程师而非操作工），请在「按岗位拆解」中手动填写——系统无从知晓这一点。", "limit4": "<b>定额与技能词典是您的，而非行业标准。</b>内置数值取自公开研究，仅作为起点。在您针对自身行业加以确认之前，所有派生指标都只是数量级估计，而非依照批准规范的测算。"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"meth": {"limitsTitle": "Lo que este modelo no sabe", "limit1": "<b>La banda P10-P90 no cubre todo lo que puede salir mal.</b> Refleja la dispersión de la rotación, del éxito de contratación y la incertidumbre del plan que usted declaró, pero no accidentes, ni una obra detenida, ni un cambio de contratista, ni un fallo de suministro. El intervalo real es más ancho que el calculado; trátelo como una cota inferior de la incertidumbre, no como su totalidad.", "limit2": "<b>El «índice de desplazamiento» no es una probabilidad.</b> Procede de estimaciones expertas de automatizabilidad, no de una frecuencia observada de desaparición de profesiones. Sirve para comparar puestos entre sí y para comprobar la sensibilidad a los supuestos; no sirve para leerse como un porcentaje de probabilidad.", "limit3": "<b>El reparto dentro de un grupo es una proporción, no un hecho.</b> La demanda se divide entre los puestos según la columna «Dotación» del directorio. Si la proporción real es otra (por ejemplo, la instalación necesita técnicos de puesta en marcha y no operadores), escriba las cifras a mano en el desglose por puesto: el sistema no puede saberlo.", "limit4": "<b>Las normas y el léxico de competencias son suyos, no un estándar sectorial.</b> Los valores incorporados provienen de investigación abierta y sirven como punto de partida. Hasta que los confirme para su propio sector, toda cifra derivada es una estimación de orden de magnitud, no un cálculo conforme a normas aprobadas."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"meth": {"limitsTitle": "Ce que ce modèle ignore", "limit1": "<b>La plage P10-P90 ne couvre pas tout ce qui peut mal tourner.</b> Elle reflète la dispersion du turnover, de la réussite du recrutement et l'incertitude du plan que vous avez déclarée — mais pas les accidents, un chantier à l'arrêt, un changement de prestataire ou une rupture d'approvisionnement. L'intervalle réel est plus large que celui calculé ; considérez-le comme une borne inférieure de l'incertitude, pas comme sa totalité.", "limit2": "<b>L'« indice de remplacement » n'est pas une probabilité.</b> Il découle d'estimations d'experts sur l'automatisabilité, et non d'une fréquence observée de disparition des métiers. Il convient pour comparer les postes entre eux et tester la sensibilité aux hypothèses ; il ne convient pas comme pourcentage de chances.", "limit3": "<b>La répartition au sein d'un groupe est une proportion, pas un fait.</b> Le besoin est réparti entre les postes selon la colonne « Effectif » du référentiel. Si le rapport réel diffère (par exemple si le site a besoin de metteurs en service plutôt que d'opérateurs), saisissez les chiffres à la main dans le détail par poste : le système ne peut pas le savoir.", "limit4": "<b>Les normes et le lexique des compétences sont les vôtres, pas un standard sectoriel.</b> Les valeurs fournies proviennent de travaux publics et servent de point de départ. Tant que vous ne les avez pas confirmées pour votre secteur, tout chiffre dérivé est un ordre de grandeur, pas un calcul conforme à des normes approuvées."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"meth": {"limitsTitle": "ما لا يعرفه هذا النموذج", "limit1": "<b>لا يغطي نطاق P10–P90 كل ما يمكن أن يسوء.</b> فهو يعكس تشتت المغادرة ونجاح التوظيف وعدم اليقين في الخطة الذي أعلنته أنت — لكنه لا يشمل الحوادث ولا توقف ورشة البناء ولا تغيير المقاول ولا انقطاع التوريد. والمجال الحقيقي أوسع من المحتسب؛ فتعامل معه كحد أدنى لعدم اليقين لا كمداه الكامل.", "limit2": "<b>«مؤشر الاستبدال» ليس احتمالًا.</b> فهو مشتق من تقديرات خبيرة لقابلية الأتمتة، لا من تكرار مرصود لاختفاء المهن. وهو صالح للمقارنة بين الوظائف ولاختبار الحساسية تجاه الافتراضات؛ وغير صالح لأن يُقرأ كنسبة مئوية من الفرص.", "limit3": "<b>التوزيع داخل المجموعة نسبة وليس واقعًا.</b> يُقسَّم الاحتياج بين الوظائف وفق عمود «العدد» في الدليل. وإذا كانت النسبة الفعلية مختلفة (كأن تحتاج المنشأة إلى مهندسي تشغيل تجريبي لا إلى مشغّلين)، فاكتب الأرقام يدويًا في التفصيل حسب الوظيفة — إذ لا يمكن للنظام معرفة ذلك.", "limit4": "<b>المعايير ومعجم المهارات ملكك أنت، وليست معيارًا قطاعيًا.</b> القيم المدمجة مأخوذة من أبحاث منشورة وتصلح نقطة انطلاق. وإلى أن تؤكدها بما يناسب قطاعك، يبقى كل رقم مشتق تقديرًا لرتبة المقدار، لا احتسابًا وفق معايير معتمدة."}});
+
+/* ---------- ДОПОЛНЕНИЕ: дефекты расчёта (es/fr/ar) ---------- */
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"distModeLabel": "Origen del reparto de la estructura", "distModeHint": "Por defecto las cuotas «Núcleo / Mantenimiento / Ingeniería» se derivan de los grupos asignados a los tipos de trabajo. Eso es correcto mientras los tipos de trabajo cubran todo el personal de la instalación: si solo se describe el proceso principal, los grupos auxiliar y de ingeniería reciben 0% y sus puestos quedan con cero personas en todos los módulos, incluidos el análisis de automatización y los riesgos de personal. Si aún no puede describir todos los trabajos, cambie a cuotas manuales.", "distFromWorks": "De los tipos de trabajo (por grupo asignado)", "distManual": "Definir manualmente (en porcentaje)", "starvedWarn": "<b>Los grupos {groups} recibieron 0%</b> porque ningún tipo de trabajo pertenece a ese grupo. Mientras tanto el directorio contiene {n} puesto(s) de esos grupos, y aparecen con dotación cero en todas las pestañas: {list}. El cálculo es formalmente correcto —sin trabajo no hay demanda— pero es poco probable que sea lo que usted quería decir.", "starvedManualBtn": "Definir cuotas manualmente"}, "life": {"legendReqBand": "Banda P10-P90 (demanda)"}, "pred": {"legendReqBand": "P10-P90 (demanda)", "dispProbHint": "<b>Es un índice, no una probabilidad en sentido estadístico.</b> Se calcula como 1−e^(−λ·t), donde λ = (proporción de operaciones automatizables según el léxico) × (ritmo de automatización) × (escala de supervivencia), y t es el horizonte del proyecto en años. Los tres factores son supuestos expertos de la pestaña «Metodología», no una frecuencia observada de desplazamiento de puestos: nadie ha medido con qué frecuencia esta profesión desapareció realmente. Por eso <b>la cifra sirve para comparar puestos y para ver cómo la mueven los supuestos, pero no debe leerse como «un 88% de probabilidad»</b>. Cambie el ritmo de automatización y la escala de supervivencia para comprobar la robustez de la conclusión."}, "meth": {"demandSigmaLabel": "Incertidumbre del plan de demanda", "demandSigmaSuf": "% (sistemática)", "demandSigmaNote": "Cuánto puede equivocarse el propio plan: volúmenes, normas y plazos solo se conocen de forma aproximada. A diferencia del ruido mensual, este error NO se promedia a lo largo del horizonte: desplaza toda la trayectoria, y por eso cada simulación de Monte Carlo recibe su propio multiplicador del plan. Este parámetro es el que fija la anchura real de la banda P10-P90. 0% significa «doy el plan por exacto»: la banda reflejará entonces solo la dispersión de rotación y contratación y parecerá sospechosamente estrecha.", "busScaleLabel": "Escala de dependencia del titular", "busScaleSuf": "personas", "busScaleNote": "Con cuántos portadores de una competencia la dependencia de una persona concreta se reduce aproximadamente a la mitad. 12 significa: 1 persona es el riesgo máximo, 12 es la mitad, 140 ronda el 8%. El riesgo decae rápido pero nunca llega exactamente a cero: incluso en un grupo grande, perder a un portador clave se nota.", "ageSpreadLabel": "Dispersión de edades en el puesto", "ageSpreadSuf": "años (σ)", "ageSpreadNote": "Desviación típica de la edad dentro del puesto. El riesgo demográfico no se calcula a partir de una única edad media, sino como la proporción esperada de personas que alcanzarán la edad de jubilación dentro del horizonte del proyecto. Por eso una media de 44 años con un horizonte de 8 años no da riesgo cero: parte del equipo es mayor que la media. Cero significaría que todos tienen la misma edad."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"distModeLabel": "Origine de la répartition de la structure", "distModeHint": "Par défaut, les parts « Cœur / Maintenance / Ingénierie » sont déduites des groupes affectés aux types de travail. C'est exact tant que les types de travail couvrent l'ensemble du personnel du site : si seul le procédé principal est décrit, les groupes auxiliaire et ingénierie reçoivent 0 %, et leurs postes se retrouvent à zéro personne dans tous les modules, y compris l'analyse d'automatisation et les risques RH. Si vous n'êtes pas encore en mesure de décrire tous les travaux, passez aux parts manuelles.", "distFromWorks": "Depuis les types de travail (par groupe affecté)", "distManual": "Définir manuellement (en pourcentage)", "starvedWarn": "<b>Les groupes {groups} ont reçu 0 %</b> car aucun type de travail ne porte ce groupe. Or le référentiel contient {n} poste(s) de ces groupes, et ils apparaissent avec un effectif nul dans tous les onglets : {list}. Le calcul est formellement correct — pas de travail, pas de besoin — mais ce n'est probablement pas ce que vous vouliez dire.", "starvedManualBtn": "Définir les parts manuellement"}, "life": {"legendReqBand": "Plage P10-P90 (besoin)"}, "pred": {"legendReqBand": "P10-P90 (besoin)", "dispProbHint": "<b>C'est un indice, pas une probabilité au sens statistique.</b> Il se calcule comme 1−e^(−λ·t), où λ = (part des opérations automatisables selon le lexique) × (rythme d'automatisation) × (échelle de survie), et t est l'horizon du projet en années. Ces trois facteurs sont des hypothèses d'expert issues de l'onglet « Méthodologie », et non une fréquence observée de remplacement des postes : personne n'a mesuré à quelle fréquence ce métier a réellement disparu. Le chiffre <b>sert donc à comparer les postes et à voir comment les hypothèses le déplacent, mais ne doit pas se lire comme « 88 % de chances »</b>. Modifiez le rythme d'automatisation et l'échelle de survie pour juger de la robustesse de la conclusion."}, "meth": {"demandSigmaLabel": "Incertitude du plan de besoin", "demandSigmaSuf": "% (systématique)", "demandSigmaNote": "À quel point le plan lui-même peut se tromper : volumes, normes et délais ne sont connus qu'approximativement. Contrairement au bruit mensuel, cette erreur ne se moyenne PAS sur l'horizon — elle décale toute la trajectoire, et c'est pourquoi chaque tirage Monte-Carlo reçoit son propre multiplicateur de plan. C'est ce paramètre qui fixe la largeur réelle de la plage P10-P90. 0 % signifie « je considère le plan comme exact » : la plage ne reflète alors que la dispersion du turnover et du recrutement et paraît suspectement étroite.", "busScaleLabel": "Échelle de dépendance au détenteur", "busScaleSuf": "personnes", "busScaleNote": "À partir de combien de détenteurs d'une compétence la dépendance à une personne précise est divisée environ par deux. 12 signifie : 1 personne correspond au risque maximal, 12 à la moitié, 140 à environ 8 %. Le risque décroît vite mais n'atteint jamais exactement zéro : même dans un grand groupe, le départ d'un détenteur clé se ressent.", "ageSpreadLabel": "Dispersion des âges dans le poste", "ageSpreadSuf": "ans (σ)", "ageSpreadNote": "Écart-type de l'âge au sein du poste. Le risque démographique n'est pas calculé à partir d'un seul âge moyen mais comme la part attendue de personnes qui atteindront l'âge de la retraite sur l'horizon du projet. C'est pourquoi une moyenne de 44 ans avec un horizon de 8 ans ne donne pas un risque nul : une partie de l'équipe est plus âgée que la moyenne. Zéro signifierait que tous ont le même âge."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"distModeLabel": "مصدر توزيع الهيكل التنظيمي", "distModeHint": "افتراضيًا تُشتق نسب «الأساسي / الصيانة / الهندسي» من المجموعات المسندة إلى أنواع العمل. وهذا صحيح ما دامت أنواع العمل تغطي كامل العاملين في المنشأة: فإذا وُصفت العملية الأساسية فقط، حصلت المجموعتان المساندة والهندسية على 0%، وحصلت وظائفهما على صفر من الأشخاص في جميع الوحدات، بما فيها تحليل الأتمتة والمخاطر البشرية. وإن لم تكن مستعدًا بعد لوصف جميع الأعمال، فانتقل إلى النسب اليدوية.", "distFromWorks": "من أنواع العمل (حسب المجموعة المسندة)", "distManual": "التحديد يدويًا (بالنسبة المئوية)", "starvedWarn": "<b>حصلت المجموعات {groups} على 0%</b> لأن أيًا من أنواع العمل لا ينتمي إلى تلك المجموعة. وفي المقابل يتضمن الدليل {n} وظيفة من هذه المجموعات، وتظهر بعدد صفري في جميع التبويبات: {list}. والاحتساب صحيح شكليًا — فلا عمل يعني لا احتياج — لكن من غير المرجَّح أن يكون هذا ما قصدته.", "starvedManualBtn": "تحديد النسب يدويًا"}, "life": {"legendReqBand": "نطاق P10–P90 (الاحتياج)"}, "pred": {"legendReqBand": "P10–P90 (الاحتياج)", "dispProbHint": "<b>هذا مؤشر، وليس احتمالًا بالمعنى الإحصائي.</b> يُحتسب بالصيغة 1−e^(−λ·t)، حيث λ = (نسبة العمليات القابلة للأتمتة وفق المعجم) × (وتيرة الأتمتة) × (مقياس البقاء)، وt هو أفق المشروع بالسنوات. والعوامل الثلاثة كلها افتراضات خبيرة من تبويب «المنهجية»، وليست تكرارًا مرصودًا لاستبدال الوظائف: فلم يقِس أحد كم مرة اختفت هذه المهنة فعلًا. ولذلك <b>يصح استخدام الرقم للمقارنة بين الوظائف ولمتابعة كيف تحرّكه الافتراضات، لكن لا يجوز قراءته كأنه «فرصة بنسبة 88%»</b>. غيِّر «وتيرة الأتمتة» و«مقياس البقاء» لترى مدى متانة الاستنتاج."}, "meth": {"demandSigmaLabel": "عدم يقين خطة الاحتياج", "demandSigmaSuf": "% (منهجي)", "demandSigmaNote": "إلى أي حد يمكن أن تكون الخطة نفسها خاطئة: فالأحجام والمعايير والمواعيد معروفة تقريبيًا فقط. وخلافًا للتشويش الشهري، لا يتوسط هذا الخطأ على مدى الأفق — بل يُزيح المسار بأكمله، ولذلك تحصل كل محاكاة من مونت كارلو على مضاعف خطة خاص بها. وهذا المعامِل تحديدًا هو ما يحدد العرض الحقيقي لنطاق P10–P90. أما 0% فيعني «أعتبر الخطة دقيقة» — وحينها لا يعكس النطاق إلا تشتت المغادرة والتوظيف ويبدو ضيقًا بصورة مريبة.", "busScaleLabel": "مقياس الاعتماد على حامل الكفاءة", "busScaleSuf": "شخصًا", "busScaleNote": "عند أي عدد من حاملي الكفاءة ينخفض الاعتماد على شخص بعينه إلى النصف تقريبًا. فـ12 تعني: شخص واحد هو أقصى مخاطرة، و12 نصفها، و140 نحو 8%. وتتراجع المخاطرة سريعًا لكنها لا تبلغ الصفر تمامًا أبدًا: فحتى في مجموعة كبيرة يظل رحيل حامل رئيسي ملموسًا.", "ageSpreadLabel": "تشتت الأعمار داخل الوظيفة", "ageSpreadSuf": "سنة (σ)", "ageSpreadNote": "الانحراف المعياري للعمر داخل الوظيفة. لا تُحتسب المخاطرة الديموغرافية من متوسط عمر واحد، بل كالنسبة المتوقعة من الأشخاص الذين سيبلغون سن التقاعد خلال أفق المشروع. ولهذا لا يكون متوسط 44 عامًا مع أفق 8 سنوات مخاطرةً صفرية: فجزء من الفريق أكبر من المتوسط. أما الصفر فيعني أن الجميع في العمر نفسه."}});
+
+/* ---------- ДОПОЛНЕНИЕ: дефекты расчёта — оргструктура, разброс, индекс (kk/zh) ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"distModeLabel": "Ұйым құрылымы үлестері қайдан", "distModeHint": "Әдепкі бойынша «Негізгі / ЖЖҚ / Инженерлік» үлестері жұмыс түрлеріне тағайындалған топтардан шығарылады. Бұл жұмыс түрлері нысанның бүкіл персоналын қамтығанда дұрыс: егер тек негізгі процесс сипатталса, көмекші және инженерлік топтар 0% алады, ал олардың лауазымдары барлық модульде — соның ішінде автоматтандыру талдауы мен кадрлық тәуекелдерде — нөл адам алады. Барлық жұмыстарды сипаттауға әзір болмасаңыз, қолмен берілетін үлестерге ауысыңыз.", "distFromWorks": "Жұмыс түрлерінен (тағайындалған топтар бойынша)", "distManual": "Қолмен беру (пайызбен)", "starvedWarn": "<b>{groups} топтары 0% алды</b>, себебі жұмыс түрлерінің ішінде мұндай тобы барлары жоқ. Ал анықтамалықта осы топтардың {n} лауазымы бар және олар барлық беттерде нөлдік санмен көрсетіледі: {list}. Есеп формальды түрде дұрыс — жұмыс жоқ болса, қажеттілік те жоқ — бірақ сіз мұны меңзеген шығарсыз деу қиын.", "starvedManualBtn": "Үлестерді қолмен беру"}, "life": {"legendReqBand": "P10–P90 дәлізі (қажеттілік)"}, "pred": {"legendReqBand": "P10–P90 (қажеттілік)", "dispProbHint": "<b>Бұл — индекс, статистикалық мағынадағы ықтималдық емес.</b> 1−e^(−λ·t) формуласымен есептеледі, мұнда λ = (лексикон бойынша автоматтандырылатын операциялар үлесі) × (автоматтандыру қарқыны) × (өмірге қабілеттілік ауқымы), t — жоба горизонты жылмен. Үш көбейткіштің де бәрі «Әдістеме» бетіндегі сараптамалық болжамдар, рөлдердің ығыстырылуының байқалған жиілігі емес: бұл кәсіптің шын мәнінде қаншалықты жиі жоғалғанын ешкім өлшеген жоқ. Сондықтан <b>санды рөлдер арасында салыстыруға және болжамдар оны қалай жылжытатынын бақылауға болады, бірақ оны «88% мүмкіндік» деп оқуға болмайды</b>. Тұжырымның қаншалықты тұрақты екенін көру үшін «Автоматтандыру қарқыны» мен «Өмірге қабілеттілік ауқымын» өзгертіңіз."}, "meth": {"demandSigmaLabel": "Қажеттілік жоспарының белгісіздігі", "demandSigmaSuf": "% (жүйелі)", "demandSigmaNote": "Жоспардың өзі қаншалықты қателесуі мүмкін: көлемдер, нормалар мен мерзімдер дәл белгісіз. Ай сайынғы шуылдан айырмашылығы, бұл қате горизонт бойынша орташаланбайды — ол бүкіл траекторияны ығыстырады, сондықтан Монте-Карлода әр прогон өз жоспар көбейткішін алады. Дәл осы параметр P10–P90 дәлізінің нақты енін белгілейді. 0% «жоспарды дәл деп санаймын» дегенді білдіреді — сонда дәліз тек кету мен жалдау шашырауын көрсетеді және күдікті тар болып көрінеді.", "busScaleLabel": "Тасымалдаушыға тәуелділік ауқымы", "busScaleSuf": "адам", "busScaleNote": "Құзырет иелерінің қай санында нақты адамға тәуелділік шамамен екі есе азаяды. 12 дегеніміз: 1 адам — ең жоғары тәуекел, 12 — жартысы, 140 — шамамен 8%. Тәуекел тез бәсеңдейді, бірақ ешқашан толық нөлге айналмайды: үлкен топта да кілт тасымалдаушының кетуі сезіледі.", "ageSpreadLabel": "Лауазымдағы жас шашырауы", "ageSpreadSuf": "жыл (σ)", "ageSpreadNote": "Лауазым ішіндегі жастың стандартты ауытқуы. Демографиялық тәуекел бір орташа жас бойынша емес, жоба горизонтында зейнет жасына жететін адамдардың күтілетін үлесі ретінде есептеледі. Сондықтан орташа 44 жас пен 8 жылдық горизонтта тәуекел нөлдік емес: ұжымның бір бөлігі орташадан үлкен. 0 болса, бәрі құрдас дегенді білдірер еді."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"norm": {"distModeLabel": "编制结构占比的来源", "distModeHint": "默认情况下，「主体 / 检修 / 工程管理」的占比由作业类型所分配的组别推导而来。只要作业类型覆盖了全厂人员，这就是正确的：若只描述了主体工艺，辅助组和工程组会得到 0%，其岗位在所有模块（包括自动化分析与人力风险）中的人数都为零。如果您暂时无法描述全部作业，请切换为手动占比。", "distFromWorks": "来自作业类型（按所分配的组别）", "distManual": "手动设定（百分比）", "starvedWarn": "<b>{groups} 组获得 0%</b>，因为没有任何作业类型属于该组。而字典中这些组共有 {n} 个岗位，它们在所有标签页上都显示为零人数：{list}。测算在形式上没有错——没有作业就没有需求——但这多半不是您的本意。", "starvedManualBtn": "手动设定占比"}, "life": {"legendReqBand": "P10–P90 区间（需求）"}, "pred": {"legendReqBand": "P10–P90（需求）", "dispProbHint": "<b>这是一个指数，而非统计意义上的概率。</b>计算方式为 1−e^(−λ·t)，其中 λ =（词典中可自动化操作的占比）×（自动化速度）×（存活尺度），t 为以年计的项目周期。这三个因子都是「方法论」标签页上的专家假设，而不是观测到的岗位被取代频率：没有人测量过这个职业实际消失的频次。因此<b>该数值适合在岗位之间比较、以及观察假设如何影响它，但不可读作「88% 的机率」</b>。请调整「自动化速度」和「存活尺度」，看看结论是否稳健。"}, "meth": {"demandSigmaLabel": "需求计划的不确定性", "demandSigmaSuf": "%（系统性）", "demandSigmaNote": "计划本身可能有多大偏差：工作量、定额和工期都只是近似已知。与逐月噪声不同，这种误差不会在整个周期内被平均掉——它会整体平移轨迹，因此蒙特卡洛的每次模拟都会获得各自的计划系数。正是该参数决定了 P10–P90 区间的真实宽度。设为 0% 意味着「我认为计划是准确的」——此时区间只反映流失与招聘的离散度，会显得可疑地狭窄。", "busScaleLabel": "关键人员依赖尺度", "busScaleSuf": "人", "busScaleNote": "当某项能力的掌握者达到多少人时，对特定个人的依赖大约减半。12 表示：1 人为最高风险，12 人为其一半，140 人约为 8%。风险衰减很快，但永远不会正好归零：即便在大团队中，关键人员的离开也能感觉到。", "ageSpreadLabel": "岗位内年龄离散度", "ageSpreadSuf": "年（σ）", "ageSpreadNote": "岗位内部年龄的标准差。人口结构风险并非按单一平均年龄计算，而是按项目周期内预计达到退休年龄的人员占比来计算。因此平均 44 岁、周期 8 年时风险并不为零：团队中有一部分人年长于平均值。为 0 则意味着所有人同龄。"}});
 
 /* ---------- ДОПОЛНЕНИЕ: средний доступный штат в оценке драйверов ---------- */
 (function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"pred": {"effectNoteAvail": "Горизонт бойындағы орташа қолжетімді штаттың өзгеруі (қазір {avail} адам). Горизонтта тапшылық жоқ, сондықтан қамтылуға әсері көрсетілген: жасыл — орташа алғанда адам көбірек қалады, қызыл — азырақ."}});
