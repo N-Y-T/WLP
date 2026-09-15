@@ -266,13 +266,17 @@ tfoot tr.totrow td{background:var(--ink);color:#fff;font-weight:800;font-size:12
 tfoot tr.totrow td.mono{font-family:var(--mono)}
 /* значение достроено интерполяцией / переопределено пользователем */
 input.pderived{color:var(--t3);font-style:italic;background:var(--surface2)}
-/* справочник: длинные названия не должны обрезаться */
-.dname{min-width:300px;width:22%}
-.dname input{width:100%;text-overflow:ellipsis}
-.dskills{min-width:280px;width:20%}
-.dskills input{width:100%;text-overflow:ellipsis}
-/* числовые колонки справочника держим узкими, чтобы текстовым осталась ширина */
-.dnum{width:1%;white-space:nowrap}
+/* Справочник. Числу нужна ширина под само число: «350 000» по строкам не переносится,
+   поэтому в прошлой версии оклад показывался как «35». Экономим на ЗАГОЛОВКАХ —
+   они переносятся в две строки, — а длинные тексты переносим по словам. */
+.dnum{white-space:nowrap}
+.dnum input{min-width:76px;width:100%}
+.dtbl thead th{white-space:normal;line-height:1.35;vertical-align:bottom;min-width:56px}
+.dtbl thead th.dnum{min-width:84px}
+.dname{min-width:190px;width:19%}
+.dname input{width:100%}
+.dskills{min-width:170px;width:15%}
+.dskills input{width:100%}
 /* навык, добавленный пользователем в лексикон */
 tr.lex-custom td{background:var(--primary-l)}
 /* выбор фазы для «Детализации по должностям» */
@@ -285,12 +289,41 @@ tr.lex-custom td{background:var(--primary-l)}
 /* численность, вписанная руками, отличается от расчётной */
 input.posmanual{background:var(--primary-l);border-color:var(--primary);font-weight:700;color:var(--primary-d)}
 tr.posrow-manual td:first-child{box-shadow:inset 3px 0 0 var(--primary)}
-/* на ноутбуках поуже отдаём текстовым колонкам ровно столько, чтобы таблица влезла целиком */
-@media(max-width:1320px){
-  .dname{min-width:210px}
-  .dskills{min-width:190px}
-  /* в языках с длинными словами (es/fr) заголовки переносим, а не растягиваем таблицу */
-  .dnum{white-space:normal}
+/* матрица «должность × фаза»: по чекбоксам кликают часто, они должны быть заметны */
+input.phbox{width:17px;height:17px;accent-color:var(--primary);cursor:pointer;margin:0}
+td.mxname,th.mxname{min-width:210px;white-space:normal;line-height:1.4}
+/* Длинный текст в таблице: однострочное поле его обрезает, поэтому здесь textarea —
+   переносит по словам и растёт вниз. Ручной ресайз выключен: высота считается по содержимому. */
+textarea.cell-wrap{width:100%;resize:none;overflow:hidden;line-height:1.4;
+  white-space:pre-wrap;overflow-wrap:anywhere;min-height:30px;font-family:inherit}
+textarea.cell-wrap.mono{font-family:var(--mono)}
+/* ---------- УЗКАЯ СТРОКА СВОДКИ (вместо повтора дашборда) ---------- */
+.sumstrip{display:flex;align-items:flex-start;gap:26px;flex-wrap:wrap;margin-bottom:18px;
+  padding:13px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.sumstrip .ss-item{min-width:150px;flex:1}
+.sumstrip .ss-lab{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);margin-bottom:3px}
+.sumstrip .ss-val{font-family:var(--mono);font-size:21px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.sumstrip .ss-note{font-size:11px;color:var(--t3);line-height:1.45;margin-top:3px}
+.sumstrip .ss-link{align-self:center;font-size:11.5px;font-weight:700;color:var(--primary);
+  cursor:pointer;white-space:nowrap;text-decoration:none;border-bottom:1px dashed var(--primary)}
+.sumstrip .ss-link:hover{color:var(--primary-d)}
+/* ссылка «подробнее на вкладке X» в плитке дашборда: сводка ведёт к своему источнику */
+.kpi{position:relative}
+.kpi .kpi-src{display:inline-block;margin-top:9px;font-size:10.5px;font-weight:700;color:var(--primary);
+  cursor:pointer;border-bottom:1px dashed var(--primary);text-decoration:none}
+.kpi .kpi-src:hover{color:var(--primary-d)}
+@media print{.kpi .kpi-src{display:none}}
+@media print{.sumstrip .ss-link{display:none}}
+/* на ноутбуках поуже текстовые колонки уступают, но числа не сжимаются */
+@media(max-width:1400px){
+  .dname{min-width:140px}
+  .dskills{min-width:120px}
+  .dskills textarea{font-size:10.5px}
+  .dtbl thead th{font-size:9px;letter-spacing:.6px}
+  /* числа не сжимаем: лучше горизонтальная прокрутка, чем «35» вместо 350 000.
+     Экономим на селекте группы — «Core»/«Aux»/«Mgmt» читаются и в 76px. */
+  .dtbl select.cell-edit{min-width:76px!important}
 }
 /* рекомендация в тепловой карте переносится, а не растягивает таблицу */
 td.recocell{min-width:190px;max-width:280px;white-space:normal;line-height:1.45}
@@ -599,7 +632,7 @@ Object.assign(I18N.ru, {
     exportJson:'Выгрузить (JSON)', save:'Сохранить', cancel:'Отменить', add:'Добавить', delete:'Удалить',
     core:'Основной', aux:'ТОиР/Aux', mgmt:'ИТР/Mgmt',
     coreShort:'Core', auxShort:'Aux', mgmtShort:'Mgmt',
-    person:'чел.', months:'мес.', days:'дн.', na:'—' },
+    person:'чел.', onDashboard:'Вся сводка — на дашборде', detailsOn:'Подробнее: {tab}', months:'мес.', days:'дн.', na:'—' },
   nav:{ dashboard:'Дашборд', normative:'Нормативный расчёт', lifecycle:'Жизненный цикл',
     predictive:'Предиктивный анализ', risks:'Кадровые риски', cba:'Переобучение / CBA',
     actions:'План действий', scenarios:'Сценарии', dictionary:'Справочник', methodology:'Методология' },
@@ -639,7 +672,7 @@ Object.assign(I18N.en, {
     exportJson:'Export (JSON)', save:'Save', cancel:'Cancel', add:'Add', delete:'Delete',
     core:'Core', aux:'Maintenance/Aux', mgmt:'Engineering/Mgmt',
     coreShort:'Core', auxShort:'Aux', mgmtShort:'Mgmt',
-    person:'people', months:'mo.', days:'days', na:'—' },
+    person:'people', onDashboard:'Full summary is on the dashboard', detailsOn:'Details: {tab}', months:'mo.', days:'days', na:'—' },
   nav:{ dashboard:'Dashboard', normative:'Normative Calculation', lifecycle:'Lifecycle',
     predictive:'Predictive Analysis', risks:'Workforce Risks', cba:'Reskilling / CBA',
     actions:'Action Plan', scenarios:'Scenarios', dictionary:'Directory', methodology:'Methodology' },
@@ -695,6 +728,10 @@ Object.assign(I18N.ru, { norm:{
   needHire:'требуется найм', needReskill:'переобучение / высвобождение', staffBalanced:'штат сбалансирован',
   detailTitle:'Детализация по должностям', detailHint:'Потребность из блока «Сводный результат» делится между должностями справочника: сначала по группам (Основной / ТОиР / ИТР), затем поровну между должностями внутри группы. Столбцы Q1–Q4 показывают, как эта потребность меняется <b>внутри выбранной фазы</b> — от её начала (Q1) к концу (Q4).',
   qMonthShort:'мес. {m}', monthRange:'мес. {from}–{to}',
+  matrixTitle:'Какие должности нужны на каких фазах',
+  matrixHint:'Отметьте, на каких фазах проекта должность реально работает. Буровик не нужен на проектировании, наладчик КИПиА — в консервации, аналитик данных нужен на проектировании и в эксплуатации, но не на СМР. Потребность фазы делится только между отмеченными должностями — неотмеченные получают ноль, а их доля уходит остальным.',
+  matrixNote:'<b>Без этой матрицы каждая должность получала долю в каждой фазе</b> — и на проектировании «работали» буровики и слесари. Снимите отметки там, где роль не нужна: числа в «Детализации по должностям», анализе автоматизации и плане действий пересчитаются. Если по фазе не отмечена ни одна должность группы, потребность делится по всем — иначе фаза потеряла бы людей молча.',
+  matrixAllBtn:'Отметить все', thPhasesOn:'Фаз',
   distModeLabel:'Откуда доли оргструктуры', distModeHint:'По умолчанию доли «Основной / ТОиР / ИТР» выводятся из групп, назначенных видам работ. Это верно, пока виды работ покрывают весь персонал объекта: если описан только основной процесс, вспомогательная и инженерная группы получат 0%, а их должности — ноль людей во всех модулях, включая анализ автоматизации и кадровые риски. Если описывать все работы вы пока не готовы, переключитесь на ручные доли.',
   distFromWorks:'Из видов работ (по назначенным группам)', distManual:'Задать вручную (в процентах)',
   starvedWarn:'<b>Группы {groups} получили 0%</b>, потому что среди видов работ нет ни одной с такой группой. В справочнике при этом {n} должн. этих групп, и они показываются с нулевой численностью на всех вкладках: {list}. Расчёт формально верен — нет работ, нет и потребности, — но это вряд ли то, что вы имели в виду.',
@@ -801,7 +838,7 @@ life:{
   verdictLikely:'Дефицит скорее случится, чем нет ({pct}% симуляций). Первый провал ожидается на {month}-м месяце.',
   verdictPossible:'Дефицит возможен, но не предопределён: он возникает в {pct}% симуляций. Решают отток и скорость найма.',
   verdictNone:'Дефицит не прогнозируется: во всех симуляциях штата хватает. Следите за профицитом и стоимостью удержания.',
-  whyMonteCarlo:'<b>Зачем здесь случайность.</b> Одна линия прогноза — это обман: никто не знает точно, сколько людей уйдёт в марте и сколько вакансий закроется в срок. Поэтому будущее проигрывается {runs} раз, каждый раз со своими случайными отклонениями оттока (±40%), спроса (±5%) и успешности найма. Из этих {runs} исходов и получается коридор: <b>P50</b> — срединный сценарий, <b>P10–P90</b> — интервал, в который попадает 80% исходов. Широкий коридор означает, что результат сильно зависит от везения, и на него нельзя закладываться; узкий — что прогноз устойчив.',
+  whyMonteCarlo:'<b>Зачем здесь случайность.</b> Одна линия прогноза — это обман: никто не знает точно, сколько людей уйдёт в марте и сколько вакансий закроется в срок. Поэтому будущее проигрывается {runs} раз, каждый раз со своими отклонениями оттока (±40%), успешности найма и — главное — <b>самого плана потребности</b>: у каждого прогона свой систематический множитель плана (параметр «Неопределённость плана потребности» на вкладке «Методология») плюс небольшой помесячный шум. Из этих {runs} исходов и получается коридор: <b>P50</b> — срединный сценарий, <b>P10–P90</b> — интервал, в который попадает 80% исходов. Широкий коридор означает, что результат сильно зависит от везения, и на него нельзя закладываться; узкий — что прогноз устойчив.',
   effectRow:'{label} выше на 25% →', effectRowDown:'{label} ниже на 25% →',
   effectNoteAvail:'Изменение среднего доступного штата за горизонт (сейчас {avail} чел.). Дефицита на горизонте нет, поэтому показано влияние на обеспеченность: зелёное — людей в среднем останется больше, красное — меньше.',
   effectNote:'Изменение пикового дефицита (сейчас {peak} чел.) при росте драйвера на четверть. Ноль означает, что на этих данных драйвер упирается в другое ограничение.',
@@ -1061,6 +1098,10 @@ Object.assign(I18N.en, { norm:{
   needHire:'hiring needed', needReskill:'reskilling / release', staffBalanced:'headcount is balanced',
   detailTitle:'Breakdown by Position', detailHint:'The demand from the Summary Result block is split across directory positions: first by group (Core / Maintenance / Engineering), then evenly among the positions within each group. The Q1-Q4 columns show how that demand changes <b>within the selected phase</b> — from its start (Q1) to its end (Q4).',
   qMonthShort:'mo. {m}', monthRange:'mo. {from}-{to}',
+  matrixTitle:'Which positions are needed in which phase',
+  matrixHint:'Tick the phases in which a position actually works. A driller is not needed during design, an instrumentation commissioner is not needed during decommissioning, a data analyst is needed during design and operation but not during construction. The phase demand is split only among the ticked positions - the unticked ones get zero and their share goes to the others.',
+  matrixNote:'<b>Without this matrix every position received a share in every phase</b> - drillers and fitters "worked" during design. Untick where a role is not needed: the figures in the breakdown by position, the automation analysis and the action plan all recompute. If no position of a group is ticked for a phase, demand is split across all of them - otherwise the phase would silently lose its people.',
+  matrixAllBtn:'Tick all', thPhasesOn:'Phases',
   distModeLabel:'Source of the org-structure split', distModeHint:'By default the core / maintenance / engineering shares are derived from the groups assigned to work types. That is correct as long as the work types cover the whole site: if only the core process is described, the auxiliary and engineering groups get 0%, and their positions get zero people in every module, including automation analysis and workforce risks. If you are not ready to describe all the work yet, switch to manual shares.',
   distFromWorks:'From work types (by assigned group)', distManual:'Set manually (in percent)',
   starvedWarn:'<b>Groups {groups} got 0%</b> because no work type carries that group. Meanwhile the directory holds {n} position(s) in those groups, and they show zero headcount on every tab: {list}. The calculation is formally correct - no work, no demand - but it is unlikely to be what you meant.',
@@ -1167,7 +1208,7 @@ life:{
   verdictLikely:'A shortage is more likely than not ({pct}% of simulations). The first shortfall is expected in month {month}.',
   verdictPossible:'A shortage is possible but not predetermined: it occurs in {pct}% of simulations. Attrition and hiring speed decide it.',
   verdictNone:'No shortage is projected: headcount suffices in every simulation. Watch the surplus and the cost of retention instead.',
-  whyMonteCarlo:'<b>Why randomness is here.</b> A single forecast line is a deception: nobody knows exactly how many people leave in March or how many vacancies close on time. So the future is played out {runs} times, each with its own random deviations in attrition (±40%), demand (±5%) and hiring success. Those {runs} outcomes produce the band: <b>P50</b> is the median scenario, <b>P10-P90</b> the interval holding 80% of outcomes. A wide band means the result depends heavily on luck and cannot be relied on; a narrow one means the forecast is robust.',
+  whyMonteCarlo:'<b>Why randomness is here.</b> A single forecast line is a deception: nobody knows exactly how many people leave in March or how many vacancies close on time. So the future is played out {runs} times, each with its own deviations in attrition (±40%), hiring success and — most importantly — <b>the demand plan itself</b>: every run gets its own systematic plan multiplier (the "Demand-plan uncertainty" parameter on the Methodology tab) plus a little month-to-month noise. Those {runs} outcomes produce the band: <b>P50</b> is the median scenario, <b>P10-P90</b> the interval holding 80% of outcomes. A wide band means the result depends heavily on luck and cannot be relied on; a narrow one means the forecast is robust.',
   effectRow:'{label} 25% higher →', effectRowDown:'{label} 25% lower →',
   effectNoteAvail:'Change in the average available headcount over the horizon (currently {avail} people). There is no shortage over the horizon, so the effect on staffing is shown instead: green means more people remain on average, red means fewer.',
   effectNote:'Change in peak shortage (currently {peak} people) when the driver rises by a quarter. Zero means that on this data the driver is blocked by another constraint.',
@@ -1412,7 +1453,9 @@ Object.assign(I18N.ru, { toast:{
   clamped:'«{label}»: допустимы значения от {min} до {max} — поправил на ближайшее.',
   tplApplied:'Шаблон «{name}» применён', tplSaved:'Шаблон «{name}» сохранён',
   tplDeleted:'Шаблон «{name}» удалён',
+  profDeleted:'Должность «{name}» удалена. Не забудьте сохранить справочник.',
   posReset:'Ручные правки численности по должностям сброшены',
+  phasesAll:'Все должности отмечены на всех фазах',
   lexNoName:'Введите название навыка',
   lexExists:'Навык «{name}» уже есть в лексиконе',
   lexAdded:'Навык «{name}» добавлен в лексикон',
@@ -1433,6 +1476,9 @@ Object.assign(I18N.ru, { toast:{
   newTemplateName:'Название нового шаблона:', newTemplateDefault:'Мой профиль',
   newIndustryName:'Как называется ваша отрасль? (например: Горнодобыча, Электроэнергетика, Логистика)',
   deleteTemplate:'Удалить шаблон «{name}»? Данные расчёта останутся, удалится только сам шаблон.',
+  deleteProf:'Удалить должность «{name}» из справочника?\n\nВместе с ней уйдут её оклад, навыки, численность и все ручные правки численности по фазам. Отменить это можно только кнопкой «Отмена» до сохранения справочника.',
+  deleteWork:'Удалить вид работ «{name}»?\n\nЕго объём, нормы и вклад в потребность будут потеряны.',
+  deleteScenario:'Удалить сценарий «{name}»?\n\nСнимок параметров будет потерян; текущие рабочие данные не затрагиваются.',
   scenarioName:'Название сценария:', scenarioDefault:'Сценарий {n}',
   newProfessionName:'Новая должность', unnamed:'Без названия', workMain:'{name} — основная работа'
 }, exportLabel:{
@@ -1443,7 +1489,9 @@ Object.assign(I18N.en, { toast:{
   clamped:'"{label}": allowed range is {min} to {max} — adjusted to the nearest valid value.',
   tplApplied:'Template "{name}" applied', tplSaved:'Template "{name}" saved',
   tplDeleted:'Template "{name}" deleted',
+  profDeleted:'Position "{name}" removed. Remember to save the directory.',
   posReset:'Manual per-position headcount edits were reset',
+  phasesAll:'Every position is now ticked for every phase',
   lexNoName:'Enter a skill name',
   lexExists:'The skill "{name}" is already in the lexicon',
   lexAdded:'The skill "{name}" was added to the lexicon',
@@ -1464,6 +1512,9 @@ Object.assign(I18N.en, { toast:{
   newTemplateName:'New template name:', newTemplateDefault:'My Profile',
   newIndustryName:'What is your industry called? (for example: Mining, Power Generation, Logistics)',
   deleteTemplate:'Delete the template "{name}"? Your calculation data stays; only the template is removed.',
+  deleteProf:'Delete the position "{name}" from the directory?\n\nIts salary, skills, headcount and every manual per-phase headcount edit go with it. This can only be undone with "Cancel" before you save the directory.',
+  deleteWork:'Delete the work type "{name}"?\n\nIts volume, norms and contribution to demand will be lost.',
+  deleteScenario:'Delete the scenario "{name}"?\n\nThe parameter snapshot will be lost; your current working data is not affected.',
   scenarioName:'Scenario name:', scenarioDefault:'Scenario {n}',
   newProfessionName:'New Position', unnamed:'Untitled', workMain:'{name} — main work'
 }, exportLabel:{
@@ -1600,15 +1651,16 @@ function currentGlossary(){ return GLOSSARY_I18N[LANG]||GLOSSARY_I18N.ru; }
 // avgAge — средний возраст носителей (демографический риск, выход на пенсию)
 // market — дефицитность профессии на рынке труда 0..1 (внешний рыночный риск)
 const INITIAL_PROFESSIONS = {
-  operator:{id:'operator',name:'Оператор технологической установки',type:'core',salary:350000,trainingBase:100000,skillRate:15000,skills:'ТБ;Арматура;Давление;Диагностика',headcount:520,avgAge:44,market:0.45},
-  patrol:{id:'patrol',name:'Оператор-обходчик',type:'core',salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ;Обход;Замеры;Арматура',headcount:380,avgAge:49,market:0.30},
-  driller:{id:'driller',name:'Машинист буровой',type:'core',salary:450000,trainingBase:150000,skillRate:20000,skills:'ТБ;Бурение;Гидравлика;Тяжелая техника',headcount:140,avgAge:47,market:0.65},
-  mechanic:{id:'mechanic',name:'Слесарь ТОиР',type:'aux',salary:300000,trainingBase:90000,skillRate:10000,skills:'ТБ;Чертежи;Инструмент;Механика',headcount:260,avgAge:46,market:0.40},
-  electrician:{id:'electrician',name:'Электромонтёр',type:'aux',salary:320000,trainingBase:90000,skillRate:12000,skills:'ТБ;Электробезопасность;Схемы;КИПиА',headcount:180,avgAge:43,market:0.50},
-  iot_tech:{id:'iot_tech',name:'Специалист IIoT (датчики)',type:'mgmt',salary:600000,trainingBase:250000,skillRate:35000,skills:'ТБ;Чертежи;Датчики;Телеметрия;Сети',headcount:28,avgAge:34,market:0.80},
-  data_scientist:{id:'data_scientist',name:'Аналитик данных (AI)',type:'mgmt',salary:900000,trainingBase:350000,skillRate:50000,skills:'Телеметрия;Python;Машинное обучение;SQL',headcount:12,avgAge:31,market:0.85}
+  operator:{id:'operator',phases:'commissioning;operation;decline',name:'Оператор технологической установки',type:'core',salary:350000,trainingBase:100000,skillRate:15000,skills:'ТБ;Арматура;Давление;Диагностика',headcount:520,avgAge:44,market:0.45},
+  patrol:{id:'patrol',phases:'commissioning;operation;decline',name:'Оператор-обходчик',type:'core',salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ;Обход;Замеры;Арматура',headcount:380,avgAge:49,market:0.30},
+  driller:{id:'driller',phases:'construction;operation',name:'Машинист буровой',type:'core',salary:450000,trainingBase:150000,skillRate:20000,skills:'ТБ;Бурение;Гидравлика;Тяжелая техника',headcount:140,avgAge:47,market:0.65},
+  mechanic:{id:'mechanic',phases:'construction;commissioning;operation;decline',name:'Слесарь ТОиР',type:'aux',salary:300000,trainingBase:90000,skillRate:10000,skills:'ТБ;Чертежи;Инструмент;Механика',headcount:260,avgAge:46,market:0.40},
+  electrician:{id:'electrician',phases:'construction;commissioning;operation;decline',name:'Электромонтёр',type:'aux',salary:320000,trainingBase:90000,skillRate:12000,skills:'ТБ;Электробезопасность;Схемы;КИПиА',headcount:180,avgAge:43,market:0.50},
+  iot_tech:{id:'iot_tech',phases:'design;commissioning;operation',name:'Специалист IIoT (датчики)',type:'mgmt',salary:600000,trainingBase:250000,skillRate:35000,skills:'ТБ;Чертежи;Датчики;Телеметрия;Сети',headcount:28,avgAge:34,market:0.80},
+  data_scientist:{id:'data_scientist',phases:'design;operation',name:'Аналитик данных (AI)',type:'mgmt',salary:900000,trainingBase:350000,skillRate:50000,skills:'Телеметрия;Python;Машинное обучение;SQL',headcount:12,avgAge:31,market:0.85}
 };
-const PROF_DEFAULTS = {salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ',headcount:20,avgAge:42,market:0.4};
+const PROF_DEFAULTS = {salary:300000,trainingBase:80000,skillRate:12000,skills:'ТБ',headcount:20,avgAge:42,market:0.4,
+  phases:'design;construction;commissioning;operation;decline'};
 // переводы отображаемых названий встроенных (несен-пользовательских) должностей — по id
 const PROFESSION_NAME_I18N = {
   ru:{ operator:'Оператор технологической установки', patrol:'Оператор-обходчик', driller:'Машинист буровой',
@@ -2231,7 +2283,7 @@ function automationAnalysis(horizonMonths){
     const surv = Math.exp(-lambda*years);            // вероятность «дожития» роли
     const dispProb = 1-surv;                          // вероятность вытеснения за горизонт
     const peers = byType[p.type] || [];
-    const fteRole = Math.round(b.staff[p.type] * groupShare(peers, p));
+    const fteRole = Math.round(b.staff[p.type] * groupShare(peers, p, b.stageId));
     const dispFTE = fteRole*dispProb;
     totalAtRisk += dispFTE;
     let status,bcls;
@@ -2315,6 +2367,20 @@ function starvedGroups(){
   });
   return out;
 }
+// На каких фазах должность вообще нужна. Пусто/не задано = на всех (прежнее поведение).
+function profPhases(p){
+  const v=p && p.phases;
+  if(typeof v==='string'){ const a=v.split(';').map(x=>x.trim()).filter(x=>STAGES[x]); return a.length?a:STAGE_ORDER.slice(); }
+  if(Array.isArray(v)){ const a=v.filter(x=>STAGES[x]); return a.length?a:STAGE_ORDER.slice(); }
+  return STAGE_ORDER.slice();
+}
+function activeInPhase(p, stageId){ return profPhases(p).indexOf(stageId)>=0; }
+// должности группы, занятые на этой фазе (по ним и делится потребность фазы)
+function positionsInPhase(positions, stageId){
+  if(!stageId) return positions;
+  const on=positions.filter(p=>activeInPhase(p,stageId));
+  return on.length?on:positions;   // ни одной не отмечено — делим по всем, иначе фаза потеряет людей
+}
 function allocateGroup(positions, groupTotal){
   const hc = positions.map(p=>Math.max(0, Number(p.headcount||0)));
   const sum = hc.reduce((a,x)=>a+x,0);
@@ -2323,10 +2389,15 @@ function allocateGroup(positions, groupTotal){
   return hc.map(x=>groupTotal*x/sum);
 }
 // доля потребности группы, приходящаяся на одну должность
-function groupShare(positions, prof){
-  const hc = positions.map(p=>Math.max(0, Number(p.headcount||0)));
+// Доля потребности группы, приходящаяся на должность, на конкретной фазе.
+// Должность, не занятая на этой фазе, получает 0 — её доля уходит остальным.
+function groupShare(positions, prof, stageId){
+  const pool = positionsInPhase(positions, stageId);
+  if(stageId && pool.indexOf(prof)<0 && !(pool.length===positions.length && !positions.some(p=>activeInPhase(p,stageId))))
+    return 0;
+  const hc = pool.map(p=>Math.max(0, Number(p.headcount||0)));
   const sum = hc.reduce((a,x)=>a+x,0);
-  if(sum<=0) return 1/Math.max(1, positions.length);
+  if(sum<=0) return 1/Math.max(1, pool.length);
   return Math.max(0, Number(prof.headcount||0))/sum;
 }
 
@@ -2775,6 +2846,18 @@ function emptyStartCard(){
       +step('3',t('empty.step3'),null,null)
     +'</div></div>';
 }
+// Узкая строка сводки: те же числа, что на дашборде, но не занимают экран
+// и не выглядят как «ещё один дашборд». Сводка остаётся одна — на дашборде.
+function summaryStrip(items){
+  return '<div class="sumstrip">'
+    +items.map(x=>'<div class="ss-item">'
+      +'<div class="ss-lab">'+esc(x.label)+(x.tip?hint(x.tip):'')+'</div>'
+      +'<div class="ss-val" style="color:'+(x.color||'var(--ink)')+'">'+x.val+'</div>'
+      +(x.note?'<div class="ss-note">'+esc(x.note)+'</div>':'')
+    +'</div>').join('')
+    +'<a class="ss-link" data-goto="dashboard">'+esc(t('common.onDashboard'))+'</a>'
+  +'</div>';
+}
 function demandChain(b){
   const c=b.chain, SC={base:t('life.scenarioBase'),optimistic:t('life.scenarioOptimistic'),automation:t('life.scenarioAutomation')};
   const row=(n,label,val,strong)=>'<div class="chrow'+(strong?' chsum':'')+'">'
@@ -2858,6 +2941,35 @@ function posValue(stageId,profId,k,computed){
   const v=ov?ov[k]:null;
   return (v===''||v==null||!isFinite(+v)) ? {v:computed,manual:false} : {v:Math.max(0,+v),manual:true};
 }
+// Матрица «какая должность нужна на какой фазе». Без неё каждая должность
+// получала долю в каждой фазе, что для проектных объектов почти всегда неверно.
+function phaseMatrix(){
+  const {phases}=buildPhases();
+  if(!phases.length) return '';
+  const list=Object.values(profDB);
+  if(!list.length) return '';
+  const TYPES=[['core',t('norm.groupCore')],['aux',t('norm.groupAux')],['mgmt',t('norm.groupMgmt')]];
+  let rows='';
+  TYPES.forEach(([ty,label])=>{
+    const arr=list.filter(x=>x.type===ty);
+    if(!arr.length) return;
+    rows+='<tr class="grouprow"><td colspan="'+(phases.length+2)+'">'+esc(label)+'</td></tr>';
+    arr.forEach(pr=>{
+      const on=profPhases(pr);
+      rows+='<tr><td class="mxname" style="font-weight:600">'+esc(profName(pr))+'</td>'
+        +phases.map(ph=>'<td class="c"><input type="checkbox" class="phbox" data-profphase="'+esc(pr.id)+'" '
+          +'data-stage="'+ph.id+'"'+(on.indexOf(ph.id)>=0?' checked':'')+'></td>').join('')
+        +'<td class="c small muted mono">'+on.length+'/'+phases.length+'</td></tr>';
+    });
+  });
+  return '<div class="card"><div class="ctitle">'+ic('activity')+esc(t('norm.matrixTitle'))+hint(t('norm.matrixHint'))
+    +'<span class="sp"></span><button class="tool" data-act="phases-all">'+esc(t('norm.matrixAllBtn'))+'</button></div>'
+    +'<div class="note note-blue" style="margin-bottom:12px">'+ic('info')+'<div>'+t('norm.matrixNote')+'</div></div>'
+    +'<div class="tbl-wrap"><table><thead><tr><th class="mxname">'+esc(t('norm.thPosition'))+'</th>'
+      +phases.map(ph=>'<th class="c" style="min-width:74px">'+esc(stageName(ph.id))
+        +'<div class="muted mono" style="font-size:9.5px;font-weight:400">'+esc(t('norm.monthRange',{from:ph.start+1,to:ph.end}))+'</div></th>').join('')
+      +'<th class="c">'+esc(t('norm.thPhasesOn'))+'</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
 function renderNormative(){
   const b=computeBase();
   const dStage=detailStage();
@@ -2881,7 +2993,7 @@ function renderNormative(){
     let h='<tr class="grouprow"><td colspan="'+NCOL+'">'+esc(label)+' · '+pct(dDist[type])+'% · '+fmtN(groupTotal)+' '+esc(t('common.person'))+'</td></tr>';
     if(!n){h+='<tr><td colspan="'+NCOL+'" class="muted" style="text-align:center;font-style:italic">'+esc(t('norm.noPositions'))+'</td></tr>';return h;}
     arr.forEach(p=>{
-      const share=groupShare(arr,p);
+      const share=groupShare(arr,p,dStage);
       const calcQ=k=>Math.round(dQ[k]*dDist[type]*share);
       const cells=[0,1,2,3].map(k=>posValue(dStage,p.id,k,calcQ(k)));
       const req=Math.round(cells.reduce((a,c)=>a+c.v,0)/4);
@@ -2987,6 +3099,8 @@ function renderNormative(){
 
   // ----- НИЖЕ, ВО ВСЮ ШИРИНУ: таблицы (им нужны все колонки) -----
   +'<div class="col-span-12">'+worksEditor()+'</div>'
+
+  +(phaseMatrix()? '<div class="col-span-12">'+phaseMatrix()+'</div>' : '')
 
   +'<div class="col-span-12">'
     +'<div class="card"><div class="ctitle">'+ic('layers')+esc(t('norm.detailTitle'))
@@ -3308,18 +3422,16 @@ function renderPredictive(){
     +toolbar({exportLabel:t('pred.exportLabel'),exportAct:'exp-pred'})+'</div>'
 
   // KPI лента
-  +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="kpi" style="border-top:3px solid '+probColor+'"><div class="kt">'+ic('shield')+esc(t('pred.kpiProbTitle'))+hint(t('dash.probHint',{thr:fmtN(M.deficitThreshold)}))+'</div>'
-      +'<div class="kv" style="color:'+probColor+'">'+pct(M.probDeficitAny)+'%</div>'
-      +'<div class="kd"><b>'+esc(probVerdict(M))+'</b></div>'
-      +'<div class="kd" style="margin-top:4px">'+esc(t('pred.kpiProbSub',{runs:M.runs.toLocaleString(curLocale()),thr:fmtN(M.deficitThreshold)}))+'</div></div>'
-    +'<div class="kpi" style="border-top:3px solid var(--red)"><div class="kt">'+ic('alert')+esc(t('pred.kpiPeakTitle'))+'</div>'
-      +'<div class="kv" style="color:var(--red)">'+fmtN(M.peakDeficitMed)+'</div>'
-      +'<div class="kd">'+esc(t('pred.kpiPeakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}))+'</div></div>'
-    +'<div class="kpi" style="border-top:3px solid var(--amber)"><div class="kt">'+ic('zap')+esc(t('pred.kpiAutoTitle'))+'</div>'
-      +'<div class="kv" style="color:var(--amber)">'+fmtN(auto.totalAtRisk)+'</div>'
-      +'<div class="kd">'+esc(t('pred.kpiAutoSub',{years:auto.years.toFixed(1)}))+'</div></div>'
-  +'</div>'
+  // Три крупные плитки здесь дословно повторяли дашборд. Оставляем узкую строку
+  // с выводом (он тут и рождается), а сводка живёт в одном месте — на дашборде.
+  +summaryStrip([
+      {label:t('pred.kpiProbTitle'), val:pct(M.probDeficitAny)+'%', color:probColor,
+       note:probVerdict(M), tip:t('dash.probHint',{thr:fmtN(M.deficitThreshold)})},
+      {label:t('pred.kpiPeakTitle'), val:fmtN(M.peakDeficitMed), color:'var(--red)',
+       note:t('pred.kpiPeakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth})},
+      {label:t('pred.kpiAutoTitle'), val:fmtN(auto.totalAtRisk), color:'var(--amber)',
+       note:t('pred.kpiAutoSub',{years:auto.years.toFixed(1)})}
+  ])
 
   +'<div class="grid g12">'
   // ЛЕВО — параметры прогноза
@@ -3498,18 +3610,18 @@ function renderDictionary(){
           +'<button class="tool" data-act="save-db" style="background:var(--primary);color:#fff;border-color:var(--primary)">'+ic('save')+esc(t('dir.saveDbBtn'))+'</button>':'')
       +'</div>'
     +'</div>'
-    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
-      +'<th>'+esc(t('norm.thPosition'))+'</th><th class="c">'+esc(t('work.thGroup'))+'</th><th class="r">'+esc(t('dir.thSalary'))+'</th>'
-      +'<th class="r">'+esc(t('dir.thTrainingBase'))+'</th><th class="r">'+esc(t('dir.thSkillPrice'))+'</th>'
-      +'<th class="c">'+esc(t('dir.thHeadcount'))+'</th><th class="c">'+esc(t('dir.thAvgAge'))+'</th><th class="c">'+esc(t('dir.thMarket'))+'</th>'
+    +'<div class="tbl-wrap" style="border:none;border-radius:0"><table class="dtbl"><thead><tr>'
+      +'<th class="dname">'+esc(t('norm.thPosition'))+'</th><th class="c dnum">'+esc(t('work.thGroup'))+'</th><th class="r dnum">'+esc(t('dir.thSalary'))+'</th>'
+      +'<th class="r dnum">'+esc(t('dir.thTrainingBase'))+'</th><th class="r dnum">'+esc(t('dir.thSkillPrice'))+'</th>'
+      +'<th class="c dnum">'+esc(t('dir.thHeadcount'))+'</th><th class="c dnum">'+esc(t('dir.thAvgAge'))+'</th><th class="c dnum">'+esc(t('dir.thMarket'))+'</th>'
       +'<th>'+esc(t('dir.thSkills'))+hint(t('dir.thSkillsHint'))+'</th>'
       +'<th class="c">'+esc(t('dir.thTrainCost'))+hint(t('dir.thTrainCostHint'))+'</th>'
       +'<th class="c">×</th></tr></thead><tbody>'
       +rows.map(p=>{
         const changed=isDirty && JSON.stringify(tempDB[p.id])!==JSON.stringify(profDB[p.id]);
         return '<tr'+(changed?' class="dirty"':'')+' data-row="'+p.id+'">'
-          +'<td class="dname"><input class="cell-edit" data-f="name" value="'+esc(profName(p))+'" title="'+esc(profName(p))+'"></td>'
-          +'<td class="c"><select class="cell-edit" data-f="type" style="text-align:center">'
+          +'<td class="dname"><textarea class="cell-edit cell-wrap" data-f="name" rows="1">'+esc(profName(p))+'</textarea></td>'
+          +'<td class="c dnum"><select class="cell-edit" data-f="type" style="text-align:center;min-width:86px">'
             +['core','aux','mgmt'].map(ty=>'<option value="'+ty+'"'+(p.type===ty?' selected':'')+'>'+esc(t('common.'+ty+'Short'))+'</option>').join('')+'</select></td>'
           +'<td class="r dnum"><input class="cell-edit mono" data-f="salary" type="number" value="'+p.salary+'" style="text-align:right;color:var(--blue);font-weight:700"></td>'
           +'<td class="r dnum"><input class="cell-edit mono" data-f="trainingBase" type="number" value="'+p.trainingBase+'" style="text-align:right;color:var(--green);font-weight:700"></td>'
@@ -3517,7 +3629,7 @@ function renderDictionary(){
           +'<td class="c dnum"><input class="cell-edit mono" data-f="headcount" type="number" value="'+(p.headcount!=null?p.headcount:0)+'" style="text-align:center;width:54px"></td>'
           +'<td class="c dnum"><input class="cell-edit mono" data-f="avgAge" type="number" value="'+(p.avgAge!=null?p.avgAge:42)+'" style="text-align:center;width:48px"></td>'
           +'<td class="c dnum"><input class="cell-edit mono" data-f="market" type="number" step="0.05" min="0" max="1" value="'+(p.market!=null?p.market:0.4)+'" style="text-align:center;width:52px"></td>'
-          +'<td class="dskills"><input class="cell-edit mono" data-f="skills" value="'+esc(p.skills)+'" title="'+esc(p.skills)+'" style="font-size:11px" list="skilllist"></td>'
+          +'<td class="dskills"><textarea class="cell-edit cell-wrap mono" data-f="skills" rows="1" style="font-size:11px">'+esc(p.skills)+'</textarea></td>'
           +'<td class="c small muted">'+esc(skillPriceSummary(p))+'</td>'
           +'<td class="c"><button class="xbtn" data-del="'+p.id+'" style="width:30px;height:30px">'+ic('trash')+'</button></td></tr>';
       }).join('')
@@ -3543,9 +3655,11 @@ function renderDashboard(){
   const probColor=light(M.probDeficitAny*100,30,60);
   const riskColor=light(risk.portfolioIndex,40,66);
 
-  const tl=(title,val,sub,color,icon,tip)=>'<div class="kpi" style="border-top:3px solid '+color+'">'
+  const tl=(title,val,sub,color,icon,tip,goto)=>'<div class="kpi" style="border-top:3px solid '+color+'">'
     +'<div class="kt">'+ic(icon)+esc(title)+(tip?hint(tip):'')+'</div>'
-    +'<div class="kv" style="color:'+color+'">'+val+'</div><div class="kd">'+esc(sub)+'</div></div>';
+    +'<div class="kv" style="color:'+color+'">'+val+'</div><div class="kd">'+esc(sub)+'</div>'
+    +(goto?'<a class="kpi-src" data-goto="'+goto+'">'+esc(t('common.detailsOn',{tab:t('nav.'+goto)}))+'</a>':'')
+  +'</div>';
 
   return '<div class="fadein">'+demoBanner()
   +'<div class="pagehead"><div><div class="eyebrow">'+esc(t('dash.eyebrow'))+'</div>'
@@ -3555,22 +3669,23 @@ function renderDashboard(){
 
   +'<div class="grid g3" style="margin-bottom:18px">'
     +tl(t('dash.gapNow'), (b.diff>0?'−':b.diff<0?'+':'')+fmtN(Math.abs(b.diff)),
-        b.diff>0?t('dash.gapDeficit'):b.diff<0?t('dash.gapSurplus'):t('dash.gapBalance'), gapColor,'users')
+        b.diff>0?t('dash.gapDeficit'):b.diff<0?t('dash.gapSurplus'):t('dash.gapBalance'), gapColor,'users',
+        null,'normative')
     +tl(t('dash.probDeficit'), pct(M.probDeficitAny)+'%',
         t('dash.probSub',{month:M.H-1,runs:M.runs.toLocaleString(curLocale())}), probColor,'shield',
-        t('dash.probHint',{thr:fmtN(M.deficitThreshold)}))
+        t('dash.probHint',{thr:fmtN(M.deficitThreshold)}),'predictive')
     +tl(t('dash.riskIndex'), risk.portfolioIndex+'<small style="font-size:14px;color:var(--t3)"> /100</small>',
         t('dash.riskSub',{critical:risk.critical,elevated:risk.elevated}), riskColor,'gauge',
-        t('dash.riskHint'))
+        t('dash.riskHint'),'risks')
   +'</div>'
   +'<div class="grid g3" style="margin-bottom:18px">'
     +tl(t('dash.peakDeficit'), fmtN(M.peakDeficitMed),
         t('dash.peakSub',{p90:fmtN(M.peakDeficitP90),month:M.peakMonth}), 'var(--red)','alert',
-        t('dash.peakHint',{runs:M.runs.toLocaleString(curLocale()),month:M.peakMonth}))
+        t('dash.peakHint',{runs:M.runs.toLocaleString(curLocale()),month:M.peakMonth}),'predictive')
     +tl(t('dash.fteAuto'), fmtN(auto.totalAtRisk),
-        t('dash.fteAutoSub',{years:auto.years.toFixed(1)}), 'var(--amber)','zap')
+        t('dash.fteAutoSub',{years:auto.years.toFixed(1)}), 'var(--amber)','zap', null,'predictive')
     +tl(t('dash.planCost'), fmtKZT(plan.total),
-        t('dash.planCostSub',{hire:plan.hire,reskill:plan.reskill,release:plan.release}), 'var(--primary)','dollar')
+        t('dash.planCostSub',{hire:plan.hire,reskill:plan.reskill,release:plan.release}), 'var(--primary)','dollar', null,'actions')
   +'</div>'
 
   +'<div class="grid g12">'
@@ -3644,11 +3759,11 @@ function renderRisks(){
     +'<p class="lead">'+esc(t('risk.lead'))+'</p></div>'
     +toolbar({exportLabel:t('risk.exportLabel'),exportAct:'exp-risk'})+'</div>'
 
-  +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="metric"><div class="mlabel">'+esc(t('risk.portfolioLabel'))+'</div><div class="mval" style="color:'+light(r.portfolioIndex,40,66)+'">'+r.portfolioIndex+'<small> /100</small></div><div class="msub">'+esc(t('risk.portfolioSub'))+'</div></div>'
-    +'<div class="metric gap-pos"><div class="mlabel">'+esc(t('risk.criticalLabel'))+'</div><div class="mval">'+r.critical+'</div><div class="msub">'+esc(t('risk.criticalSub'))+'</div></div>'
-    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">'+esc(t('risk.elevatedLabel'))+'</div><div class="mval" style="color:var(--amber)">'+r.elevated+'</div><div class="msub">'+esc(t('risk.elevatedSub'))+'</div></div>'
-  +'</div>'
+  +summaryStrip([
+      {label:t('risk.portfolioLabel'), val:r.portfolioIndex+' /100', color:light(r.portfolioIndex,40,66), note:t('risk.portfolioSub')},
+      {label:t('risk.criticalLabel'), val:String(r.critical), color:'var(--red)', note:t('risk.criticalSub')},
+      {label:t('risk.elevatedLabel'), val:String(r.elevated), color:'var(--amber)', note:t('risk.elevatedSub')}
+  ])
 
   +'<div class="grid g12">'
   +'<div class="col-span-4"><div class="card accent"><div class="ctitle">'+ic('sliders')+esc(t('risk.weightsTitle'))
@@ -3704,11 +3819,11 @@ function renderActions(){
     +'<p class="lead">'+esc(t('act.lead'))+'</p></div>'
     +toolbar({exportLabel:t('act.exportLabel'),exportAct:'exp-act'})+'</div>'
 
-  +'<div class="grid g3" style="margin-bottom:18px">'
-    +'<div class="metric gap-pos"><div class="mlabel">'+esc(t('act.hireType'))+'</div><div class="mval">'+fmtN(plan.hire)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('act.hireMetricSub'))+'</div></div>'
-    +'<div class="metric" style="background:var(--amber-l);border-color:var(--amber-bd)"><div class="mlabel">'+esc(t('act.reskillType'))+'</div><div class="mval" style="color:var(--amber)">'+fmtN(plan.reskill)+' <small>'+esc(t('common.person'))+'</small></div><div class="msub">'+esc(t('act.reskillMetricSub'))+'</div></div>'
-    +'<div class="metric"><div class="mlabel">'+esc(t('act.totalCostLabel'))+'</div><div class="mval">'+fmtKZT(plan.total)+'</div><div class="msub">'+esc(t('act.actsCount',{n:plan.acts.length}))+'</div></div>'
-  +'</div>'
+  +summaryStrip([
+      {label:t('act.hireType'), val:fmtN(plan.hire)+' '+t('common.person'), color:'var(--red)', note:t('act.hireMetricSub')},
+      {label:t('act.reskillType'), val:fmtN(plan.reskill)+' '+t('common.person'), color:'var(--amber)', note:t('act.reskillMetricSub')},
+      {label:t('act.totalCostLabel'), val:fmtKZT(plan.total), color:'var(--primary)', note:t('act.actsCount',{n:plan.acts.length})}
+  ])
 
   +'<div class="card flush">'
     +'<div class="tbl-wrap" style="border:none;border-radius:0"><table><thead><tr>'
@@ -3919,6 +4034,14 @@ function syncTabs(){
 }
 
 /* ---------- РЕНДЕР c сохранением фокуса ---------- */
+// Подгоняем высоту переносящихся полей под содержимое: иначе textarea покажет
+// одну строку и мы вернёмся к той же обрезке.
+function autosizeCells(root){
+  (root||document).querySelectorAll('textarea.cell-wrap').forEach(el=>{
+    el.style.height='auto';
+    el.style.height=Math.max(30, el.scrollHeight)+'px';
+  });
+}
 function render(){
   const view=document.getElementById('view');
   hideTip(); // подсказка могла указывать на элемент, который сейчас будет заменён
@@ -3936,6 +4059,7 @@ function render(){
   const tab=TABS.find(t=>t.id===activeTab)||TABS[0];
   view.innerHTML = tab.render();
   persist(); // автосохранение состояния в localStorage
+  autosizeCells(view);
   // восстановить фокус
   if(focusId){
     const el=document.getElementById(focusId);
@@ -4367,6 +4491,12 @@ function handleAction(act){
     case 'lex-add': addLexiconSkill(); break;
     case 'pos-reset': resetPosOverrides(); break;
     case 'dist-manual': S.distMode='manual'; render(); showToast(t('toast.distManual')); break;
+    case 'phases-all': {
+      const all=STAGE_ORDER.join(';');
+      Object.values(profDB).forEach(pr=>{ pr.phases=all; });
+      Object.values(tempDB).forEach(pr=>{ pr.phases=all; });
+      render(); showToast(t('toast.phasesAll')); break;
+    }
     case 'lex-add-missing': addMissingLexiconSkills(); break;
     case 'demo-hide': S.demoDismissed=true; render(); break;
     case 'exp-norm': exportJSON('normative',t('exportLabel.normative')); break;
@@ -4395,7 +4525,9 @@ function addWork(){
   render(); showToast(t('toast.workAdded'));
 }
 function delWork(id){
-  S.works=(S.works||[]).filter(w=>w.id!==id);
+  const w=(S.works||[]).find(x=>x.id===id);
+  if(!confirm(t('prompt.deleteWork',{name:w?workDisplayName(w):id}))) return;
+  S.works=(S.works||[]).filter(x=>x.id!==id);
   render(); showToast(t('toast.workDeleted'));
 }
 function saveScenario(){
@@ -4422,6 +4554,8 @@ function setBaseline(id){
   render();
 }
 function deleteScenario(id){
+  const sc=scenarios.find(x=>x.id===id);
+  if(!confirm(t('prompt.deleteScenario',{name:sc?sc.name:id}))) return;
   scenarios=scenarios.filter(s=>s.id!==id);
   render();
   showToast(t('toast.scenarioDeleted'));
@@ -4470,6 +4604,19 @@ function applyInput(el){
       S[id]=el.value;
     }
     return true;
+  }
+  // на каких фазах нужна должность
+  if(el.dataset && el.dataset.profphase){
+    const id=el.dataset.profphase, st=el.dataset.stage;
+    const target=tempDB[id]||profDB[id];
+    if(target){
+      const cur=new Set(profPhases(target));
+      if(el.checked) cur.add(st); else cur.delete(st);
+      const val=STAGE_ORDER.filter(x=>cur.has(x)).join(';');
+      if(tempDB[id]) tempDB[id].phases=val;
+      if(profDB[id]) profDB[id].phases=val;   // матрица применяется сразу, без «Сохранить»
+    }
+    return 'profphase';
   }
   // ручная численность по должности в выбранной фазе
   if(el.dataset && el.dataset.pos!=null && el.dataset.pos!==''){
@@ -4571,6 +4718,7 @@ function bindEvents(){
   view.addEventListener('input', e=>{
     const el=e.target;
     if(el.id==='saveTpl'||el.id==='tpl'||el.id==='newSkillName'||el.id==='newSkillRisk') return;
+    if(el.classList && el.classList.contains('cell-wrap')){ el.style.height='auto'; el.style.height=Math.max(30,el.scrollHeight)+'px'; }
     applyInput(el);
   });
 
@@ -4591,11 +4739,21 @@ function bindEvents(){
     const del=e.target.closest('[data-del]');
     if(del){
       const id=del.dataset.del;
-      delete tempDB[id]; isDirty=true; render();
+      const pr=tempDB[id];
+      // удаление должности уносит с собой оклады, навыки и ручные правки численности —
+      // спрашиваем, как и при удалении шаблона
+      if(!confirm(t('prompt.deleteProf',{name:pr?profName(pr):id}))) return;
+      delete tempDB[id];
+      // ручные правки численности по этой должности больше ни к чему не относятся
+      if(S.positionPlan) Object.keys(S.positionPlan).forEach(st=>{ if(S.positionPlan[st]) delete S.positionPlan[st][id]; });
+      isDirty=true; render();
+      showToast(t('toast.profDeleted',{name:pr?profName(pr):id}));
       return;
     }
     const delw=e.target.closest('[data-delwork]');
     if(delw){ delWork(delw.dataset.delwork); return; }
+    const gt=e.target.closest('[data-goto]');
+    if(gt){ goToTab(gt.dataset.goto); return; }
     const ds=e.target.closest('[data-dstage]');
     if(ds){ S.detailStage=ds.dataset.dstage; render(); return; }
     const delsk=e.target.closest('[data-delskill]');
@@ -4739,7 +4897,7 @@ const AI_TOOLS = [
   {name:'add_work',description:'Добавить один вид работ.',input_schema:{type:'object',properties:{work:{type:'object'}},required:['work']}},
   {name:'set_industry_template',description:'Создать отраслевой шаблон под отрасль заказчика и сделать его активным. Используй, когда отрасль клиента не совпадает ни с одним встроенным шаблоном (нефтегаз / машиностроение / IT-R&D): например горное дело, энергетика, логистика, строительство, агро, металлургия, здравоохранение. Заполняй поля по документу клиента и отраслевым бенчмаркам, а не наугад.',input_schema:{type:'object',properties:{name:{type:'string',description:'Название отрасли, как её назвал бы заказчик'},volume:{type:'number'},unit:{type:'string',description:'Единица измерения объёма: тонн, м³, скважин, заявок…'},period:{type:'string',description:'Период объёма: смена, сутки, месяц, квартал, год'},norm:{type:'number',description:'Норма выработки на 1 человека за период'},shifts:{type:'number'},absCoeff:{type:'number',description:'Коэффициент списочного состава, 1.0…3.0'},actualStaff:{type:'number'},rCore:{type:'number'},rAux:{type:'number'},rMgmt:{type:'number'},turnover:{type:'number',description:'Годовая текучесть, %'},hireCap:{type:'number',description:'Ёмкость найма, чел./мес'},fillDays:{type:'number',description:'Срок закрытия вакансии, дней'},sepCap:{type:'number'},autoPace:{type:'number',description:'Темп автоматизации, 0.3…1.6'}},required:['name']}},
   {name:'set_phase_plan',description:'Задать ПЛАНОВУЮ численность персонала по фазам напрямую из документа заказчика (в людях, а не в множителях) и переключить расчёт в режим «план». Используй, когда в документе есть готовый график численности по месяцам/этапам — тогда потребность берётся из документа, а не выводится из норм.',input_schema:{type:'object',properties:{plan:{type:'object',description:'{design:[q1,q2,q3,q4], construction:[...], commissioning:[...], operation:[...], decline:[...]} — численность в 4 точках каждой фазы (начало→конец). Указывай только те фазы, что есть в проекте.'}},required:['plan']}},
-  {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). Используй это при проектировании расчёта по документу заказчика: одним вызовом задай тот набор должностей, который реально нужен объекту.',input_schema:{type:'object',properties:{professions:{type:'array',items:{type:'object'},description:'Массив должностей: {name, type:core|aux|mgmt, salary, trainingBase, skillRate, skills, headcount, avgAge, market}'}},required:['professions']}},
+  {name:'set_professions',description:'ПОЛНОСТЬЮ заменить справочник должностей (удаляет демо-данные). Используй это при проектировании расчёта по документу заказчика: одним вызовом задай тот набор должностей, который реально нужен объекту.',input_schema:{type:'object',properties:{professions:{type:'array',items:{type:'object'},description:'Массив должностей: {name, type:core|aux|mgmt, salary, trainingBase, skillRate, skills, headcount, avgAge, market, phases}. phases — на каких фазах роль занята, из design|construction|commissioning|operation|decline через «;». Указывай честно: буровик не нужен на проектировании, наладчик КИПиА — в консервации. Пропуск поля означает «на всех фазах».'}},required:['professions']}},
   {name:'upsert_profession',description:'Добавить или обновить ОДНУ должность в справочнике.',input_schema:{type:'object',properties:{profession:{type:'object'}},required:['profession']}},
   {name:'delete_profession',description:'Удалить должность по id.',input_schema:{type:'object',properties:{id:{type:'string'}},required:['id']}},
   {name:'set_risk_weights',description:'Задать веса факторов кадрового риска.',input_schema:{type:'object',properties:{weights:{type:'object'}},required:['weights']}},
@@ -4805,6 +4963,12 @@ function aiNormalizeProfession(pr){
     type:['core','aux','mgmt'].includes(pr.type)?pr.type:'core',
     salary:num(pr.salary,300000), trainingBase:num(pr.trainingBase,80000), skillRate:num(pr.skillRate,12000),
     skills:String(pr.skills||''), headcount:num(pr.headcount,20), avgAge:num(pr.avgAge,42),
+    // на каких фазах роль занята; пусто = на всех
+    phases:(function(v){
+      const arr = Array.isArray(v) ? v : String(v||'').split(/[;,\s]+/);
+      const ok = arr.map(x=>String(x).trim()).filter(x=>STAGES[x]);
+      return ok.length ? STAGE_ORDER.filter(x=>ok.indexOf(x)>=0).join(';') : STAGE_ORDER.join(';');
+    })(pr.phases),
     market:clamp(num(pr.market,0.4),0,1)};
 }
 function aiApplyAfterMutation(){ const ids=Object.keys(profDB); if(!profDB[S.sourceProf])S.sourceProf=ids[0]; if(!profDB[S.targetProf])S.targetProf=ids[ids.length>1?1:0]; render(); }
@@ -5627,6 +5791,20 @@ Object.assign(I18N.zh.ai, { slideLabel:'幻灯片 {n}' });
   var it=g&&g[2]&&g[2].items&&g[2].items[1];
   if(it) it.how=pair[1];
 });
+
+/* ---------- ДОПОЛНЕНИЕ: пояснение Монте-Карло с систематической неопределённостью ---------- */
+(function(v){var L=I18N.kk=I18N.kk||{};L.pred=Object.assign(L.pred||{},{whyMonteCarlo:v});})("<b>Кездейсоқтық неге қажет.</b> Бір болжам сызығы — алдау: наурызда қанша адам кететінін және қанша вакансияның уақытында жабылатынын ешкім дәл білмейді. Сондықтан болашақ {runs} рет ойнатылады, әр жолы кетудің (±40%), жалдау табыстылығының және ең бастысы — <b>қажеттілік жоспарының өзінің</b> ауытқуларымен: әр прогонның өз жүйелі жоспар көбейткіші болады («Әдістеме» бетіндегі «Қажеттілік жоспарының белгісіздігі» параметрі) және шағын ай сайынғы шуыл қосылады. Осы {runs} нәтижеден дәліз шығады: <b>P50</b> — ортаңғы сценарий, <b>P10–P90</b> — нәтижелердің 80%-ы кіретін аралық. Кең дәліз нәтиже сәттілікке қатты тәуелді екенін білдіреді, оған сүйенуге болмайды; тар дәліз болжам тұрақты екенін көрсетеді.");
+(function(v){var L=I18N.zh=I18N.zh||{};L.pred=Object.assign(L.pred||{},{whyMonteCarlo:v});})("<b>为什么这里要引入随机性。</b>单一条预测线是一种误导：没人能确知三月会有多少人离职、多少空缺能按期填补。因此系统把未来演算 {runs} 次，每次都带有各自的偏差：流失（±40%）、招聘成功率，以及最重要的<b>需求计划本身</b>——每次模拟都会获得自己的系统性计划系数（「方法论」标签页上的「需求计划的不确定性」参数），再加上少量逐月噪声。这 {runs} 个结果构成区间带：<b>P50</b> 为中位情形，<b>P10–P90</b> 为涵盖 80% 结果的区间。区间宽说明结果很依赖运气，不可据此下注；区间窄则说明预测稳健。");
+(function(v){var L=I18N.es=I18N.es||{};L.pred=Object.assign(L.pred||{},{whyMonteCarlo:v});})("<b>Por qué hay azar aquí.</b> Una única línea de pronóstico engaña: nadie sabe con exactitud cuánta gente se va en marzo ni cuántas vacantes se cubren a tiempo. Por eso el futuro se juega {runs} veces, cada una con sus propias desviaciones de rotación (±40%), de éxito de contratación y —sobre todo— <b>del propio plan de demanda</b>: cada simulación recibe su propio multiplicador sistemático del plan (el parámetro «Incertidumbre del plan de demanda» en la pestaña Metodología) más un pequeño ruido mensual. De esos {runs} resultados sale la banda: <b>P50</b> es el escenario mediano y <b>P10-P90</b> el intervalo que contiene el 80% de los resultados. Una banda ancha significa que el resultado depende mucho de la suerte y no se puede apostar por él; una estrecha, que el pronóstico es robusto.");
+(function(v){var L=I18N.fr=I18N.fr||{};L.pred=Object.assign(L.pred||{},{whyMonteCarlo:v});})("<b>Pourquoi du hasard ici.</b> Une seule courbe de prévision est trompeuse : personne ne sait exactement combien de personnes partent en mars ni combien de postes sont pourvus à temps. L'avenir est donc rejoué {runs} fois, chaque fois avec ses propres écarts de turnover (±40 %), de réussite du recrutement et surtout <b>du plan de besoin lui-même</b> : chaque tirage reçoit son propre multiplicateur systématique de plan (le paramètre « Incertitude du plan de besoin » dans l'onglet Méthodologie), plus un léger bruit mensuel. De ces {runs} issues naît la plage : <b>P50</b> est le scénario médian, <b>P10-P90</b> l'intervalle contenant 80 % des issues. Une plage large signifie que le résultat dépend beaucoup de la chance et qu'on ne peut pas s'y fier ; une plage étroite, que la prévision est robuste.");
+(function(v){var L=I18N.ar=I18N.ar||{};L.pred=Object.assign(L.pred||{},{whyMonteCarlo:v});})("<b>لماذا العشوائية هنا.</b> خط توقُّع واحد مضلِّل: فلا أحد يعرف بدقة كم شخصًا سيغادر في مارس ولا كم وظيفة شاغرة ستُشغل في موعدها. ولذلك يُحتسب المستقبل {runs} مرة، في كل مرة بانحرافات خاصة في المغادرة (±40%) ونجاح التوظيف، والأهم من ذلك في <b>خطة الاحتياج نفسها</b>: إذ تحصل كل محاكاة على مضاعف خطة منهجي خاص بها (معامِل «عدم يقين خطة الاحتياج» في تبويب المنهجية) إضافةً إلى تشويش شهري بسيط. ومن هذه النتائج الـ{runs} ينشأ النطاق: <b>P50</b> هو السيناريو الوسيط، و<b>P10–P90</b> هو المجال الذي يشمل 80% من النتائج. والنطاق الواسع يعني أن النتيجة تعتمد كثيرًا على الحظ ولا يصح الاعتماد عليها؛ أما الضيق فيعني أن التوقع متين.");
+
+/* ---------- ДОПОЛНЕНИЕ: матрица фаз, подтверждения удаления, кросс-ссылки ---------- */
+(function(d){var L=I18N.kk=I18N.kk||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"common": {"onDashboard": "Толық сводка — дашбордта", "detailsOn": "Толығырақ: {tab}"}, "norm": {"matrixTitle": "Қандай лауазымдар қандай фазада қажет", "matrixHint": "Лауазым жобаның қай фазаларында шынымен жұмыс істейтінін белгілеңіз. Бұрғылаушы жобалауда қажет емес, КИПиА баптаушысы — консервацияда, деректер талдаушысы жобалау мен пайдалануда қажет, бірақ ҚМЖ-да емес. Фаза қажеттілігі тек белгіленген лауазымдар арасында бөлінеді — белгіленбегендер нөл алады, ал олардың үлесі қалғандарға кетеді.", "matrixNote": "<b>Бұл матрица болмағанда әр лауазым әр фазада үлес алатын</b> — жобалауда бұрғылаушылар мен слесарьлар «жұмыс істейтін». Рөл қажет емес жерде белгіні алып тастаңыз: «Лауазымдар бойынша талдаудағы», автоматтандыру талдауындағы және іс-шаралар жоспарындағы сандар қайта есептеледі. Фаза бойынша топтың бірде-бір лауазымы белгіленбесе, қажеттілік барлығы бойынша бөлінеді — әйтпесе фаза адамдарын үнсіз жоғалтар еді.", "matrixAllBtn": "Барлығын белгілеу", "thPhasesOn": "Фаза"}, "toast": {"profDeleted": "«{name}» лауазымы жойылды. Анықтамалықты сақтауды ұмытпаңыз.", "phasesAll": "Барлық лауазымдар барлық фазада белгіленді"}, "prompt": {"deleteProf": "«{name}» лауазымы анықтамалықтан жойылсын ба?\n\nОнымен бірге жалақысы, дағдылары, саны және фазалар бойынша барлық қолмен түзетілген сандар кетеді. Мұны анықтамалықты сақтағанға дейін «Бас тарту» батырмасымен ғана қайтаруға болады.", "deleteWork": "«{name}» жұмыс түрі жойылсын ба?\n\nОның көлемі, нормалары және қажеттілікке қосқан үлесі жоғалады.", "deleteScenario": "«{name}» сценарийі жойылсын ба?\n\nПараметрлер суреті жоғалады; ағымдағы жұмыс деректері өзгермейді."}});
+(function(d){var L=I18N.zh=I18N.zh||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"common": {"onDashboard": "完整汇总见仪表板", "detailsOn": "详情：{tab}"}, "norm": {"matrixTitle": "各阶段分别需要哪些岗位", "matrixHint": "请勾选该岗位实际参与工作的项目阶段。钻井工在设计阶段并不需要，仪表调试人员在退役阶段不需要，数据分析师在设计和运营阶段需要、但施工阶段不需要。阶段需求只在已勾选的岗位之间分配——未勾选的岗位为零，其份额归于其他岗位。", "matrixNote": "<b>没有这张矩阵时，每个岗位在每个阶段都会分到份额</b>——于是设计阶段也「有」钻井工和钳工在工作。请取消不需要该角色的勾选：「按岗位拆解」、自动化分析和行动计划中的数字都会重新计算。若某阶段该组内没有任何岗位被勾选，需求将在全部岗位间分配——否则该阶段会无声地失去人员。", "matrixAllBtn": "全部勾选", "thPhasesOn": "阶段"}, "toast": {"profDeleted": "岗位「{name}」已删除。请记得保存字典。", "phasesAll": "已为所有岗位勾选所有阶段"}, "prompt": {"deleteProf": "要从字典中删除岗位「{name}」吗？\n\n其薪资、技能、人数以及所有按阶段手动填写的人数都会一并消失。只能在保存字典之前用「取消」按钮撤销。", "deleteWork": "要删除作业类型「{name}」吗？\n\n其工作量、定额及对需求的贡献都将丢失。", "deleteScenario": "要删除方案「{name}」吗？\n\n参数快照将丢失；当前工作数据不受影响。"}});
+(function(d){var L=I18N.es=I18N.es||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"common": {"onDashboard": "El resumen completo está en el panel", "detailsOn": "Detalles: {tab}"}, "norm": {"matrixTitle": "Qué puestos se necesitan en qué fase", "matrixHint": "Marque las fases del proyecto en las que el puesto trabaja realmente. Un perforista no hace falta en el diseño, un técnico de puesta en marcha de instrumentación no hace falta en el desmantelamiento, un analista de datos hace falta en diseño y operación pero no en construcción. La demanda de la fase se reparte solo entre los puestos marcados: los no marcados quedan a cero y su parte pasa a los demás.", "matrixNote": "<b>Sin esta matriz cada puesto recibía una parte en cada fase</b>: en el diseño «trabajaban» perforistas y mecánicos. Desmarque donde el rol no haga falta: las cifras del desglose por puesto, del análisis de automatización y del plan de acción se recalculan. Si en una fase no hay ningún puesto marcado del grupo, la demanda se reparte entre todos; de lo contrario la fase perdería a su gente en silencio.", "matrixAllBtn": "Marcar todo", "thPhasesOn": "Fases"}, "toast": {"profDeleted": "El puesto «{name}» se eliminó. Recuerde guardar el directorio.", "phasesAll": "Todos los puestos quedan marcados en todas las fases"}, "prompt": {"deleteProf": "¿Eliminar el puesto «{name}» del directorio?\n\nCon él se van su salario, sus competencias, su dotación y todas las ediciones manuales de dotación por fase. Solo se puede deshacer con «Cancelar» antes de guardar el directorio.", "deleteWork": "¿Eliminar el tipo de trabajo «{name}»?\n\nSe perderán su volumen, sus normas y su aportación a la demanda.", "deleteScenario": "¿Eliminar el escenario «{name}»?\n\nSe perderá la instantánea de parámetros; sus datos de trabajo actuales no se ven afectados."}});
+(function(d){var L=I18N.fr=I18N.fr||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"common": {"onDashboard": "Le récapitulatif complet est sur le tableau de bord", "detailsOn": "Détails : {tab}"}, "norm": {"matrixTitle": "Quels postes sont nécessaires à quelle phase", "matrixHint": "Cochez les phases du projet où le poste travaille réellement. Un foreur n'est pas nécessaire en conception, un metteur en service d'instrumentation ne l'est pas au démantèlement, un analyste de données l'est en conception et en exploitation mais pas en construction. Le besoin de la phase est réparti uniquement entre les postes cochés : les autres restent à zéro et leur part revient aux premiers.", "matrixNote": "<b>Sans cette matrice, chaque poste recevait une part dans chaque phase</b> : en conception, des foreurs et des mécaniciens « travaillaient ». Décochez là où le rôle n'est pas utile : les chiffres du détail par poste, de l'analyse d'automatisation et du plan d'action sont recalculés. Si aucun poste du groupe n'est coché pour une phase, le besoin est réparti sur tous — sinon la phase perdrait son personnel en silence.", "matrixAllBtn": "Tout cocher", "thPhasesOn": "Phases"}, "toast": {"profDeleted": "Le poste « {name} » a été supprimé. Pensez à enregistrer le référentiel.", "phasesAll": "Tous les postes sont désormais cochés pour toutes les phases"}, "prompt": {"deleteProf": "Supprimer le poste « {name} » du référentiel ?\n\nSon salaire, ses compétences, son effectif et toutes les saisies manuelles d'effectif par phase disparaissent avec lui. Cela ne peut être annulé qu'avec « Annuler » avant l'enregistrement du référentiel.", "deleteWork": "Supprimer le type de travail « {name} » ?\n\nSon volume, ses normes et sa contribution au besoin seront perdus.", "deleteScenario": "Supprimer le scénario « {name} » ?\n\nL'instantané des paramètres sera perdu ; vos données de travail actuelles ne sont pas affectées."}});
+(function(d){var L=I18N.ar=I18N.ar||{};Object.keys(d).forEach(function(k){L[k]=Object.assign(L[k]||{},d[k]);});})({"common": {"onDashboard": "الملخص الكامل في لوحة المعلومات", "detailsOn": "التفاصيل: {tab}"}, "norm": {"matrixTitle": "أي الوظائف يلزم في أي مرحلة", "matrixHint": "حدِّد المراحل التي تعمل فيها الوظيفة فعلًا. فعامل الحفر لا يلزم في مرحلة التصميم، ومهندس تشغيل أجهزة القياس لا يلزم في مرحلة إيقاف التشغيل، ومحلل البيانات يلزم في التصميم والتشغيل لا في الإنشاء. ويُوزَّع احتياج المرحلة على الوظائف المحدَّدة فقط — أما غير المحدَّدة فتحصل على صفر وتنتقل حصتها إلى غيرها.", "matrixNote": "<b>بدون هذه المصفوفة كانت كل وظيفة تحصل على حصة في كل مرحلة</b> — فكان عمال الحفر والميكانيكيون «يعملون» في مرحلة التصميم. أزِل التحديد حيث لا يلزم الدور: وستُعاد احتساب الأرقام في التفصيل حسب الوظيفة وتحليل الأتمتة وخطة الإجراءات. وإن لم تُحدَّد أي وظيفة من المجموعة لمرحلة ما، وُزِّع الاحتياج على الجميع — وإلا لفقدت المرحلة عامليها بصمت.", "matrixAllBtn": "تحديد الكل", "thPhasesOn": "المراحل"}, "toast": {"profDeleted": "حُذفت الوظيفة «{name}». لا تنسَ حفظ الدليل.", "phasesAll": "جرى تحديد جميع الوظائف في جميع المراحل"}, "prompt": {"deleteProf": "هل تريد حذف الوظيفة «{name}» من الدليل؟\n\nسيذهب معها راتبها ومهاراتها وعددها وجميع التعديلات اليدوية للأعداد حسب المرحلة. ولا يمكن التراجع عن ذلك إلا بزر «إلغاء» قبل حفظ الدليل.", "deleteWork": "هل تريد حذف نوع العمل «{name}»؟\n\nسيُفقد حجمه ومعاييره ومساهمته في الاحتياج.", "deleteScenario": "هل تريد حذف السيناريو «{name}»؟\n\nستُفقد لقطة المعامِلات؛ ولا تتأثر بيانات عملك الحالية."}});
 
 /* ---------- «Руководство»: формулы должны совпадать с кодом во ВСЕХ языках ---------- */
 /* В ru добавлен раздел «С чего начать», поэтому в остальных языках индексы разделов
